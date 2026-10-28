@@ -890,9 +890,7 @@ function handleSaveKomitmen(e) {
         }
     });
 
-    // Jalankan Promise pembacaan file foto secara aman
     Promise.all(filePromises).then(results => {
-        // Filter hasil foto yang valid (tidak null)
         const validImages = results.filter(img => img !== null);
 
         const newReport = {
@@ -901,12 +899,12 @@ function handleSaveKomitmen(e) {
             kpmNama,
             jenis: selectedJenis.join(', '),
             status,
-            kelompok: currentUser.kelompok,
+            kelompok: currentUser.kelompok, // Menggunakan kelompok ketua yang sedang login
             statusVerifikasi: "PENDING",
             foto: validImages.length > 0 ? validImages : ""
         };
 
-        // Simpan ke state dan database
+        // Masukkan ke array dan simpan
         appState.komitmenList.push(newReport);
         saveState();
 
@@ -914,9 +912,13 @@ function handleSaveKomitmen(e) {
         document.getElementById('formKomitmen').reset();
         document.getElementById('dynamicKomitmenContainer').innerHTML = `<p class="text-slate-400 italic">Silakan pilih KPM terlebih dahulu untuk memunculkan pilihan komitmen.</p>`;
         
-        // Refresh tabel tampilan ketua
         renderKetuaAllTables();
         
+        // Panggil render pendamping secara otomatis jika akun sedang login sebagai pendamping
+        if (currentUser && currentUser.role === 'pendamping') {
+            renderPendampingVerifikasiTable();
+        }
+
         showToast("Berhasil", "Laporan komitmen berhasil dikirim ke Pendamping.", "success");
     }).catch(err => {
         console.error("Gagal memproses file foto:", err);
