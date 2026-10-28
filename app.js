@@ -379,21 +379,27 @@ function renderPendampingVerifikasiTable() {
 
     let allReports = [];
     appState.komitmenList.forEach(item => {
-        if (filterKelompok === 'ALL' || item.kelompok === filterKelompok) allReports.push({ ...item, reportType: 'Komitmen' });
+        if (filterKelompok === 'ALL' || item.kelompok === filterKelompok) {
+            allReports.push({ ...item, reportType: 'Komitmen' });
+        }
     });
     appState.rekonsiliasiList.forEach(item => {
-        if (filterKelompok === 'ALL' || item.kelompok === filterKelompok) allReports.push({ ...item, reportType: 'Rekonsiliasi' });
+        if (filterKelompok === 'ALL' || item.kelompok === filterKelompok) {
+            allReports.push({ ...item, reportType: 'Rekonsiliasi' });
+        }
     });
 
     if (allReports.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="7" class="text-center p-6 text-slate-400">Belum ada laporan.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="7" class="text-center p-6 text-slate-400">Belum ada laporan masuk.</td></tr>`;
         return;
     }
+
+    allReports.sort((a, b) => new Date(b.tanggal) - new Date("" + a.tanggal)); // Urutkan dari yang terbaru
 
     allReports.forEach(r => {
         let fotoHtml = '-';
         if (Array.isArray(r.foto)) {
-            fotoHtml = r.foto.map((f, i) => `<a href="${f}" target="_blank" class="text-blue-600 underline text-[11px] block">Foto ${i+1}</a>`).join('');
+            fotoHtml = r.foto.map((f, i) => `<a href="${f}" target="_blank" class="text-blue-600 underline text-[11px] block font-semibold">Foto ${i+1}</a>`).join('');
         } else if (r.foto) {
             fotoHtml = `<a href="${r.foto}" target="_blank" class="text-blue-600 underline font-semibold">Lihat Bukti</a>`;
         }
@@ -405,14 +411,14 @@ function renderPendampingVerifikasiTable() {
         tbody.innerHTML += `
             <tr>
                 <td class="p-3">${r.tanggal}</td>
-                <td class="p-3 font-semibold">${r.kelompok}</td>
+                <td class="p-3 font-semibold text-blue-900">${r.kelompok}</td>
                 <td class="p-3">${r.reportType}</td>
                 <td class="p-3"><div class="font-bold">${r.kpmNama}</div><div class="text-[11px] text-slate-500">${r.jenis || r.tahap || ''}</div></td>
                 <td class="p-3">${fotoHtml}</td>
                 <td class="p-3"><span class="px-2.5 py-1 rounded-full font-bold ${badgeStatus}">${r.statusVerifikasi||'PENDING'}</span></td>
                 <td class="p-3 text-center space-x-1">
-                    <button onclick="approveReport('${r.id}', '${r.reportType}')" class="bg-emerald-600 text-white px-2.5 py-1 rounded text-xs font-bold">Setuju</button>
-                    <button onclick="rejectReport('${r.id}', '${r.reportType}')" class="bg-red-600 text-white px-2.5 py-1 rounded text-xs font-bold">Tolak</button>
+                    <button onclick="approveReport('${r.id}', '${r.reportType}')" class="bg-emerald-600 text-white px-2.5 py-1 rounded text-xs font-bold shadow hover:bg-emerald-700">Setuju</button>
+                    <button onclick="rejectReport('${r.id}', '${r.reportType}')" class="bg-red-600 text-white px-2.5 py-1 rounded text-xs font-bold shadow hover:bg-red-700">Tolak</button>
                 </td>
             </tr>
         `;
@@ -861,17 +867,28 @@ function handleSaveKomitmen(e) {
             kpmNama,
             jenis: selectedJenis.join(', '),
             status,
-            kelompok: currentUser.kelompok,
+            kelompok: currentUser.kelompok, // Memastikan kelompok ikut tersimpan agar terbaca di dashboard pendamping
             statusVerifikasi: "PENDING",
             foto: base64Images.length > 0 ? base64Images : ""
         };
 
+        // Masukkan ke state lokal
         appState.komitmenList.push(newReport);
+        
+        // Simpan langsung ke Firebase & LocalStorage
         saveState();
+
+        // Reset form & tampilkan notifikasi
         document.getElementById('formKomitmen').reset();
         document.getElementById('dynamicKomitmenContainer').innerHTML = `<p class="text-slate-400 italic">Silakan pilih KPM terlebih dahulu untuk memunculkan pilihan komitmen.</p>`;
+        
+        // Refresh tabel di sisi ketua
         renderKetuaAllTables();
+        
         showToast("Berhasil", "Laporan komitmen berhasil dikirim ke Pendamping.", "success");
+    }).catch(err => {
+        console.error("Gagal memproses foto komitmen:", err);
+        alert("Terjadi kesalahan saat memuat foto bukti.");
     });
 }
 
