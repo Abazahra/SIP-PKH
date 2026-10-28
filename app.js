@@ -441,8 +441,9 @@ function renderPendampingKetuaManagement() {
     tbodyPending.innerHTML = '';
     tbodyActive.innerHTML = '';
 
-    const pendingKetua = appState.ketuaUsers.filter(k => k.status === 'PENDING' && k.pendampingId === currentUser.id);
-    const activeKetua = appState.ketuaUsers.filter(k => k.status === 'VERIFIED' && k.pendampingId === currentUser.id);
+    // Diperbarui agar menampilkan semua ketua yang statusnya PENDING tanpa batasan ID pendamping yang kaku
+    const pendingKetua = appState.ketuaUsers.filter(k => k.status === 'PENDING');
+    const activeKetua = appState.ketuaUsers.filter(k => k.status === 'VERIFIED');
 
     if (pendingKetua.length > 0) {
         badgePending.classList.remove('hidden');
