@@ -39,34 +39,9 @@ let appState = {
     ]
 };
 
-let appState = {
-    inviteCode: "PKH-SUKAMAJU",
-    pendampingProfiles: [
-        { id: "PND-01", nama: "Budi Santoso, S.Sos", nip: "198805122020121001", pin: "123456", inviteCode: "PKH-SUKAMAJU" }
-    ],
-    ketuaUsers: [
-        { id: "KET-01", nama: "Siti Aminah", hp: "081234567890", kelompok: "Mawar 01", pin: "123456", status: "VERIFIED", pendampingId: "PND-01", date: "2026-10-01" },
-        { id: "KET-02", nama: "Dewi Lestari", hp: "089876543210", kelompok: "Melati 02", pin: "123456", status: "VERIFIED", pendampingId: "PND-01", date: "2026-10-05" }
-    ],
-    kpmList: [
-        { id: "KPM-01", nama: "Ratna Sari", nik: "3201123456780001", komponen: "Balita / PAUD", alamat: "Jl. Melati No. 12", kelompok: "Mawar 01" },
-        { id: "KPM-02", nama: "Sri Wahyuni", nik: "3201123456780002", komponen: "Lansia", alamat: "Jl. Mawar No. 05", kelompok: "Mawar 01" }
-    ],
-    p2k2List: [
-        { id: "P2K2-01", tanggal: "2026-10-20", kpmNama: "Ratna Sari", kelompok: "Mawar 01", modul: "Modul Kesehatan dan Gizi", status: "Hadir", foto: "" }
-    ],
-    komitmenList: [
-        { id: "KOM-01", tanggal: "2026-10-22", kpmNama: "Ratna Sari", kelompok: "Mawar 01", jenis: "Posyandu / Layanan Kesehatan Balita", status: "Terpenuhi 100%", foto: "", statusVerifikasi: "DISETUJUI" }
-    ],
-    rekonsiliasiList: [
-        { id: "REK-01", tanggal: "2026-10-25", kpmNama: "Ratna Sari", kelompok: "Mawar 01", tahap: "Tahap 3", nominal: 750000, foto: "", statusVerifikasi: "DISETUJUI" }
-    ]
-};
-
 document.addEventListener('DOMContentLoaded', () => {
     loadLocalStorageData();
     checkUrlInviteParams();
-    renderUI();
     updateShareInviteUrl();
 });
 
@@ -80,7 +55,6 @@ async function loadLocalStorageData() {
             renderUI();
             updateShareInviteUrl();
         } else {
-            // Jika dokumen kosong atau belum ada, buat data awal ke Firebase
             await docRef.set(appState);
             renderUI();
             updateShareInviteUrl();
@@ -100,8 +74,15 @@ async function loadLocalStorageData() {
     }
 }
 
-function saveState() {
-    localStorage.setItem('SIP_PKH_STATE_V2', JSON.stringify(appState));
+// Simpan Data Otomatis ke Firebase Firestore
+async function saveState() {
+    try {
+        await db.collection("pkh_database").doc("main_state").set(appState);
+        localStorage.setItem('SIP_PKH_STATE_V2', JSON.stringify(appState));
+    } catch (e) {
+        console.error("Gagal menyimpan ke Firebase:", e);
+        localStorage.setItem('SIP_PKH_STATE_V2', JSON.stringify(appState));
+    }
 }
 
 function openAboutModal() {
@@ -168,7 +149,6 @@ function updateInviteCode() {
     showToast("Kode Undangan Diperbarui", "Kode undangan baru: " + customCode, "success");
 }
 
-// Navigasi Tab Utama (Masuk vs Daftar)
 function switchMainTab(tab) {
     const formLogin = document.getElementById('formLogin');
     const regContainer = document.getElementById('formRegisterContainer');
@@ -250,7 +230,6 @@ function handleLogin(e) {
     }
 }
 
-// Registrasi Pendamping Baru
 function handleRegisterPendamping(e) {
     e.preventDefault();
     const nama = document.getElementById('regPndNama').value.trim();
@@ -282,7 +261,6 @@ function handleRegisterPendamping(e) {
     document.getElementById('loginIdentifier').value = nip;
 }
 
-// Registrasi Ketua Kelompok (Diperbarui agar lebih fleksibel)
 function handleRegisterKetua(e) {
     e.preventDefault();
     const inviteCode = document.getElementById('regKetuaInviteCode').value.trim().toUpperCase();
@@ -291,11 +269,8 @@ function handleRegisterKetua(e) {
     const kelompok = document.getElementById('regKetuaKelompok').value.trim();
     const pin = document.getElementById('regKetuaPin').value.trim();
 
-    // Cari pendamping berdasarkan kode undangan, jika kosong gunakan pendamping pertama sebagai cadangan
     let validPendamping = appState.pendampingProfiles.find(p => (p.inviteCode || "").toUpperCase() === inviteCode);
-    
     if (!validPendamping) {
-        // Fallback cadangan jika pendamping baru belum sempat tersimpan profilnya di localstorage
         validPendamping = appState.pendampingProfiles[0];
     }
 
@@ -497,7 +472,6 @@ function renderPendampingKetuaManagement() {
     tbodyPending.innerHTML = '';
     tbodyActive.innerHTML = '';
 
-    // Diperbarui agar menampilkan semua ketua yang statusnya PENDING tanpa batasan ID pendamping yang kaku
     const pendingKetua = appState.ketuaUsers.filter(k => k.status === 'PENDING');
     const activeKetua = appState.ketuaUsers.filter(k => k.status === 'VERIFIED');
 
