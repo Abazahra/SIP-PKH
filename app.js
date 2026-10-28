@@ -627,7 +627,7 @@ function updateDynamicKomitmenCheckboxes() {
     const komponenList = kpmObj.komponen.split(',').map(item => item.trim());
     let html = '';
 
-    komponenList.forEach(comp => {
+    komponenList.forEach((comp, idx) => {
         let labelName = '';
         if (comp.includes('Balita') || comp.includes('PAUD')) labelName = 'Pemeriksaan Balita';
         else if (comp.includes('SD')) labelName = 'Kehadiran SD';
@@ -638,21 +638,38 @@ function updateDynamicKomitmenCheckboxes() {
         else if (comp.includes('Disabilitas')) labelName = 'Layanan Disabilitas Berat';
         else labelName = comp;
 
+        // Menggunakan index unik (idx) agar tidak terjadi duplikasi ID/element pada KPM multi-komponen
         html += `
-            <div class="space-y-1 pb-2 border-b border-slate-100 last:border-0">
+            <div class="space-y-1 pb-3 border-b border-slate-100 last:border-0" data-komponen-block="${idx}">
                 <label class="flex items-center space-x-2 font-bold text-slate-700">
-                    <input type="checkbox" name="komitmenJenisCheckbox" value="${labelName}" onchange="toggleKomitmenFotoInput(this)" class="rounded text-emerald-700">
+                    <input type="checkbox" name="komitmenJenisCheckbox" value="${labelName}" data-index="${idx}" onchange="toggleKomitmenFotoInputCustom(this, ${idx})" class="rounded text-emerald-700">
                     <span>${labelName} (${comp})</span>
                 </label>
-                <div id="fileContainer_${labelName}" class="hidden pl-5 pt-1">
+                <div id="fileContainer_${idx}" class="hidden pl-5 pt-1">
                     <label class="text-[10px] text-slate-500 block mb-0.5">Upload Bukti Foto (${labelName}):</label>
-                    <input type="file" accept="image/*" class="komitmen-dynamic-file w-full text-[10px] p-1 bg-white border border-slate-300 rounded" data-jenis="${labelName}">
+                    <input type="file" accept="image/*" class="komitmen-file-input-${idx} w-full text-[10px] p-1 bg-white border border-slate-300 rounded" data-jenis="${labelName}">
                 </div>
             </div>
         `;
     });
 
     container.innerHTML = html;
+}
+
+function toggleKomitmenFotoInputCustom(cb, idx) {
+    const container = document.getElementById('fileContainer_' + idx);
+    if (!container) return;
+    const fileInput = container.querySelector('input');
+    if (cb.checked) {
+        container.classList.remove('hidden');
+        if (fileInput) fileInput.setAttribute('required', 'true');
+    } else {
+        container.classList.add('hidden');
+        if (fileInput) {
+            fileInput.removeAttribute('required');
+            fileInput.value = '';
+        }
+    }
 }
 
 function renderKetuaAllTables() {
@@ -840,7 +857,7 @@ function handleSaveKomitmen(e) {
     e.preventDefault();
     const kpmNama = document.getElementById('komitmenKpmSelect').value;
     const status = document.getElementById('komitmenStatus').value;
-    if (!kpmNama) return alert("Pilih KPM.");
+    if (!kpmNama) return alert("Pilih KPM terlebih dahulu.");
 
     const checkboxes = document.querySelectorAll('input[name="komitmenJenisCheckbox"]:checked');
     if (checkboxes.length === 0) return alert("Pilih minimal satu layanan komitmen.");
@@ -849,46 +866,52 @@ function handleSaveKomitmen(e) {
     let filePromises = [];
 
     checkboxes.forEach(cb => {
-        selectedJenis.push(cb.value);
-        const fileInput = document.querySelector(`#fileContainer_${CSS.escape(cb.value)} input`);
-        if (fileInput && fileInput.files[0]) {
+        const jenisVal = cb.value;
+        const idx = cb.getAttribute('data-index');
+        selectedJenis.push(jenisVal);
+
+        const fileInput = document.querySelector(`.komitmen-file-input-${idx}`);
+        if (fileInput && fileInput.files && fileInput.files[0]) {
             filePromises.push(new Promise((resolve) => {
                 const reader = new FileReader();
                 reader.onload = (ev) => resolve(ev.target.result);
+                reader.onerror = () => resolve(null);
                 reader.readAsDataURL(fileInput.files[0]);
             }));
         }
     });
 
-    Promise.all(filePromises).then(base64Images => {
+    // Jalankan Promise pembacaan file foto secara aman
+    Promise.all(filePromises).then(results => {
+        // Filter hasil foto yang valid (tidak null)
+        const validImages = results.filter(img => img !== null);
+
         const newReport = {
             id: "KOM-" + Date.now(),
             tanggal: new Date().toISOString().split('T')[0],
             kpmNama,
             jenis: selectedJenis.join(', '),
             status,
-            kelompok: currentUser.kelompok, // Memastikan kelompok ikut tersimpan agar terbaca di dashboard pendamping
+            kelompok: currentUser.kelompok,
             statusVerifikasi: "PENDING",
-            foto: base64Images.length > 0 ? base64Images : ""
+            foto: validImages.length > 0 ? validImages : ""
         };
 
-        // Masukkan ke state lokal
+        // Simpan ke state dan database
         appState.komitmenList.push(newReport);
-        
-        // Simpan langsung ke Firebase & LocalStorage
         saveState();
 
-        // Reset form & tampilkan notifikasi
+        // Reset form
         document.getElementById('formKomitmen').reset();
         document.getElementById('dynamicKomitmenContainer').innerHTML = `<p class="text-slate-400 italic">Silakan pilih KPM terlebih dahulu untuk memunculkan pilihan komitmen.</p>`;
         
-        // Refresh tabel di sisi ketua
+        // Refresh tabel tampilan ketua
         renderKetuaAllTables();
         
         showToast("Berhasil", "Laporan komitmen berhasil dikirim ke Pendamping.", "success");
     }).catch(err => {
-        console.error("Gagal memproses foto komitmen:", err);
-        alert("Terjadi kesalahan saat memuat foto bukti.");
+        console.error("Gagal memproses file foto:", err);
+        alert("Terjadi kesalahan saat memproses foto bukti komitmen.");
     });
 }
 
