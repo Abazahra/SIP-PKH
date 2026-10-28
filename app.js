@@ -601,6 +601,54 @@ function populateKetuaKpmSelects() {
     });
 }
 
+// FUNGSI OTOMATIS: Menampilkan opsi komitmen sesuai komponen KPM yang dipilih
+function updateDynamicKomitmenCheckboxes() {
+    const kpmNama = document.getElementById('komitmenKpmSelect').value;
+    const container = document.getElementById('dynamicKomitmenContainer');
+    if (!container) return;
+
+    if (!kpmNama) {
+        container.innerHTML = `<p class="text-slate-400 italic">Silakan pilih KPM terlebih dahulu untuk memunculkan pilihan komitmen.</p>`;
+        return;
+    }
+
+    const kpmObj = appState.kpmList.find(k => k.nama === kpmNama && k.kelompok === currentUser.kelompok);
+    if (!kpmObj || !kpmObj.komponen) {
+        container.innerHTML = `<p class="text-red-500 italic">KPM ini belum memiliki data komponen PKH.</p>`;
+        return;
+    }
+
+    const komponenList = kpmObj.komponen.split(',').map(item => item.trim());
+    let html = '';
+
+    komponenList.forEach(comp => {
+        let labelName = '';
+        if (comp.includes('Balita') || comp.includes('PAUD')) labelName = 'Pemeriksaan Balita';
+        else if (comp.includes('SD')) labelName = 'Kehadiran SD';
+        else if (comp.includes('SMP')) labelName = 'Kehadiran SMP';
+        else if (comp.includes('SMA')) labelName = 'Kehadiran SMA';
+        else if (comp.includes('Ibu Hamil')) labelName = 'Pemeriksaan Ibu Hamil';
+        else if (comp.includes('Lansia')) labelName = 'Layanan Kesehatan/Homecare Lansia';
+        else if (comp.includes('Disabilitas')) labelName = 'Layanan Disabilitas Berat';
+        else labelName = comp;
+
+        html += `
+            <div class="space-y-1 pb-2 border-b border-slate-100 last:border-0">
+                <label class="flex items-center space-x-2 font-bold text-slate-700">
+                    <input type="checkbox" name="komitmenJenisCheckbox" value="${labelName}" onchange="toggleKomitmenFotoInput(this)" class="rounded text-emerald-700">
+                    <span>${labelName} (${comp})</span>
+                </label>
+                <div id="fileContainer_${labelName}" class="hidden pl-5 pt-1">
+                    <label class="text-[10px] text-slate-500 block mb-0.5">Upload Bukti Foto (${labelName}):</label>
+                    <input type="file" accept="image/*" class="komitmen-dynamic-file w-full text-[10px] p-1 bg-white border border-slate-300 rounded" data-jenis="${labelName}">
+                </div>
+            </div>
+        `;
+    });
+
+    container.innerHTML = html;
+}
+
 function renderKetuaAllTables() {
     if (!currentUser) return;
     const myKelompok = currentUser.kelompok;
@@ -769,13 +817,16 @@ function handleSaveP2k2(e) {
 function toggleKomitmenFotoInput(cb) {
     const container = document.getElementById('fileContainer_' + cb.value);
     if (!container) return;
+    const fileInput = container.querySelector('input');
     if (cb.checked) {
         container.classList.remove('hidden');
-        container.querySelector('input').setAttribute('required', 'true');
+        if (fileInput) fileInput.setAttribute('required', 'true');
     } else {
         container.classList.add('hidden');
-        container.querySelector('input').removeAttribute('required');
-        container.querySelector('input').value = '';
+        if (fileInput) {
+            fileInput.removeAttribute('required');
+            fileInput.value = '';
+        }
     }
 }
 
@@ -786,7 +837,7 @@ function handleSaveKomitmen(e) {
     if (!kpmNama) return alert("Pilih KPM.");
 
     const checkboxes = document.querySelectorAll('input[name="komitmenJenisCheckbox"]:checked');
-    if (checkboxes.length === 0) return alert("Pilih minimal satu layanan.");
+    if (checkboxes.length === 0) return alert("Pilih minimal satu layanan komitmen.");
 
     let selectedJenis = [];
     let filePromises = [];
@@ -804,7 +855,7 @@ function handleSaveKomitmen(e) {
     });
 
     Promise.all(filePromises).then(base64Images => {
-        appState.komitmenList.push({
+        const newReport = {
             id: "KOM-" + Date.now(),
             tanggal: new Date().toISOString().split('T')[0],
             kpmNama,
@@ -812,13 +863,15 @@ function handleSaveKomitmen(e) {
             status,
             kelompok: currentUser.kelompok,
             statusVerifikasi: "PENDING",
-            foto: base64Images
-        });
+            foto: base64Images.length > 0 ? base64Images : ""
+        };
+
+        appState.komitmenList.push(newReport);
         saveState();
         document.getElementById('formKomitmen').reset();
-        document.querySelectorAll('[id^="fileContainer_"]').forEach(el => el.classList.add('hidden'));
+        document.getElementById('dynamicKomitmenContainer').innerHTML = `<p class="text-slate-400 italic">Silakan pilih KPM terlebih dahulu untuk memunculkan pilihan komitmen.</p>`;
         renderKetuaAllTables();
-        showToast("Berhasil", "Laporan komitmen dikirim ke Pendamping.", "success");
+        showToast("Berhasil", "Laporan komitmen berhasil dikirim ke Pendamping.", "success");
     });
 }
 
