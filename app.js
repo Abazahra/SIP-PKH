@@ -1,4 +1,43 @@
+// Konfigurasi Firebase dari Proyek Anda
+const firebaseConfig = {
+    apiKey: "AIzaSyDEKeXD6pyw5IAEYMtL24SOsuixn9uvLXw",
+    authDomain: "sip-pkh.firebaseapp.com",
+    projectId: "sip-pkh",
+    storageBucket: "sip-pkh.firebasestorage.app",
+    messagingSenderId: "920578331795",
+    appId: "1:920578331795:web:f4514ced3a9eceaefce966",
+    measurementId: "G-TVDFV2JHXW"
+};
+
+// Inisialisasi Firebase Compatibility Mode
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
 let currentUser = null;
+
+let appState = {
+    inviteCode: "PKH-SUKAMAJU",
+    pendampingProfiles: [
+        { id: "PND-01", nama: "Budi Santoso, S.Sos", nip: "198805122020121001", pin: "123456", inviteCode: "PKH-SUKAMAJU" }
+    ],
+    ketuaUsers: [
+        { id: "KET-01", nama: "Siti Aminah", hp: "081234567890", kelompok: "Mawar 01", pin: "123456", status: "VERIFIED", pendampingId: "PND-01", date: "2026-10-01" },
+        { id: "KET-02", nama: "Dewi Lestari", hp: "089876543210", kelompok: "Melati 02", pin: "123456", status: "VERIFIED", pendampingId: "PND-01", date: "2026-10-05" }
+    ],
+    kpmList: [
+        { id: "KPM-01", nama: "Ratna Sari", nik: "3201123456780001", komponen: "Balita / PAUD", alamat: "Jl. Melati No. 12", kelompok: "Mawar 01" },
+        { id: "KPM-02", nama: "Sri Wahyuni", nik: "3201123456780002", komponen: "Lansia", alamat: "Jl. Mawar No. 05", kelompok: "Mawar 01" }
+    ],
+    p2k2List: [
+        { id: "P2K2-01", tanggal: "2026-10-20", kpmNama: "Ratna Sari", kelompok: "Mawar 01", modul: "Modul Kesehatan dan Gizi", status: "Hadir", foto: "" }
+    ],
+    komitmenList: [
+        { id: "KOM-01", tanggal: "2026-10-22", kpmNama: "Ratna Sari", kelompok: "Mawar 01", jenis: "Posyandu / Layanan Kesehatan Balita", status: "Terpenuhi 100%", foto: "", statusVerifikasi: "DISETUJUI" }
+    ],
+    rekonsiliasiList: [
+        { id: "REK-01", tanggal: "2026-10-25", kpmNama: "Ratna Sari", kelompok: "Mawar 01", tahap: "Tahap 3", nominal: 750000, foto: "", statusVerifikasi: "DISETUJUI" }
+    ]
+};
 
 let appState = {
     inviteCode: "PKH-SUKAMAJU",
