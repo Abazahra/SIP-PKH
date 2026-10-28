@@ -378,11 +378,14 @@ function renderPendampingVerifikasiTable() {
     tbody.innerHTML = '';
 
     let allReports = [];
+    
+    // Ambil data komitmen dan pastikan semua properti terbaca
     appState.komitmenList.forEach(item => {
         if (filterKelompok === 'ALL' || item.kelompok === filterKelompok) {
             allReports.push({ ...item, reportType: 'Komitmen' });
         }
     });
+    
     appState.rekonsiliasiList.forEach(item => {
         if (filterKelompok === 'ALL' || item.kelompok === filterKelompok) {
             allReports.push({ ...item, reportType: 'Rekonsiliasi' });
@@ -394,14 +397,17 @@ function renderPendampingVerifikasiTable() {
         return;
     }
 
-    allReports.sort((a, b) => new Date(b.tanggal) - new Date("" + a.tanggal)); // Urutkan dari yang terbaru
+    // Urutkan dari laporan terbaru
+    allReports.sort((a, b) => new Date(b.tanggal) - new Date(a.tanggal));
 
     allReports.forEach(r => {
         let fotoHtml = '-';
-        if (Array.isArray(r.foto)) {
-            fotoHtml = r.foto.map((f, i) => `<a href="${f}" target="_blank" class="text-blue-600 underline text-[11px] block font-semibold">Foto ${i+1}</a>`).join('');
-        } else if (r.foto) {
-            fotoHtml = `<a href="${r.foto}" target="_blank" class="text-blue-600 underline font-semibold">Lihat Bukti</a>`;
+        
+        // PERBAIKAN UTAMA: Menangani foto ganda / array foto dari laporan multi-komponen
+        if (Array.isArray(r.foto) && r.foto.length > 0) {
+            fotoHtml = r.foto.map((f, i) => `<a href="${f}" target="_blank" class="text-blue-600 underline text-[11px] block font-semibold hover:text-blue-800">Foto ${i+1}</a>`).join('');
+        } else if (r.foto && typeof r.foto === 'string' && r.foto.trim() !== '') {
+            fotoHtml = `<a href="${r.foto}" target="_blank" class="text-blue-600 underline font-semibold hover:text-blue-800">Lihat Bukti</a>`;
         }
 
         let badgeStatus = 'bg-amber-100 text-amber-800';
@@ -411,14 +417,17 @@ function renderPendampingVerifikasiTable() {
         tbody.innerHTML += `
             <tr>
                 <td class="p-3">${r.tanggal}</td>
-                <td class="p-3 font-semibold text-blue-900">${r.kelompok}</td>
-                <td class="p-3">${r.reportType}</td>
-                <td class="p-3"><div class="font-bold">${r.kpmNama}</div><div class="text-[11px] text-slate-500">${r.jenis || r.tahap || ''}</div></td>
-                <td class="p-3">${fotoHtml}</td>
-                <td class="p-3"><span class="px-2.5 py-1 rounded-full font-bold ${badgeStatus}">${r.statusVerifikasi||'PENDING'}</span></td>
-                <td class="p-3 text-center space-x-1">
-                    <button onclick="approveReport('${r.id}', '${r.reportType}')" class="bg-emerald-600 text-white px-2.5 py-1 rounded text-xs font-bold shadow hover:bg-emerald-700">Setuju</button>
-                    <button onclick="rejectReport('${r.id}', '${r.reportType}')" class="bg-red-600 text-white px-2.5 py-1 rounded text-xs font-bold shadow hover:bg-red-700">Tolak</button>
+                <td class="p-3 font-semibold text-blue-900">${r.kelompok || '-'}</td>
+                <td class="p-3 font-bold text-slate-700">${r.reportType}</td>
+                <td class="p-3">
+                    <div class="font-bold text-slate-900">${r.kpmNama}</div>
+                    <div class="text-[11px] text-slate-500 font-medium">${r.jenis || r.tahap || ''}</div>
+                </td>
+                <td class="p-3 space-y-0.5">${fotoHtml}</td>
+                <td class="p-3"><span class="px-2.5 py-1 rounded-full font-bold ${badgeStatus}">${r.statusVerifikasi || 'PENDING'}</span></td>
+                <td class="p-3 text-center space-x-1 whitespace-nowrap">
+                    <button onclick="approveReport('${r.id}', '${r.reportType}')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-2.5 py-1 rounded text-xs font-bold shadow">Setuju</button>
+                    <button onclick="rejectReport('${r.id}', '${r.reportType}')" class="bg-red-600 hover:bg-red-700 text-white px-2.5 py-1 rounded text-xs font-bold shadow">Tolak</button>
                 </td>
             </tr>
         `;
