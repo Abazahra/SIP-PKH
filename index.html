@@ -8,469 +8,464 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Firebase SDK (Compat Version) -->
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 </head>
-<body class="bg-slate-50 min-h-screen font-sans flex flex-col justify-between">
+<body class="bg-slate-50 font-sans text-slate-900 min-h-screen flex flex-col justify-between">
 
-    <!-- Top Navigation Bar -->
+    <!-- Top Navigation / Header -->
     <header class="bg-blue-900 text-white shadow-md sticky top-0 z-40">
         <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
-            <div class="flex items-center space-x-3 cursor-pointer" onclick="location.reload()">
-                <div class="bg-white text-blue-900 p-2 rounded-xl font-bold shadow">
-                    <i class="fas fa-hands-holding-child text-xl"></i>
+            <div class="flex items-center space-x-3">
+                <div class="bg-white p-2 rounded-xl text-blue-900 font-bold shadow">
+                    <i class="fas fa-hands-helping text-xl"></i>
                 </div>
                 <div>
-                    <h1 class="font-bold text-lg tracking-wide">SIP-PKH</h1>
-                    <p class="text-xs text-blue-200">Sistem Laporan Komitmen KPM</p>
+                    <h1 class="font-bold text-lg leading-tight">SIP-PKH</h1>
+                    <p class="text-[11px] text-blue-200">Sistem Laporan Komitmen KPM</p>
                 </div>
             </div>
 
-            <!-- Profile Nav & Logout -->
-            <div id="userNavProfile" class="hidden items-center space-x-4">
-                <div class="text-right hidden sm:block">
-                    <div id="navUserName" class="font-semibold text-sm">Nama User</div>
-                    <div id="navUserRole" class="text-xs text-blue-200">Role</div>
+            <div class="flex items-center space-x-3">
+                <button onclick="openAboutModal()" class="text-xs bg-blue-800 hover:bg-blue-700 px-3 py-1.5 rounded-lg border border-blue-700 transition flex items-center space-x-1.5">
+                    <i class="fas fa-info-circle text-amber-300"></i>
+                    <span class="hidden sm:inline">Tentang Aplikasi</span>
+                </button>
+                
+                <div id="userNavProfile" class="hidden items-center space-x-3 border-l border-blue-800 pl-3">
+                    <div class="text-right hidden sm:block">
+                        <div id="navUserName" class="text-xs font-bold text-white">Nama Pengguna</div>
+                        <div id="navUserRole" class="text-[10px] text-blue-300">Pendamping PKH</div>
+                    </div>
+                    <button onclick="handleLogout()" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold transition shadow flex items-center space-x-1">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span>Keluar</span>
+                    </button>
                 </div>
-                <button onclick="handleLogout()" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center space-x-1.5 shadow">
-                    <i class="fas fa-sign-out-alt"></i> <span>Keluar</span>
-                </button>
-            </div>
-            <div>
-                <button onclick="openAboutModal()" class="bg-amber-500 hover:bg-amber-600 text-slate-900 px-3 py-1.5 rounded-lg text-xs font-bold transition shadow flex items-center space-x-1">
-                    <i class="fas fa-info-circle"></i> <span>Tentang Aplikasi</span>
-                </button>
             </div>
         </div>
     </header>
 
-    <!-- Main Container -->
-    <main class="max-w-7xl mx-auto px-4 py-6 flex-grow w-full">
+    <!-- Main Container Content -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 py-6">
 
         <!-- 1. AUTH VIEW (LOGIN & REGISTER) -->
-        <section id="authView" class="max-w-md mx-auto bg-white rounded-2xl shadow-xl overflow-hidden border border-slate-100 my-8">
+        <div id="authView" class="max-w-md mx-auto bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden my-8">
             <div class="bg-blue-900 p-6 text-white text-center">
                 <h2 class="text-xl font-bold">Selamat Datang di SIP-PKH</h2>
-                <p class="text-xs text-blue-200 mt-1">Silakan masuk atau daftar akun untuk melanjutkan</p>
-                
-                <!-- Tab Selector -->
-                <div class="grid grid-cols-2 gap-2 mt-5 bg-blue-950 p-1 rounded-xl">
-                    <button id="mainTabLogin" onclick="switchMainTab('login')" class="py-2 rounded-lg bg-blue-900 text-white shadow font-semibold text-xs transition">Masuk Aplikasi</button>
-                    <button id="mainTabRegister" onclick="switchMainTab('register')" class="py-2 rounded-lg text-slate-300 hover:text-white font-semibold text-xs transition">Daftar Akun Baru</button>
-                </div>
+                <p class="text-xs text-blue-200 mt-1">Silakan masuk atau daftar untuk mulai mengelola laporan</p>
             </div>
 
-            <div class="p-6">
-                <!-- Form Login -->
-                <form id="formLogin" onsubmit="handleLogin(event)" class="space-y-4">
+            <!-- Tab Switcher -->
+            <div class="grid grid-cols-2 p-2 bg-slate-100 gap-2 text-xs font-semibold">
+                <button id="mainTabLogin" onclick="switchMainTab('login')" class="py-2 rounded-lg bg-blue-900 text-white shadow">Masuk Aplikasi</button>
+                <button id="mainTabRegister" onclick="switchMainTab('register')" class="py-2 rounded-lg text-slate-600 hover:text-slate-900">Daftar Akun Baru</button>
+            </div>
+
+            <!-- Form Login -->
+            <form id="formLogin" onsubmit="handleLogin(event)" class="p-6 space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Peran / Role</label>
+                    <select id="loginRole" onchange="toggleLoginRoleUI()" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-900 outline-none">
+                        <option value="pendamping">Pendamping PKH (Admin)</option>
+                        <option value="ketua">Ketua Kelompok</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label id="labelLoginIdentitas" class="block text-xs font-bold text-slate-700 mb-1">Nama atau NIP Pendamping</label>
+                    <input type="text" id="loginIdentifier" required placeholder="Masukkan Nama atau NIP" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-900 outline-none">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">PIN Keamanan</label>
+                    <input type="password" id="loginPin" required placeholder="••••••" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-900 outline-none">
+                </div>
+
+                <button type="submit" class="w-full bg-blue-900 hover:bg-blue-800 text-white py-3 rounded-xl font-bold text-sm shadow-lg transition">
+                    Masuk ke Sistem
+                </button>
+            </form>
+
+            <!-- Form Register Container -->
+            <div id="formRegisterContainer" class="hidden p-6 space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Daftar Sebagai</label>
+                    <select id="regRoleType" onchange="toggleRegisterRoleUI()" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-900 outline-none">
+                        <option value="ketua">Ketua Kelompok (Menggunakan Kode Undangan)</option>
+                        <option value="pendamping">Pendamping PKH Baru</option>
+                    </select>
+                </div>
+
+                <!-- Form Register Ketua Kelompok -->
+                <form id="formRegisterKetua" onsubmit="handleRegisterKetua(event)" class="space-y-3">
                     <div>
-                        <label class="block text-xs font-bold text-slate-700 mb-1">PERAN / ROLE</label>
-                        <select id="loginRole" onchange="toggleLoginRoleUI()" class="w-full border border-slate-300 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-blue-800 outline-none">
-                            <option value="pendamping">Pendamping PKH (Admin)</option>
-                            <option value="ketua">Ketua Kelompok KPM</option>
-                        </select>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Kode Undangan dari Pendamping</label>
+                        <input type="text" id="regKetuaInviteCode" required placeholder="Contoh: PKH-SUKAMAJU" class="w-full p-2 bg-slate-50 border border-slate-300 rounded-xl text-sm uppercase">
                     </div>
                     <div>
-                        <label id="labelLoginIdentitas" class="block text-xs font-bold text-slate-700 mb-1">Nama atau NIP Pendamping</label>
-                        <input type="text" id="loginIdentifier" required placeholder="Masukkan Nama atau NIP" class="w-full border border-slate-300 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-blue-800 outline-none">
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Nama Lengkap Ketua</label>
+                        <input type="text" id="regKetuaNama" required placeholder="Nama Ketua Kelompok" class="w-full p-2 bg-slate-50 border border-slate-300 rounded-xl text-sm">
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-slate-700 mb-1">PIN AKUN (6 Digit)</label>
-                        <input type="password" id="loginPin" required placeholder="******" maxlength="6" class="w-full border border-slate-300 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-blue-800 outline-none tracking-widest text-center font-bold text-lg">
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Nomor HP / WhatsApp</label>
+                        <input type="text" id="regKetuaHp" required placeholder="08xxxxxxxxxx" class="w-full p-2 bg-slate-50 border border-slate-300 rounded-xl text-sm">
                     </div>
-                    <button type="submit" class="w-full bg-blue-900 hover:bg-blue-800 text-white py-3 rounded-xl font-bold text-sm transition shadow-lg">
-                        Masuk ke Dashboard
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Nama Kelompok PKH</label>
+                        <input type="text" id="regKetuaKelompok" required placeholder="Contoh: Mawar 01" class="w-full p-2 bg-slate-50 border border-slate-300 rounded-xl text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Buat PIN (6 Digit)</label>
+                        <input type="password" id="regKetuaPin" required placeholder="••••••" maxlength="6" class="w-full p-2 bg-slate-50 border border-slate-300 rounded-xl text-sm">
+                    </div>
+                    <button type="submit" class="w-full bg-emerald-700 hover:bg-emerald-600 text-white py-3 rounded-xl font-bold text-sm shadow transition">
+                        Daftarkan Akun Ketua
                     </button>
                 </form>
 
-                <!-- Form Register Container -->
-                <div id="formRegisterContainer" class="hidden space-y-4">
+                <!-- Form Register Pendamping -->
+                <form id="formRegisterPendamping" onsubmit="handleRegisterPendamping(event)" class="hidden space-y-3">
                     <div>
-                        <label class="block text-xs font-bold text-slate-700 mb-1">DAFTAR SEBAGAI</label>
-                        <select id="regRoleType" onchange="toggleRegisterRoleUI()" class="w-full border border-slate-300 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-blue-800 outline-none">
-                            <option value="ketua">Ketua Kelompok KPM</option>
-                            <option value="pendamping">Pendamping PKH Baru (Admin)</option>
-                        </select>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Nama Lengkap & Gelar</label>
+                        <input type="text" id="regPndNama" required placeholder="Budi Santoso, S.Sos" class="w-full p-2 bg-slate-50 border border-slate-300 rounded-xl text-sm">
                     </div>
-
-                    <!-- Register Ketua -->
-                    <form id="formRegisterKetua" onsubmit="handleRegisterKetua(event)" class="space-y-3">
-                        <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1">KODE UNDANGAN DARI PENDAMPING *</label>
-                            <input type="text" id="regKetuaInviteCode" required placeholder="Cth: PKH-SUKAMAJU" class="w-full border border-slate-300 rounded-xl p-2.5 text-sm uppercase font-mono font-bold bg-amber-50 focus:ring-2 focus:ring-blue-800 outline-none">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1">NAMA LENGKAP KETUA KELOMPOK *</label>
-                            <input type="text" id="regKetuaNama" required placeholder="Cth: Siti Aminah" class="w-full border border-slate-300 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-blue-800 outline-none">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1">NOMOR HP / WHATSAPP *</label>
-                            <input type="tel" id="regKetuaHp" required placeholder="081234567890" class="w-full border border-slate-300 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-blue-800 outline-none">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1">NAMA KELOMPOK KPM *</label>
-                            <input type="text" id="regKetuaKelompok" required placeholder="Cth: Mawar 01" class="w-full border border-slate-300 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-blue-800 outline-none">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1">BUAT PIN AKUN (6 Angka) *</label>
-                            <input type="password" id="regKetuaPin" required maxlength="6" placeholder="******" class="w-full border border-slate-300 rounded-xl p-2.5 text-sm tracking-widest text-center font-bold focus:ring-2 focus:ring-blue-800 outline-none">
-                        </div>
-                        <button type="submit" class="w-full bg-emerald-700 hover:bg-emerald-600 text-white py-3 rounded-xl font-bold text-sm transition shadow-lg mt-2">
-                            Kirim Pendaftaran Ketua
-                        </button>
-                    </form>
-
-                    <!-- Register Pendamping -->
-                    <form id="formRegisterPendamping" onsubmit="handleRegisterPendamping(event)" class="space-y-3 hidden">
-                        <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1">NAMA LENGKAP & GELAR *</label>
-                            <input type="text" id="regPndNama" required placeholder="Cth: Budi Santoso, S.Sos" class="w-full border border-slate-300 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-blue-800 outline-none">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1">NIP PENDAMPING *</label>
-                            <input type="text" id="regPndNip" required placeholder="19880512..." class="w-full border border-slate-300 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-blue-800 outline-none">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1">KODE UNDANGAN WILAYAH ANDA *</label>
-                            <input type="text" id="regPndInvite" required placeholder="Cth: PKH-KECAMATAN" class="w-full border border-slate-300 rounded-xl p-2.5 text-sm uppercase font-mono font-bold bg-amber-50 focus:ring-2 focus:ring-blue-800 outline-none">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1">PIN AKUN (6 Angka) *</label>
-                            <input type="password" id="regPndPin" required maxlength="6" placeholder="******" class="w-full border border-slate-300 rounded-xl p-2.5 text-sm tracking-widest text-center font-bold focus:ring-2 focus:ring-blue-800 outline-none">
-                        </div>
-                        <button type="submit" class="w-full bg-blue-900 hover:bg-blue-800 text-white py-3 rounded-xl font-bold text-sm transition shadow-lg mt-2">
-                            Daftarkan Akun Pendamping
-                        </button>
-                    </form>
-                </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">NIP Pendamping</label>
+                        <input type="text" id="regPndNip" required placeholder="Nomor Induk Pegawai" class="w-full p-2 bg-slate-50 border border-slate-300 rounded-xl text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Buat Kode Undangan Unik</label>
+                        <input type="text" id="regPndInvite" required value="PKH-SUKAMAJU" class="w-full p-2 bg-slate-50 border border-slate-300 rounded-xl text-sm uppercase">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Buat PIN Keamanan</label>
+                        <input type="password" id="regPndPin" required placeholder="••••••" class="w-full p-2 bg-slate-50 border border-slate-300 rounded-xl text-sm">
+                    </div>
+                    <button type="submit" class="w-full bg-blue-900 hover:bg-blue-800 text-white py-3 rounded-xl font-bold text-sm shadow transition">
+                        Daftar Sebagai Pendamping
+                    </button>
+                </form>
             </div>
-        </section>
+        </div>
 
         <!-- 2. PENDAMPING DASHBOARD VIEW -->
-        <section id="pendampingDashboardView" class="hidden space-y-6">
+        <div id="pendampingDashboardView" class="hidden space-y-6">
             <!-- Welcome Banner -->
             <div class="bg-gradient-to-r from-blue-900 to-indigo-900 text-white p-6 rounded-2xl shadow-lg flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
-                    <span class="bg-blue-800 text-blue-200 text-xs font-bold px-3 py-1 rounded-full border border-blue-700">AKSES PENDAMPING PKH</span>
-                    <h2 id="pendampingWelcomeName" class="text-2xl font-bold mt-2">Selamat Datang, Pendamping</h2>
-                    <p id="pendampingWelcomeDetail" class="text-sm text-blue-200 mt-0.5">NIP & Wilayah Dampingan</p>
+                    <span class="bg-blue-800 text-blue-200 text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider">Akses Pendamping PKH</span>
+                    <h2 id="pendampingWelcomeName" class="text-xl font-bold mt-2">Selamat Datang, Pendamping</h2>
+                    <p id="pendampingWelcomeDetail" class="text-xs text-blue-200 mt-0.5">Kelola verifikasi laporan dan kelompok binaan Anda di sini.</p>
                 </div>
-                <div class="bg-blue-950/60 p-4 rounded-xl border border-blue-700/50 w-full md:w-auto">
-                    <p class="text-xs text-blue-300 font-semibold">Kode Undangan Ketua Kelompok:</p>
-                    <div class="flex items-center space-x-2 mt-1">
-                        <span id="displayInviteCode" class="font-mono font-bold text-amber-400 text-lg">PKH-SUKAMAJU</span>
-                        <button onclick="copyInviteUrl()" class="bg-blue-800 hover:bg-blue-700 text-white px-2.5 py-1 rounded text-xs font-semibold"><i class="fas fa-copy"></i> Salin Link</button>
-                        <button onclick="shareInviteWhatsApp()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-2.5 py-1 rounded text-xs font-semibold"><i class="fab fa-whatsapp"></i> WA</button>
-                    </div>
+                <div class="bg-white/10 p-3 rounded-xl border border-white/20 text-xs">
+                    <span class="text-blue-200 block">Kode Undangan Ketua:</span>
+                    <strong id="displayInviteCode" class="text-sm font-mono text-amber-300">PKH-SUKAMAJU</strong>
+                    <button onclick="shareInviteWhatsApp()" class="mt-2 w-full bg-emerald-600 hover:bg-emerald-500 text-white py-1.5 px-3 rounded-lg font-bold flex items-center justify-center space-x-1.5 transition">
+                        <i class="fab fa-whatsapp"></i> <span>Bagikan Tautan</span>
+                    </button>
                 </div>
             </div>
 
-            <!-- Pendamping Tabs Navigation -->
-            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-                <div class="flex border-b border-slate-200 overflow-x-auto">
-                    <button id="pTabVerifikasi" onclick="switchPendampingTab('verifikasi')" class="py-3 px-5 border-b-2 border-blue-900 text-blue-900 flex items-center space-x-2 font-semibold text-sm whitespace-nowrap">
-                        <i class="fas fa-clipboard-check"></i> <span>Verifikasi Laporan KPM</span>
-                    </button>
-                    <button id="pTabUndangan" onclick="switchPendampingTab('undangan')" class="py-3 px-5 border-b-2 border-transparent text-slate-500 hover:text-slate-700 flex items-center space-x-2 font-semibold text-sm whitespace-nowrap">
-                        <i class="fas fa-user-check"></i> <span>Undang & Verifikasi Ketua</span>
-                        <span id="badgePendingKetua" class="hidden bg-red-600 text-white text-[10px] px-2 py-0.5 rounded-full font-bold">0</span>
-                    </button>
-                    <button id="pTabRekap" onclick="switchPendampingTab('rekap')" class="py-3 px-5 border-b-2 border-transparent text-slate-500 hover:text-slate-700 flex items-center space-x-2 font-semibold text-sm whitespace-nowrap">
-                        <i class="fas fa-file-pdf"></i> <span>Cetak PDF & Rekapitulasi</span>
-                    </button>
+            <!-- Tab Navigation Pendamping -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-2 flex space-x-2 overflow-x-auto">
+                <button id="pTabVerifikasi" onclick="switchPendampingTab('verifikasi')" class="py-3 px-4 rounded-xl bg-blue-900 text-white text-xs font-bold flex items-center space-x-2 shadow">
+                    <i class="fas fa-clipboard-check"></i> <span>Verifikasi Laporan KPM</span>
+                </button>
+                <button id="pTabUndangan" onclick="switchPendampingTab('undangan')" class="py-3 px-4 rounded-xl text-slate-600 hover:bg-slate-100 text-xs font-bold flex items-center space-x-2">
+                    <i class="fas fa-user-shield"></i> <span>Undang & Verifikasi Ketua</span>
+                    <span id="badgePendingKetua" class="bg-red-600 text-white text-[10px] px-1.5 py-0.5 rounded-full hidden">0</span>
+                </button>
+                <button id="pTabRekap" onclick="switchPendampingTab('rekap')" class="py-3 px-4 rounded-xl text-slate-600 hover:bg-slate-100 text-xs font-bold flex items-center space-x-2">
+                    <i class="fas fa-print"></i> <span>Cetak PDF & Rekapitulasi</span>
+                </button>
+            </div>
+
+            <!-- Tab Content 1: Verifikasi Laporan -->
+            <div id="pContentVerifikasi" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-4">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-4 border-b border-slate-100">
+                    <div>
+                        <h3 class="font-bold text-slate-800 text-base">Daftar Laporan Masuk dari Ketua Kelompok</h3>
+                        <p class="text-xs text-slate-500">Periksa dan setujui laporan komitmen serta rekapitulasi pencairan.</p>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <select id="pFilterKelompokVerifikasi" onchange="renderPendampingVerifikasiTable()" class="p-2 bg-slate-50 border border-slate-300 rounded-xl text-xs font-semibold">
+                            <option value="ALL">-- Semua Kelompok --</option>
+                        </select>
+                    </div>
                 </div>
 
-                <!-- Tab Content 1: Verifikasi Laporan -->
-                <div id="pContentVerifikasi" class="p-6 space-y-4">
-                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-slate-50 p-4 rounded-xl border border-slate-200">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-xs">
+                        <thead>
+                            <tr class="bg-slate-100 text-slate-700 uppercase tracking-wider">
+                                <th class="p-3">Tanggal</th>
+                                <th class="p-3">Kelompok</th>
+                                <th class="p-3">Jenis Laporan</th>
+                                <th class="p-3">Nama KPM & Keterangan</th>
+                                <th class="p-3">Bukti Foto</th>
+                                <th class="p-3">Status</th>
+                                <th class="p-3 text-center">Aksi Verifikasi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbodyPendampingVerifikasi" class="divide-y divide-slate-100">
+                            <!-- Data dinamis -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Tab Content 2: Manajemen & Undangan Ketua -->
+            <div id="pContentUndangan" class="hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-slate-50 p-5 rounded-2xl border border-slate-200 space-y-3">
+                        <h4 class="font-bold text-slate-800 text-sm flex items-center space-x-2">
+                            <i class="fas id-card text-blue-900"></i> <span>Pengaturan Tautan & Kode Undangan</span>
+                        </h4>
+                        <p class="text-xs text-slate-500">Bagikan tautan ini ke WhatsApp Ketua Kelompok agar mereka bisa mendaftar otomatis.</p>
                         <div>
-                            <h3 class="font-bold text-slate-800">Antrean Verifikasi Komitmen & Pencairan KPM</h3>
-                            <p class="text-xs text-slate-500">Periksa laporan yang dikirimkan oleh Ketua Kelompok.</p>
+                            <label class="block text-[11px] font-bold text-slate-600 mb-1">Tautan Pendaftaran Otomatis:</label>
+                            <div class="flex space-x-2">
+                                <input type="text" id="shareInviteUrl" readonly class="w-full p-2 bg-white border border-slate-300 rounded-xl text-xs font-mono text-slate-600">
+                                <button onclick="copyInviteUrl()" class="bg-blue-900 hover:bg-blue-800 text-white px-3 py-2 rounded-xl text-xs font-bold whitespace-nowrap">Salin</button>
+                            </div>
                         </div>
-                        <div class="flex items-center space-x-2 w-full sm:w-auto">
-                            <select id="pFilterKelompokVerifikasi" onchange="renderPendampingVerifikasiTable()" class="border border-slate-300 rounded-lg p-2 text-xs font-semibold bg-white outline-none">
-                                <option value="ALL">-- Semua Kelompok --</option>
-                            </select>
+                        <div class="pt-2 border-t border-slate-200">
+                            <label class="block text-[11px] font-bold text-slate-600 mb-1">Ubah Kode Undangan:</label>
+                            <div class="flex space-x-2">
+                                <input type="text" id="inputCustomInviteCode" placeholder="KODEBARU" class="w-full p-2 bg-white border border-slate-300 rounded-xl text-xs font-mono uppercase">
+                                <button onclick="updateInviteCode()" class="bg-amber-600 hover:bg-amber-500 text-white px-3 py-2 rounded-xl text-xs font-bold whitespace-nowrap">Simpan</button>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="overflow-x-auto border border-slate-200 rounded-xl">
+                    <div class="bg-slate-50 p-5 rounded-2xl border border-slate-200 space-y-3">
+                        <h4 class="font-bold text-slate-800 text-sm flex items-center space-x-2">
+                            <i class="fas fa-user-plus text-emerald-700"></i> <span>Tambah Akun Ketua Manual</span>
+                        </h4>
+                        <p class="text-xs text-slate-500">Jika ketua kelompok tidak mendaftar sendiri via web, Anda dapat membuatkannya.</p>
+                        <button onclick="openTambahKetuaManualModal()" class="w-full bg-emerald-700 hover:bg-emerald-600 text-white py-2.5 rounded-xl text-xs font-bold shadow transition">
+                            + Buat Akun Ketua Kelompok Baru
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Antrean Pendaftaran -->
+                <div class="space-y-3 pt-4 border-t border-slate-100">
+                    <h4 class="font-bold text-slate-800 text-sm">Antrean Pendaftaran Ketua Kelompok (Pending)</h4>
+                    <div class="overflow-x-auto">
                         <table class="w-full text-left border-collapse text-xs">
                             <thead>
-                                <tr class="bg-slate-100 text-slate-700 border-b border-slate-200">
-                                    <th class="p-3">Tanggal</th>
+                                <tr class="bg-slate-100 text-slate-700 uppercase">
+                                    <th class="p-3">Nama Ketua</th>
+                                    <th class="p-3">No HP</th>
                                     <th class="p-3">Kelompok</th>
-                                    <th class="p-3">Jenis Laporan</th>
-                                    <th class="p-3">Nama KPM & Detail</th>
-                                    <th class="p-3">Bukti Foto</th>
-                                    <th class="p-3">Status</th>
-                                    <th class="p-3 text-center">Aksi Verifikasi</th>
+                                    <th class="p-3">Tanggal Daftar</th>
+                                    <th class="p-3 text-center">Persetujuan</th>
                                 </tr>
                             </thead>
-                            <tbody id="tbodyPendampingVerifikasi" class="divide-y divide-slate-100">
-                                <!-- Rendered via JS -->
-                            </tbody>
+                            <tbody id="tbodyPendingKetua" class="divide-y divide-slate-100"></tbody>
                         </table>
                     </div>
                 </div>
 
-                <!-- Tab Content 2: Manajemen Ketua Kelompok & Kode Undangan -->
-                <div id="pContentUndangan" class="p-6 space-y-6 hidden">
-                    <!-- Pengaturan Kode Undangan -->
-                    <div class="bg-blue-50 border border-blue-200 p-5 rounded-2xl flex flex-col md:flex-row justify-between items-center gap-4">
-                        <div>
-                            <h4 class="font-bold text-blue-900">Ubah Kode Undangan Wilayah</h4>
-                            <p class="text-xs text-blue-700 mt-0.5">Sesuaikan kode unik agar mudah dibagikan ke Ketua Kelompok Anda.</p>
-                        </div>
-                        <div class="flex items-center space-x-2 w-full md:w-auto">
-                            <input type="text" id="inputCustomInviteCode" placeholder="Cth: PKH-PAMEUNGPEUK" class="border border-blue-300 rounded-xl px-3 py-2 text-xs font-mono font-bold uppercase outline-none bg-white">
-                            <button onclick="updateInviteCode()" class="bg-blue-900 hover:bg-blue-800 text-white px-4 py-2 rounded-xl text-xs font-bold shadow">Simpan Kode</button>
-                        </div>
-                    </div>
-
-                    <!-- Tautan Berbagi Cepat -->
-                    <div class="bg-white border border-slate-200 p-4 rounded-xl flex items-center justify-between gap-2">
-                        <div class="truncate">
-                            <span class="text-xs font-bold text-slate-600 block">Tautan Pendaftaran Otomatis:</span>
-                            <input type="text" id="shareInviteUrl" readonly class="text-xs font-mono text-blue-700 bg-slate-50 border border-slate-200 rounded p-1 w-full mt-1 outline-none">
-                        </div>
-                        <button onclick="copyInviteUrl()" class="bg-slate-800 hover:bg-slate-900 text-white px-3 py-2 rounded-lg text-xs font-bold whitespace-nowrap self-end"><i class="fas fa-copy"></i> Salin</button>
-                    </div>
-
-                    <!-- Antrean Pendaftaran Ketua Kelompok -->
-                    <div class="space-y-3">
-                        <div class="flex justify-between items-center">
-                            <h4 class="font-bold text-slate-800 text-sm flex items-center space-x-2">
-                                <i class="fas fa-user-clock text-amber-500"></i> <span>Antrean Verifikasi Pendaftaran Ketua Kelompok</span>
-                            </h4>
-                            <button onclick="openTambahKetuaManualModal()" class="bg-blue-900 hover:bg-blue-800 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow flex items-center space-x-1">
-                                <i class="fas fa-plus"></i> <span>Tambah Ketua Manual</span>
-                            </button>
-                        </div>
-                        <div class="overflow-x-auto border border-slate-200 rounded-xl">
-                            <table class="w-full text-left border-collapse text-xs">
-                                <tr class="bg-slate-100 text-slate-700 border-b border-slate-200 font-bold">
+                <!-- Ketua Aktif -->
+                <div class="space-y-3 pt-4 border-t border-slate-100">
+                    <h4 class="font-bold text-slate-800 text-sm">Daftar Ketua Kelompok Aktif Binaan</h4>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse text-xs">
+                            <thead>
+                                <tr class="bg-slate-100 text-slate-700 uppercase">
                                     <th class="p-3">Nama Ketua</th>
-                                    <th class="p-3">No. HP / WA</th>
-                                    <th class="p-3">Nama Kelompok</th>
-                                    <th class="p-3">Tanggal Daftar</th>
-                                    <th class="p-3 text-center">Aksi Verifikasi</th>
-                                </tr>
-                                <tbody id="tbodyPendingKetua" class="divide-y divide-slate-100"></tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                    <!-- Daftar Ketua Kelompok Aktif -->
-                    <div class="space-y-3 pt-4 border-t border-slate-200">
-                        <h4 class="font-bold text-slate-800 text-sm flex items-center space-x-2">
-                            <i class="fas fa-users text-emerald-600"></i> <span>Daftar Ketua Kelompok Aktif</span>
-                        </h4>
-                        <div class="overflow-x-auto border border-slate-200 rounded-xl">
-                            <table class="w-full text-left border-collapse text-xs">
-                                <tr class="bg-slate-100 text-slate-700 border-b border-slate-200 font-bold">
-                                    <th class="p-3">Nama Ketua</th>
-                                    <th class="p-3">No. HP / WA</th>
+                                    <th class="p-3">No HP</th>
                                     <th class="p-3">Kelompok</th>
-                                    <th class="p-3">Status Akun</th>
-                                    <th class="p-3 text-center">Manajemen</th>
+                                    <th class="p-3">Status</th>
+                                    <th class="p-3 text-center">Aksi</th>
                                 </tr>
-                                <tbody id="tbodyActiveKetua" class="divide-y divide-slate-100"></tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Tab Content 3: Cetak PDF & Rekapitulasi -->
-                <div id="pContentRekap" class="p-6 space-y-6 hidden">
-                    <div class="bg-amber-50 border border-amber-200 p-4 rounded-xl flex items-center justify-between">
-                        <div>
-                            <h4 class="font-bold text-amber-900 text-sm">Pusat Cetak & Unduh Laporan Resmi</h4>
-                            <p class="text-xs text-amber-700">Pratinjau dokumen lengkap berstandar Kementerian Sosial dengan kop surat dan tanda tangan.</p>
-                        </div>
-                        <span class="bg-amber-200 text-amber-900 text-xs font-bold px-3 py-1 rounded-full">Resmi</span>
-                    </div>
-
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
-                        <!-- Card 1: P2K2 -->
-                        <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm hover:shadow-md transition flex flex-col justify-between space-y-4">
-                            <div>
-                                <div class="bg-blue-100 text-blue-900 w-12 h-12 rounded-xl flex items-center justify-center font-bold text-lg mb-3">
-                                    <i class="fas fa-users-rectangle"></i>
-                                </div>
-                                <h4 class="font-bold text-slate-800 text-base">Laporan Kehadiran P2K2</h4>
-                                <p class="text-xs text-slate-500 mt-1">Laporan bulanan presensi modul P2K2 KPM per kelompok dilengkapi Kop Kemensos & TTD.</p>
-                            </div>
-                            <button onclick="openPrintModal('p2k2')" class="w-full bg-blue-900 hover:bg-blue-800 text-white py-2.5 rounded-xl font-semibold text-sm transition shadow flex items-center justify-center space-x-2">
-                                <i class="fas fa-print"></i> <span>Pratinjau & Cetak PDF</span>
-                            </button>
-                        </div>
-
-                        <!-- Card 2: Komitmen -->
-                        <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm hover:shadow-md transition flex flex-col justify-between space-y-4">
-                            <div>
-                                <div class="bg-emerald-100 text-emerald-800 w-12 h-12 rounded-xl flex items-center justify-center font-bold text-lg mb-3">
-                                    <i class="fas fa-clipboard-user"></i>
-                                </div>
-                                <h4 class="font-bold text-slate-800 text-base">Laporan Verifikasi Komitmen</h4>
-                                <p class="text-xs text-slate-500 mt-1">Laporan pemeriksaan komitmen Kesehatan, Pendidikan, Lansia, & Disabilitas KPM.</p>
-                            </div>
-                            <button onclick="openPrintModal('komitmen')" class="w-full bg-emerald-700 hover:bg-emerald-600 text-white py-2.5 rounded-xl font-semibold text-sm transition shadow flex items-center justify-center space-x-2">
-                                <i class="fas fa-print"></i> <span>Pratinjau & Cetak PDF</span>
-                            </button>
-                        </div>
-
-                        <!-- Card 3: Rekonsiliasi -->
-                        <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm hover:shadow-md transition flex flex-col justify-between space-y-4">
-                            <div>
-                                <div class="bg-amber-100 text-amber-800 w-12 h-12 rounded-xl flex items-center justify-center font-bold text-lg mb-3">
-                                    <i class="fas fa-wallet"></i>
-                                </div>
-                                <h4 class="font-bold text-slate-800 text-base">Laporan Rekonsiliasi Pencairan</h4>
-                                <p class="text-xs text-slate-500 mt-1">Rekapitulasi bukti transaksi pencairan bantuan sosial PKH KPM per kelompok.</p>
-                            </div>
-                            <button onclick="openPrintModal('rekonsiliasi')" class="w-full bg-amber-600 hover:bg-amber-500 text-white py-2.5 rounded-xl font-semibold text-sm transition shadow flex items-center justify-center space-x-2">
-                                <i class="fas fa-print"></i> <span>Pratinjau & Cetak PDF</span>
-                            </button>
-                        </div>
+                            </thead>
+                            <tbody id="tbodyActiveKetua" class="divide-y divide-slate-100"></tbody>
+                        </table>
                     </div>
                 </div>
             </div>
-        </section>
+
+            <!-- Tab Content 3: Cetak PDF & Rekapitulasi -->
+            <div id="pContentRekap" class="hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-6">
+                <div>
+                    <h3 class="font-bold text-slate-800 text-base">Pusat Cetak Laporan Resmi Pendamping PKH</h3>
+                    <p class="text-xs text-slate-500">Pratinjau dokumen laporan lengkap dengan Kop Kementerian Sosial dan Tanda Tangan Pendamping.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Kartu Cetak P2K2 -->
+                    <div class="bg-slate-50 p-5 rounded-2xl border border-slate-200 flex flex-col justify-between space-y-4">
+                        <div>
+                            <div class="bg-blue-100 text-blue-900 w-10 h-10 rounded-xl flex items-center justify-center font-bold mb-3">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <h4 class="font-bold text-slate-800 text-sm">Laporan Kehadiran P2K2</h4>
+                            <p class="text-xs text-slate-500 mt-1">Laporan bulanan presensi modul P2K2 KPM per kelompok dilengkapi Kop Kemensos & TTD.</p>
+                        </div>
+                        <button onclick="openPrintModal('p2k2')" class="w-full bg-blue-900 hover:bg-blue-800 text-white py-2.5 rounded-xl font-semibold text-sm transition shadow flex items-center justify-center space-x-2">
+                            <i class="fas fa-print"></i> <span>Pratinjau & Cetak PDF</span>
+                        </button>
+                    </div>
+
+                    <!-- Kartu Cetak Komitmen -->
+                    <div class="bg-slate-50 p-5 rounded-2xl border border-slate-200 flex flex-col justify-between space-y-4">
+                        <div>
+                            <div class="bg-emerald-100 text-emerald-800 w-10 h-10 rounded-xl flex items-center justify-center font-bold mb-3">
+                                <i class="fas fa-notes-medical"></i>
+                            </div>
+                            <h4 class="font-bold text-slate-800 text-sm">Laporan Verifikasi Komitmen</h4>
+                            <p class="text-xs text-slate-500 mt-1">Laporan pemeriksaan komitmen Kesehatan, Pendidikan, Lansia, & Disabilitas KPM.</p>
+                        </div>
+                        <button onclick="openPrintModal('komitmen')" class="w-full bg-emerald-700 hover:bg-emerald-600 text-white py-2.5 rounded-xl font-semibold text-sm transition shadow flex items-center justify-center space-x-2">
+                            <i class="fas fa-print"></i> <span>Pratinjau & Cetak PDF</span>
+                        </button>
+                    </div>
+
+                    <!-- Kartu Cetak Rekonsiliasi -->
+                    <div class="bg-slate-50 p-5 rounded-2xl border border-slate-200 flex flex-col justify-between space-y-4">
+                        <div>
+                            <div class="bg-amber-100 text-amber-800 w-10 h-10 rounded-xl flex items-center justify-center font-bold mb-3">
+                                <i class="fas fa-wallet"></i>
+                            </div>
+                            <h4 class="font-bold text-slate-800 text-sm">Laporan Rekonsiliasi Pencairan</h4>
+                            <p class="text-xs text-slate-500 mt-1">Rekapitulasi bukti transaksi pencairan bantuan sosial PKH KPM per kelompok.</p>
+                        </div>
+                        <button onclick="openPrintModal('rekonsiliasi')" class="w-full bg-amber-600 hover:bg-amber-500 text-white py-2.5 rounded-xl font-semibold text-sm transition shadow flex items-center justify-center space-x-2">
+                            <i class="fas fa-print"></i> <span>Pratinjau & Cetak PDF</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <!-- 3. KETUA KELOMPOK DASHBOARD VIEW -->
-        <section id="ketuaDashboardView" class="hidden space-y-6">
-            <!-- Welcome Banner Ketua -->
+        <div id="ketuaDashboardView" class="hidden space-y-6">
+            <!-- Welcome Banner -->
             <div class="bg-gradient-to-r from-emerald-800 to-teal-900 text-white p-6 rounded-2xl shadow-lg flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
-                    <span class="bg-emerald-700 text-emerald-100 text-xs font-bold px-3 py-1 rounded-full border border-emerald-600">AKSES KETUA KELOMPOK KPM</span>
-                    <h2 id="ketuaWelcomeName" class="text-2xl font-bold mt-2">Selamat Datang, Ketua Kelompok</h2>
-                    <p id="ketuaWelcomeDetail" class="text-sm text-emerald-200 mt-0.5">Kelompok & No HP</p>
+                    <span class="bg-emerald-700 text-emerald-100 text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider">Akses Ketua Kelompok</span>
+                    <h2 id="ketuaWelcomeName" class="text-xl font-bold mt-2">Selamat Datang, Ketua</h2>
+                    <p id="ketuaWelcomeDetail" class="text-xs text-emerald-100 mt-0.5">Kelola anggota KPM dan input laporan bulanan kelompok Anda.</p>
                 </div>
-                <div class="bg-emerald-950/60 p-4 rounded-xl border border-emerald-700/50">
-                    <p class="text-xs text-emerald-300 font-semibold">Pendamping PKH Wilayah:</p>
-                    <p id="ketuaPendampingNama" class="font-bold text-white text-base">Budi Santoso, S.Sos</p>
+                <div class="bg-white/10 p-3 rounded-xl border border-white/20 text-xs">
+                    <span class="text-emerald-200 block">Pendamping Binaan:</span>
+                    <strong id="ketuaPendampingNama" class="text-sm text-white">Budi Santoso, S.Sos</strong>
                 </div>
             </div>
 
-            <!-- Ketua Tabs Navigation -->
-            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-                <div class="flex border-b border-slate-200 overflow-x-auto">
-                    <button id="kTabKpm" onclick="switchKetuaTab('kpm')" class="py-3 px-4 border-b-2 border-emerald-700 text-emerald-700 flex items-center space-x-2 font-semibold text-sm whitespace-nowrap">
-                        <i class="fas fa-users"></i> <span>Data Anggota KPM</span>
-                    </button>
-                    <button id="kTabP2k2" onclick="switchKetuaTab('p2k2')" class="py-3 px-4 border-b-2 border-transparent text-slate-500 hover:text-slate-700 flex items-center space-x-2 font-semibold text-sm whitespace-nowrap">
-                        <i class="fas fa-calendar-check"></i> <span>Presensi P2K2</span>
-                    </button>
-                    <button id="kTabKomitmen" onclick="switchKetuaTab('komitmen')" class="py-3 px-4 border-b-2 border-transparent text-slate-500 hover:text-slate-700 flex items-center space-x-2 font-semibold text-sm whitespace-nowrap">
-                        <i class="fas fa-heart-pulse"></i> <span>Laporan Komitmen</span>
-                    </button>
-                    <button id="kTabRekonsiliasi" onclick="switchKetuaTab('rekonsiliasi')" class="py-3 px-4 border-b-2 border-transparent text-slate-500 hover:text-slate-700 flex items-center space-x-2 font-semibold text-sm whitespace-nowrap">
-                        <i class="fas fa-money-bill-transfer"></i> <span>Rekonsiliasi Pencairan</span>
-                    </button>
-                </div>
+            <!-- Tab Navigation Ketua -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-2 flex space-x-2 overflow-x-auto">
+                <button id="kTabKpm" onclick="switchKetuaTab('kpm')" class="py-3 px-4 rounded-xl bg-emerald-700 text-white text-xs font-bold flex items-center space-x-2 shadow">
+                    <i class="fas fa-users"></i> <span>Data Anggota KPM</span>
+                </button>
+                <button id="kTabP2k2" onclick="switchKetuaTab('p2k2')" class="py-3 px-4 rounded-xl text-slate-600 hover:bg-slate-100 text-xs font-bold flex items-center space-x-2">
+                    <i class="fas fa-calendar-check"></i> <span>Presensi P2K2</span>
+                </button>
+                <button id="kTabKomitmen" onclick="switchKetuaTab('komitmen')" class="py-3 px-4 rounded-xl text-slate-600 hover:bg-slate-100 text-xs font-bold flex items-center space-x-2">
+                    <i class="fas fa-check-circle"></i> <span>Laporan Komitmen</span>
+                </button>
+                <button id="kTabRekonsiliasi" onclick="switchKetuaTab('rekonsiliasi')" class="py-3 px-4 rounded-xl text-slate-600 hover:bg-slate-100 text-xs font-bold flex items-center space-x-2">
+                    <i class="fas fa-money-bill-wave"></i> <span>Rekonsiliasi Pencairan</span>
+                </button>
+            </div>
 
-                <!-- Tab Content KPM -->
-                <div id="kContentKpm" class="p-6 space-y-6">
-                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                        <!-- Form Tambah KPM -->
-                        <div class="bg-slate-50 p-5 rounded-2xl border border-slate-200 h-fit">
-                            <h3 class="font-bold text-slate-800 text-sm mb-3 flex items-center space-x-2">
-                                <i class="fas fa-user-plus text-emerald-700"></i> <span>Tambah Anggota KPM Baru</span>
-                            </h3>
-                            <form id="formKpm" onsubmit="handleSaveKpm(event)" class="space-y-3">
-                                <div>
-                                    <label class="block text-xs font-bold text-slate-700 mb-1">NAMA LENGKAP KPM *</label>
-                                    <input type="text" id="kpmNama" required placeholder="Cth: Ratna Sari" class="w-full border border-slate-300 rounded-xl p-2.5 text-xs bg-white outline-none">
-                                </div>
-                                <div>
-                                    <label class="block text-xs font-bold text-slate-700 mb-1">NOMOR NIK *</label>
-                                    <input type="text" id="kpmNik" required maxlength="16" placeholder="320112..." class="w-full border border-slate-300 rounded-xl p-2.5 text-xs font-mono bg-white outline-none">
-                                </div>
-                                <div>
-                                    <label class="block text-xs font-bold text-slate-700 mb-1">KOMPONEN PKH *</label>
-                                    <select id="kpmKomponen" class="w-full border border-slate-300 rounded-xl p-2.5 text-xs bg-white outline-none">
-                                        <option value="Balita / PAUD">Balita / PAUD</option>
-                                        <option value="Anak Sekolah SD">Anak Sekolah SD</option>
-                                        <option value="Anak Sekolah SMP">Anak Sekolah SMP</option>
-                                        <option value="Anak Sekolah SMA">Anak Sekolah SMA</option>
-                                        <option value="Ibu Hamil / Menyusui">Ibu Hamil / Menyusui</option>
-                                        <option value="Lansia (60+ Tahun)">Lansia (60+ Tahun)</option>
-                                        <option value="Disabilitas Berat">Disabilitas Berat</option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <label class="block text-xs font-bold text-slate-700 mb-1">ALAMAT / RT RW *</label>
-                                    <input type="text" id="kpmAlamat" required placeholder="Cth: Kp. Sukamaju RT 01/02" class="w-full border border-slate-300 rounded-xl p-2.5 text-xs bg-white outline-none">
-                                </div>
-                                <button type="submit" class="w-full bg-emerald-700 hover:bg-emerald-600 text-white py-2.5 rounded-xl font-bold text-xs transition shadow">
-                                    Simpan Anggota KPM
-                                </button>
-                            </form>
+            <!-- Tab Content 1: KPM Management -->
+            <div id="kContentKpm" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-6">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <form id="formKpm" onsubmit="handleSaveKpm(event)" class="bg-slate-50 p-5 rounded-2xl border border-slate-200 space-y-3">
+                        <h4 class="font-bold text-slate-800 text-sm">Tambah Anggota KPM Baru</h4>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Nama KPM (Ibu / Pengurus)</label>
+                            <input type="text" id="kpmNama" required placeholder="Nama Lengkap KPM" class="w-full p-2 bg-white border border-slate-300 rounded-xl text-xs">
                         </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Nomor Induk Kependudukan (NIK)</label>
+                            <input type="text" id="kpmNik" required placeholder="16 digit NIK" maxlength="16" class="w-full p-2 bg-white border border-slate-300 rounded-xl text-xs font-mono">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Komponen Utama PKH</label>
+                            <select id="kpmKomponen" class="w-full p-2 bg-white border border-slate-300 rounded-xl text-xs">
+                                <option value="Balita / PAUD">Balita / Anak Usia Dini / PAUD</option>
+                                <option value="Anak Sekolah SD">Anak Sekolah Tingkat SD</option>
+                                <option value="Anak Sekolah SMP">Anak Sekolah Tingkat SMP</option>
+                                <option value="Anak Sekolah SMA">Anak Sekolah Tingkat SMA</option>
+                                <option value="Ibu Hamil / Menyusui">Ibu Hamil / Menyusui</option>
+                                <option value="Lansia (60+ Tahun)">Lansia (60+ Tahun)</option>
+                                <option value="Disabilitas Berat">Disabilitas Berat</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Alamat / RT / RW</label>
+                            <input type="text" id="kpmAlamat" required placeholder="Kampung / RT 01 / RW 02" class="w-full p-2 bg-white border border-slate-300 rounded-xl text-xs">
+                        </div>
+                        <button type="submit" class="w-full bg-emerald-700 hover:bg-emerald-600 text-white py-2.5 rounded-xl font-bold text-xs shadow transition">
+                            Simpan Anggota KPM
+                        </button>
+                    </form>
 
-                        <!-- Tabel KPM -->
-                        <div class="lg:col-span-2 space-y-3">
-                            <h3 class="font-bold text-slate-800 text-sm">Daftar Anggota KPM Kelompok Anda</h3>
-                            <div class="overflow-x-auto border border-slate-200 rounded-xl">
-                                <table class="w-full text-left border-collapse text-xs">
-                                    <tr class="bg-slate-100 text-slate-700 border-b border-slate-200 font-bold">
+                    <div class="lg:col-span-2 space-y-3">
+                        <h4 class="font-bold text-slate-800 text-sm">Daftar Anggota Keluarga Penerima Manfaat (KPM)</h4>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse text-xs">
+                               <thead>
+                                    <tr class="bg-slate-100 text-slate-700 uppercase">
                                         <th class="p-3">Nama KPM</th>
                                         <th class="p-3">NIK</th>
                                         <th class="p-3">Komponen</th>
                                         <th class="p-3">Alamat</th>
                                         <th class="p-3 text-center">Aksi</th>
                                     </tr>
-                                    <tbody id="tbodyKetuaKpm" class="divide-y divide-slate-100"></tbody>
-                                </table>
-                            </div>
+                               </thead>
+                               <tbody id="tbodyKetuaKpm" class="divide-y divide-slate-100"></tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <!-- Tab Content P2K2 -->
-                <div id="kContentP2k2" class="p-6 space-y-6 hidden">
-                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                        <div class="bg-slate-50 p-5 rounded-2xl border border-slate-200 h-fit">
-                            <h3 class="font-bold text-slate-800 text-sm mb-3 flex items-center space-x-2">
-                                <i class="fas fa-calendar-plus text-emerald-700"></i> <span>Input Presensi P2K2</span>
-                            </h3>
-                            <form id="formP2k2" onsubmit="handleSaveP2k2(event)" class="space-y-3">
-                                <div>
-                                    <label class="block text-xs font-bold text-slate-700 mb-1">PILIH ANGGOTA KPM *</label>
-                                    <select id="p2k2KpmSelect" required class="w-full border border-slate-300 rounded-xl p-2.5 text-xs bg-white outline-none">
-                                        <option value="">-- Pilih KPM --</option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <label class="block text-xs font-bold text-slate-700 mb-1">MODUL P2K2 *</label>
-                                    <select id="p2k2Modul" class="w-full border border-slate-300 rounded-xl p-2.5 text-xs bg-white outline-none">
-                                        <option value="Modul Kesehatan dan Gizi">Modul Kesehatan dan Gizi</option>
-                                        <option value="Modul Pengelolaan Keuangan & Usaha">Modul Pengelolaan Keuangan & Usaha</option>
-                                        <option value="Modul Pendidikan & Pengasuhan Anak">Modul Pendidikan & Pengasuhan Anak</option>
-                                        <option value="Modul Perlindungan Anak & Kesejahteraan Sosial">Modul Perlindungan Anak & Kesejahteraan Sosial</option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <label class="block text-xs font-bold text-slate-700 mb-1">STATUS KEHADIRAN *</label>
-                                    <select id="p2k2Status" class="w-full border border-slate-300 rounded-xl p-2.5 text-xs bg-white outline-none">
-                                        <option value="Hadir">Hadir</option>
-                                        <option value="Izin">Izin</option>
-                                        <option value="Sakit">Sakit</option>
-                                        <option value="Tanpa Keterangan">Tanpa Keterangan</option>
-                                    </select>
-                                </div>
-                                <button type="submit" class="w-full bg-emerald-700 hover:bg-emerald-600 text-white py-2.5 rounded-xl font-bold text-xs transition shadow">
-                                    Simpan Presensi P2K2
-                                </button>
-                            </form>
+            <!-- Tab Content 2: Presensi P2K2 -->
+            <div id="kContentP2k2" class="hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-6">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <form id="formP2k2" onsubmit="handleSaveP2k2(event)" class="bg-slate-50 p-5 rounded-2xl border border-slate-200 space-y-3">
+                        <h4 class="font-bold text-slate-800 text-sm">Input Presensi Pertemuan P2K2</h4>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Pilih KPM</label>
+                            <select id="p2k2KpmSelect" required class="w-full p-2 bg-white border border-slate-300 rounded-xl text-xs">
+                                <option value="">-- Pilih KPM --</option>
+                            </select>
                         </div>
-                        <div class="lg:col-span-2 space-y-3">
-                            <h3 class="font-bold text-slate-800 text-sm">Riwayat Presensi Pertemuan P2K2</h3>
-                            <div class="overflow-x-auto border border-slate-200 rounded-xl">
-                                <table class="w-full text-left border-collapse text-xs">
-                                    <tr class="bg-slate-100 text-slate-700 border-b border-slate-200 font-bold">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Modul P2K2 / Pertemuan</label>
+                            <select id="p2k2Modul" class="w-full p-2 bg-white border border-slate-300 rounded-xl text-xs">
+                                <option value="Modul Kesehatan dan Gizi">Modul Kesehatan dan Gizi</option>
+                                <option value="Modul Pendidikan dan Pengasuhan Anak">Modul Pendidikan dan Pengasuhan Anak</option>
+                                <option value="Modul Pengelolaan Keuangan Keluarga">Modul Pengelolaan Keuangan Keluarga</option>
+                                <option value="Modul Perlindungan Anak">Modul Perlindungan Anak</option>
+                                <option value="Modul Kesejahteraan Sosial (Lansia/Disabilitas)">Modul Kesejahteraan Sosial (Lansia/Disabilitas)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Status Kehadiran</label>
+                            <select id="p2k2Status" class="w-full p-2 bg-white border border-slate-300 rounded-xl text-xs">
+                                <option value="Hadir">Hadir</option>
+                                <option value="Izin">Izin</option>
+                                <option value="Sakit">Sakit</option>
+                                <option value="Alpa / Tanpa Keterangan">Alpa / Tanpa Keterangan</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="w-full bg-emerald-700 hover:bg-emerald-600 text-white py-2.5 rounded-xl font-bold text-xs shadow transition">
+                            Simpan Presensi P2K2
+                        </button>
+                    </form>
+
+                    <div class="lg:col-span-2 space-y-3">
+                        <h4 class="font-bold text-slate-800 text-sm">Riwayat Presensi P2K2 Kelompok</h4>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse text-xs">
+                                <thead>
+                                    <tr class="bg-slate-100 text-slate-700 uppercase">
                                         <th class="p-3">Tanggal</th>
                                         <th class="p-3">Nama KPM</th>
                                         <th class="p-3">Modul</th>
@@ -478,36 +473,247 @@
                                         <th class="p-3">Foto</th>
                                         <th class="p-3 text-center">Aksi</th>
                                     </tr>
-                                    <tbody id="tbodyKetuaP2k2" class="divide-y divide-slate-100"></tbody>
-                                </table>
-                            </div>
+                                </thead>
+                                <tbody id="tbodyKetuaP2k2" class="divide-y divide-slate-100"></tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <!-- Tab Content Komitmen -->
-                <div id="kContentKomitmen" class="p-6 space-y-6 hidden">
-                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                        <div class="bg-slate-50 p-5 rounded-2xl border border-slate-200 h-fit">
-                            <h3 class="font-bold text-slate-800 text-sm mb-3 flex items-center space-x-2">
-                                <i class="fas fa-file-circle-plus text-emerald-700"></i> <span>Kirim Laporan Komitmen</span>
-                            </h3>
-                            <form id="formKomitmen" onsubmit="handleSaveKomitmen(event)" class="space-y-3">
-                                <div>
-                                    <label class="block text-xs font-bold text-slate-700 mb-1">PILIH ANGGOTA KPM *</label>
-                                    <select id="komitmenKpmSelect" required class="w-full border border-slate-300 rounded-xl p-2.5 text-xs bg-white outline-none">
-                                        <option value="">-- Pilih KPM --</option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <label class="block text-xs font-bold text-slate-700 mb-1">JENIS KOMITMEN *</label>
-                                    <select id="komitmenJenis" class="w-full border border-slate-300 rounded-xl p-2.5 text-xs bg-white outline-none">
-                                        <option value="Posyandu / Layanan Kesehatan Balita">Posyandu / Layanan Kesehatan Balita</option>
-                                        <option value="Kehadiran Sekolah Anak (85%+)">Kehadiran Sekolah Anak (85%+)</option>
-                                        <option value="Pemeriksaan Ibu Hamil / Nifas">Pemeriksaan Ibu Hamil / Nifas</option>
-                                        <option value="Layanan Kesehatan Lansia">Layanan Kesehatan Lansia</option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <label class="block text-xs font-bold text-slate-700 mb-1">STATUS PEMENUHAN *</label>
-                                    <select id="komitmenStatus"
+            <!-- Tab Content 3: Laporan Komitmen -->
+            <div id="kContentKomitmen" class="hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-6">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <form id="formKomitmen" onsubmit="handleSaveKomitmen(event)" class="bg-slate-50 p-5 rounded-2xl border border-slate-200 space-y-3">
+                        <h4 class="font-bold text-slate-800 text-sm">Kirim Laporan Pemenuhan Komitmen</h4>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Pilih KPM</label>
+                            <select id="komitmenKpmSelect" required class="w-full p-2 bg-white border border-slate-300 rounded-xl text-xs">
+                                <option value="">-- Pilih KPM --</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Jenis Komitmen / Layanan</label>
+                            <select id="komitmenJenis" class="w-full p-2 bg-white border border-slate-300 rounded-xl text-xs">
+                                <option value="Posyandu / Layanan Kesehatan Balita">Posyandu / Layanan Kesehatan Balita</option>
+                                <option value="Pemeriksaan Ibu Hamil">Pemeriksaan Ibu Hamil</option>
+                                <option value="Kehadiran Sekolah Anak (Minimal 85%)">Kehadiran Sekolah Anak (Minimal 85%)</option>
+                                <option value="Layanan Kesehatan Lansia">Layanan Kesehatan Lansia</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Status Pemenuhan</label>
+                            <select id="komitmenStatus" class="w-full p-2 bg-white border border-slate-300 rounded-xl text-xs">
+                                <option value="Terpenuhi 100%">Terpenuhi 100%</option>
+                                <option value="Terpenuhi Sebagian">Terpenuhi Sebagian</option>
+                                <option value="Tidak Terpenuhi">Tidak Terpenuhi</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="w-full bg-emerald-700 hover:bg-emerald-600 text-white py-2.5 rounded-xl font-bold text-xs shadow transition">
+                            Kirim ke Pendamping
+                        </button>
+                    </form>
+
+                    <div class="lg:col-span-2 space-y-3">
+                        <h4 class="font-bold text-slate-800 text-sm">Riwayat Laporan Komitmen Kelompok</h4>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse text-xs">
+                                <thead>
+                                    <tr class="bg-slate-100 text-slate-700 uppercase">
+                                        <th class="p-3">Tanggal</th>
+                                        <th class="p-3">Nama KPM</th>
+                                        <th class="p-3">Jenis Layanan</th>
+                                        <th class="p-3">Status</th>
+                                        <th class="p-3">Bukti</th>
+                                        <th class="p-3 text-center">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tbodyKetuaKomitmen" class="divide-y divide-slate-100"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab Content 4: Rekonsiliasi Pencairan -->
+            <div id="kContentRekonsiliasi" class="hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-6">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <form id="formRekonsiliasi" onsubmit="handleSaveRekonsiliasi(event)" class="bg-slate-50 p-5 rounded-2xl border border-slate-200 space-y-3">
+                        <h4 class="font-bold text-slate-800 text-sm">Input Rekonsiliasi Pencairan Bantuan</h4>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Pilih KPM</label>
+                            <select id="rekonKpmSelect" required class="w-full p-2 bg-white border border-slate-300 rounded-xl text-xs">
+                                <option value="">-- Pilih KPM --</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Tahap Pencairan</label>
+                            <select id="rekonTahap" class="w-full p-2 bg-white border border-slate-300 rounded-xl text-xs">
+                                <option value="Tahap 1 (Jan-Mar)">Tahap 1 (Jan - Mar)</option>
+                                <option value="Tahap 2 (Apr-Jun)">Tahap 2 (Apr - Jun)</option>
+                                <option value="Tahap 3 (Jul-Sep)">Tahap 3 (Jul - Sep)</option>
+                                <option value="Tahap 4 (Okt-Des)">Tahap 4 (Okt - Des)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Nominal Diterima (Rp)</label>
+                            <input type="number" id="rekonNominal" required placeholder="Contoh: 750000" class="w-full p-2 bg-white border border-slate-300 rounded-xl text-xs">
+                        </div>
+                        <button type="submit" class="w-full bg-emerald-700 hover:bg-emerald-600 text-white py-2.5 rounded-xl font-bold text-xs shadow transition">
+                            Simpan Rekonsiliasi
+                        </button>
+                    </form>
+
+                    <div class="lg:col-span-2 space-y-3">
+                        <h4 class="font-bold text-slate-800 text-sm">Riwayat Rekonsiliasi Pencairan Kelompok</h4>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse text-xs">
+                                <thead>
+                                    <tr class="bg-slate-100 text-slate-700 uppercase">
+                                        <th class="p-3">Tanggal</th>
+                                        <th class="p-3">Nama KPM</th>
+                                        <th class="p-3">Tahap</th>
+                                        <th class="p-3">Nominal</th>
+                                        <th class="p-3">Struk</th>
+                                        <th class="p-3 text-center">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tbodyKetuaRekonsiliasi" class="divide-y divide-slate-100"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-white border-t border-slate-200 mt-12 py-6 text-center text-xs text-slate-500">
+        <p>SIP-PKH &copy; 2026 - Sistem Informasi Pelaporan Komitmen KPM PKH</p>
+    </footer>
+
+    <!-- MODAL CETAK / PRINT VIEWER -->
+    <div id="modalPrintViewer" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-white w-full max-w-4xl rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+            <div class="bg-blue-900 text-white p-4 flex justify-between items-center">
+                <h3 class="font-bold text-sm flex items-center space-x-2">
+                    <i class="fas fa-file-pdf"></i> <span>Pratinjau Dokumen Cetak Resmi</span>
+                </h3>
+                <div class="space-x-2">
+                    <button onclick="executeWindowPrint()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1.5 rounded-lg text-xs font-bold transition">
+                        <i class="fas fa-print"></i> Cetak / Simpan PDF
+                    </button>
+                    <button onclick="closePrintModal()" class="bg-slate-700 hover:bg-slate-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold">
+                        Tutup
+                    </button>
+                </div>
+            </div>
+
+            <div id="printAreaContent" class="p-8 bg-white overflow-y-auto space-y-6 text-slate-900">
+                <!-- KOP SURAT KEMENSOS -->
+                <div class="border-b-2 border-black pb-4 flex items-center space-x-4">
+                    <div class="w-16 h-16 bg-blue-900 text-white rounded-full flex items-center justify-center font-extrabold text-xl">
+                        PKH
+                    </div>
+                    <div class="text-center flex-grow">
+                        <h4 class="font-bold text-sm uppercase tracking-wider">KEMENTERIAN SOSIAL REPUBLIK INDONESIA</h4>
+                        <h3 class="font-extrabold text-base uppercase">PROGRAM KELUARGA HARAPAN (PKH)</h3>
+                        <p class="text-[10px] text-slate-600">Sistem Informasi Pelaporan dan Pengawasan Komitmen KPM</p>
+                    </div>
+                </div>
+
+                <div class="text-center space-y-1">
+                    <h2 id="printDocTitle" class="font-extrabold text-sm uppercase text-slate-900">LAPORAN RESMI PKH</h2>
+                    <p id="printDocSubtitle" class="text-xs text-slate-600">Binaan Wilayah Kerja Pendamping</p>
+                </div>
+
+                <div id="printDocTableContainer" class="space-y-4">
+                    <!-- Tabel hasil render dinamis -->
+                </div>
+
+                <!-- TANDA TANGAN -->
+                <div class="pt-8 flex justify-between items-end text-xs">
+                    <div></div>
+                    <div class="text-center space-y-16">
+                        <p id="printTtdTanggal">Jakarta, 2026</p>
+                        <div>
+                            <p class="font-bold underline" id="printPendampingTtdNama">E. Yuyus Syamsul Firdaus, S.Sos.I</p>
+                            <p id="printPendampingTtdNip">NIP. 198310102025211098</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL TAMBAH KETUA MANUAL -->
+    <div id="modalTambahKetua" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-md rounded-2xl shadow-xl overflow-hidden p-6 space-y-4">
+            <div class="flex justify-between items-center pb-3 border-b border-slate-100">
+                <h3 class="font-bold text-slate-800 text-sm">Tambah Akun Ketua Kelompok</h3>
+                <button onclick="closeTambahKetuaManualModal()" class="text-slate-400 hover:text-slate-700"><i class="fas fa-times"></i></button>
+            </div>
+            <form onsubmit="handleTambahKetuaManual(event)" class="space-y-3">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Nama Ketua Kelompok</label>
+                    <input type="text" id="mKetuaNama" required class="w-full p-2 bg-slate-50 border border-slate-300 rounded-xl text-xs">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Nomor HP / WhatsApp</label>
+                    <input type="text" id="mKetuaHp" required class="w-full p-2 bg-slate-50 border border-slate-300 rounded-xl text-xs">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Nama Kelompok Binaan</label>
+                    <input type="text" id="mKetuaKelompok" required class="w-full p-2 bg-slate-50 border border-slate-300 rounded-xl text-xs">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">PIN Akses (6 Digit)</label>
+                    <input type="password" id="mKetuaPin" required maxlength="6" class="w-full p-2 bg-slate-50 border border-slate-300 rounded-xl text-xs">
+                </div>
+                <button type="submit" class="w-full bg-blue-900 hover:bg-blue-800 text-white py-2.5 rounded-xl font-bold text-xs shadow transition">
+                    Simpan & Aktifkan Akun
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL TENTANG APLIKASI -->
+    <div id="modalAboutApp" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-md rounded-2xl shadow-xl overflow-hidden p-6 space-y-4">
+            <div class="flex justify-between items-center pb-3 border-b border-slate-100">
+                <h3 class="font-bold text-slate-800 text-sm">Tentang SIP-PKH</h3>
+                <button onclick="closeAboutModal()" class="text-slate-400 hover:text-slate-700"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="space-y-3 text-xs text-slate-600">
+                <p><strong>SIP-PKH (Sistem Informasi Pelaporan Komitmen KPM PKH)</strong> adalah aplikasi web kolaboratif yang dirancang khusus untuk mempermudah Pendamping dan Ketua Kelompok PKH dalam mengelola presensi P2K2, verifikasi komitmen, serta rekonsiliasi pencairan bantuan.</p>
+                <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-1">
+                    <p class="font-bold text-slate-800">Dibuat & Dikembangkan oleh:</p>
+                    <p class="text-blue-900 font-bold">Encep Yuyus Syamsul Firdaus, S.Sos.I</p>
+                    <p class="text-[11px] text-slate-500">Pendamping PKH Profesional</p>
+                </div>
+                <div class="p-3 bg-blue-50 rounded-xl border border-blue-100 space-y-1">
+                    <p class="font-bold text-blue-900">Dukungan / Donasi Pengembangan:</p>
+                    <p class="font-mono text-slate-800">BSI: <strong>7211585298</strong></p>
+                    <button onclick="copyAccountNo()" class="mt-1 w-full bg-blue-900 text-white py-1 rounded text-[11px] font-bold">Salin No. Rekening</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST NOTIFICATION (Diperbaiki agar tidak menyangkut dan pointer-events-none) -->
+    <div id="toast" class="fixed top-20 right-5 z-50 transform transition-transform duration-300 ease-in-out translate-x-full bg-emerald-600 text-white px-4 py-3 rounded-lg shadow-lg flex items-center space-x-3 max-w-md pointer-events-none">
+        <div>
+            <h4 id="toastTitle" class="font-bold text-sm">Notifikasi</h4>
+            <p id="toastMessage" class="text-xs">Pesan sistem...</p>
+        </div>
+    </div>
+
+    <!-- Firebase SDK Compat Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    
+    <!-- Main Application Script -->
+    <script src="app.js"></script>
+</body>
+</html>
