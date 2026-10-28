@@ -292,6 +292,7 @@ function populatePendampingFilters() {
 function renderPendampingKelompokManajemen() {
     const filter = document.getElementById('pFilterKelompokManajemen').value;
     const tbody = document.getElementById('tbodyPendampingKelompokList');
+    if (!tbody) return;
     tbody.innerHTML = '';
 
     const ketuaList = filter === 'ALL' ? appState.ketuaUsers.filter(k => k.status === 'VERIFIED') : appState.ketuaUsers.filter(k => k.status === 'VERIFIED' && k.kelompok === filter);
@@ -373,6 +374,7 @@ function editKelompokName(id) {
 function renderPendampingVerifikasiTable() {
     const filterKelompok = document.getElementById('pFilterKelompokVerifikasi').value;
     const tbody = document.getElementById('tbodyPendampingVerifikasi');
+    if (!tbody) return;
     tbody.innerHTML = '';
 
     let allReports = [];
@@ -442,7 +444,6 @@ function renderPendampingKetuaManagement() {
 
     if (!tbodyPending || !tbodyActive) return;
 
-    // Render Pending Ketua
     tbodyPending.innerHTML = '';
     const pending = appState.ketuaUsers.filter(k => k.status === 'PENDING');
     if (badgePending) {
@@ -468,7 +469,6 @@ function renderPendampingKetuaManagement() {
         });
     }
 
-    // Render Active Ketua (Dilengkapi Tombol Ganti PIN / Password & Hapus)
     tbodyActive.innerHTML = '';
     const active = appState.ketuaUsers.filter(k => k.status === 'VERIFIED');
     if (active.length === 0) {
@@ -570,7 +570,6 @@ function handleTambahKetuaManual(e) {
     showToast("Berhasil", "Akun ketua kelompok manual ditambahkan.", "success");
 }
 
-// --- KETUA KELOMPOK ---
 function switchKetuaTab(tab) {
     ['kContentKpm', 'kContentP2k2', 'kContentKomitmen', 'kContentRekonsiliasi'].forEach(id => document.getElementById(id).classList.add('hidden'));
     ['kTabKpm', 'kTabP2k2', 'kTabKomitmen', 'kTabRekonsiliasi'].forEach(id => document.getElementById(id).className = "py-3 px-4 rounded-xl text-slate-600 hover:bg-slate-100 text-xs font-bold flex items-center space-x-2");
@@ -644,7 +643,6 @@ function renderKetuaAllTables() {
         });
     }
 
-    // (Sinkronisasi Poin Penting): Riwayat Komitmen Ketua Menampilkan Status Verifikasi Terbaru dari Pendamping
     const tbodyKomitmen = document.getElementById('tbodyKetuaKomitmen');
     if (tbodyKomitmen) {
         tbodyKomitmen.innerHTML = '';
@@ -770,6 +768,7 @@ function handleSaveP2k2(e) {
 
 function toggleKomitmenFotoInput(cb) {
     const container = document.getElementById('fileContainer_' + cb.value);
+    if (!container) return;
     if (cb.checked) {
         container.classList.remove('hidden');
         container.querySelector('input').setAttribute('required', 'true');
