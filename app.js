@@ -70,16 +70,33 @@ document.addEventListener('DOMContentLoaded', () => {
     updateShareInviteUrl();
 });
 
-function loadLocalStorageData() {
-    const saved = localStorage.getItem('SIP_PKH_STATE_V2');
-    if (saved) {
-        try {
-            appState = JSON.parse(saved);
-        } catch (e) {
-            console.error("Gagal memuat LocalStorage", e);
+// Load Data dari Firebase Firestore secara Real-time dengan Pengaman
+async function loadLocalStorageData() {
+    try {
+        const docRef = db.collection("pkh_database").doc("main_state");
+        const doc = await docRef.get();
+        if (doc.exists && doc.data() && doc.data().pendampingProfiles) {
+            appState = doc.data();
+            renderUI();
+            updateShareInviteUrl();
+        } else {
+            // Jika dokumen kosong atau belum ada, buat data awal ke Firebase
+            await docRef.set(appState);
+            renderUI();
+            updateShareInviteUrl();
         }
-    } else {
-        saveState();
+    } catch (e) {
+        console.error("Gagal memuat dari Firebase, menggunakan cache lokal:", e);
+        const saved = localStorage.getItem('SIP_PKH_STATE_V2');
+        if (saved) {
+            try {
+                appState = JSON.parse(saved);
+            } catch (err) {
+                console.error("Gagal parsing localstorage", err);
+            }
+        }
+        renderUI();
+        updateShareInviteUrl();
     }
 }
 
