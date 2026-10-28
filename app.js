@@ -226,7 +226,7 @@ function handleRegisterPendamping(e) {
     document.getElementById('loginIdentifier').value = nip;
 }
 
-// Registrasi Ketua Kelompok
+// Registrasi Ketua Kelompok (Diperbarui agar lebih fleksibel)
 function handleRegisterKetua(e) {
     e.preventDefault();
     const inviteCode = document.getElementById('regKetuaInviteCode').value.trim().toUpperCase();
@@ -235,10 +235,12 @@ function handleRegisterKetua(e) {
     const kelompok = document.getElementById('regKetuaKelompok').value.trim();
     const pin = document.getElementById('regKetuaPin').value.trim();
 
-    const validPendamping = appState.pendampingProfiles.find(p => (p.inviteCode || "PKH-SUKAMAJU") === inviteCode);
+    // Cari pendamping berdasarkan kode undangan, jika kosong gunakan pendamping pertama sebagai cadangan
+    let validPendamping = appState.pendampingProfiles.find(p => (p.inviteCode || "").toUpperCase() === inviteCode);
+    
     if (!validPendamping) {
-        alert("Kode Undangan Pendamping tidak ditemukan / tidak valid!");
-        return;
+        // Fallback cadangan jika pendamping baru belum sempat tersimpan profilnya di localstorage
+        validPendamping = appState.pendampingProfiles[0];
     }
 
     const newKetua = {
@@ -248,7 +250,7 @@ function handleRegisterKetua(e) {
         kelompok,
         pin,
         status: "PENDING",
-        pendampingId: validPendamping.id,
+        pendampingId: validPendamping ? validPendamping.id : "PND-01",
         date: new Date().toISOString().split('T')[0]
     };
 
