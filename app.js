@@ -1010,3 +1010,163 @@ function showToast(title, message, type = 'success') {
         toast.classList.add('translate-x-full');
     }, 3000);
 }
+
+// --- FUNGSI CETAK PDF & PRATINJAU ---
+function openPrintModal(type) {
+    const modal = document.getElementById('modalPrintViewer');
+    const printDocTitle = document.getElementById('printDocTitle');
+    const printDocSubtitle = document.getElementById('printDocSubtitle');
+    const tableContainer = document.getElementById('printDocTableContainer');
+
+    if (!modal) {
+        alert("Modal cetak tidak ditemukan di HTML.");
+        return;
+    }
+
+    const currentPendamping = (currentUser && currentUser.role === 'pendamping') ? currentUser : (appState.pendampingProfiles[0] || { nama: "Pendamping PKH", nip: "-" });
+    
+    const elNama = document.getElementById('printPendampingTtdNama');
+    const elNip = document.getElementById('printPendampingTtdNip');
+    const elTgl = document.getElementById('printTtdTanggal');
+
+    if (elNama) elNama.innerText = currentPendamping.nama;
+    if (elNip) elNip.innerText = "NIP. " + (currentPendamping.nip || "-");
+
+    const todayStr = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+    if (elTgl) elTgl.innerText = "Jakarta, " + todayStr;
+
+    if (tableContainer) tableContainer.innerHTML = '';
+
+    if (type === 'p2k2') {
+        if (printDocTitle) printDocTitle.innerText = "LAPORAN PRESENSI KEHADIRAN P2K2 KPM PKH";
+        if (printDocSubtitle) printDocSubtitle.innerText = "Sistem Informasi Pelaporan Program Keluarga Harapan";
+
+        let html = `
+            <table class="w-full border-collapse border border-black text-xs text-black">
+                <thead>
+                    <tr class="bg-gray-100 text-center font-bold">
+                        <th class="border border-black p-2">No</th>
+                        <th class="border border-black p-2">Tanggal</th>
+                        <th class="border border-black p-2">Kelompok</th>
+                        <th class="border border-black p-2">Nama KPM</th>
+                        <th class="border border-black p-2">Modul P2K2</th>
+                        <th class="border border-black p-2">Status Kehadiran</th>
+                    </tr>
+                </thead>
+                <tbody>
+        `;
+        if (!appState.p2k2List || appState.p2k2List.length === 0) {
+            html += `<tr><td colspan="6" class="border border-black p-4 text-center">Tidak ada data presensi.</td></tr>`;
+        } else {
+            appState.p2k2List.forEach((p, idx) => {
+                html += `
+                    <tr>
+                        <td class="border border-black p-2 text-center">${idx + 1}</td>
+                        <td class="border border-black p-2 text-center">${p.tanggal}</td>
+                        <td class="border border-black p-2 text-center font-bold">${p.kelompok}</td>
+                        <td class="border border-black p-2 font-bold">${p.kpmNama}</td>
+                        <td class="border border-black p-2">${p.modul}</td>
+                        <td class="border border-black p-2 text-center font-bold">${p.status}</td>
+                    </tr>
+                `;
+            });
+        }
+        html += `</tbody></table>`;
+        if (tableContainer) tableContainer.innerHTML = html;
+
+    } else if (type === 'komitmen') {
+        if (printDocTitle) printDocTitle.innerText = "LAPORAN HASIL VERIFIKASI KOMITMEN KPM PKH";
+        if (printDocSubtitle) printDocSubtitle.innerText = "Pemeriksaan Layanan Kesehatan, Pendidikan, Lansia & Disabilitas";
+
+        let html = `
+            <table class="w-full border-collapse border border-black text-xs text-black">
+                <thead>
+                    <tr class="bg-gray-100 text-center font-bold">
+                        <th class="border border-black p-2">No</th>
+                        <th class="border border-black p-2">Tanggal</th>
+                        <th class="border border-black p-2">Kelompok</th>
+                        <th class="border border-black p-2">Nama KPM</th>
+                        <th class="border border-black p-2">Jenis Komitmen</th>
+                        <th class="border border-black p-2">Status Pemenuhan</th>
+                        <th class="border border-black p-2">Verifikasi Pendamping</th>
+                    </tr>
+                </thead>
+                <tbody>
+        `;
+        if (!appState.komitmenList || appState.komitmenList.length === 0) {
+            html += `<tr><td colspan="7" class="border border-black p-4 text-center">Tidak ada data komitmen.</td></tr>`;
+        } else {
+            appState.komitmenList.forEach((k, idx) => {
+                html += `
+                    <tr>
+                        <td class="border border-black p-2 text-center">${idx + 1}</td>
+                        <td class="border border-black p-2 text-center">${k.tanggal}</td>
+                        <td class="border border-black p-2 text-center font-bold">${k.kelompok}</td>
+                        <td class="border border-black p-2 font-bold">${k.kpmNama}</td>
+                        <td class="border border-black p-2">${k.jenis}</td>
+                        <td class="border border-black p-2 text-center">${k.status}</td>
+                        <td class="border border-black p-2 text-center font-bold">${k.statusVerifikasi || 'PENDING'}</td>
+                    </tr>
+                `;
+            });
+        }
+        html += `</tbody></table>`;
+        if (tableContainer) tableContainer.innerHTML = html;
+
+    } else if (type === 'rekonsiliasi') {
+        if (printDocTitle) printDocTitle.innerText = "LAPORAN REKONSILIASI PENCAIRAN BANTUAN SOSIAL PKH";
+        if (printDocSubtitle) printDocSubtitle.innerText = "Rekapitulasi Transaksi Pencairan Dana Bantuan KPM";
+
+        let totalNominal = 0;
+        let html = `
+            <table class="w-full border-collapse border border-black text-xs text-black">
+                <thead>
+                    <tr class="bg-gray-100 text-center font-bold">
+                        <th class="border border-black p-2">No</th>
+                        <th class="border border-black p-2">Tanggal</th>
+                        <th class="border border-black p-2">Kelompok</th>
+                        <th class="border border-black p-2">Nama KPM</th>
+                        <th class="border border-black p-2">Tahap Pencairan</th>
+                        <th class="border border-black p-2 text-right">Nominal Diterima (Rp)</th>
+                    </tr>
+                </thead>
+                <tbody>
+        `;
+        if (!appState.rekonsiliasiList || appState.rekonsiliasiList.length === 0) {
+            html += `<tr><td colspan="6" class="border border-black p-4 text-center">Tidak ada data rekonsiliasi.</td></tr>`;
+        } else {
+            appState.rekonsiliasiList.forEach((r, idx) => {
+                totalNominal += (r.nominal || 0);
+                html += `
+                    <tr>
+                        <td class="border border-black p-2 text-center">${idx + 1}</td>
+                        <td class="border border-black p-2 text-center">${r.tanggal}</td>
+                        <td class="border border-black p-2 text-center font-bold">${r.kelompok}</td>
+                        <td class="border border-black p-2 font-bold">${r.kpmNama}</td>
+                        <td class="border border-black p-2 text-center">${r.tahap}</td>
+                        <td class="border border-black p-2 text-right font-bold">Rp ${Number(r.nominal || 0).toLocaleString('id-ID')}</td>
+                    </tr>
+                `;
+            });
+            html += `
+                <tr class="bg-gray-100 font-bold">
+                    <td colspan="5" class="border border-black p-2 text-right uppercase">Total Realisasi Pencairan:</td>
+                    <td class="border border-black p-2 text-right">Rp ${totalNominal.toLocaleString('id-ID')}</td>
+                </tr>
+            `;
+        }
+        html += `</tbody></table>`;
+        if (tableContainer) tableContainer.innerHTML = html;
+    }
+
+    modal.classList.remove('hidden');
+}
+
+function closePrintModal() {
+    const modal = document.getElementById('modalPrintViewer');
+    if (modal) modal.classList.add('hidden');
+}
+
+function executeWindowPrint() {
+    window.print();
+}
