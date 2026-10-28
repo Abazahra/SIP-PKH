@@ -991,18 +991,22 @@ function executeWindowPrint() {
     window.print();
 }
 
+let toastTimer = null;
+
 function showToast(title, message, type = 'success') {
     const toast = document.getElementById('toast');
     document.getElementById('toastTitle').innerText = title;
     document.getElementById('toastMessage').innerText = message;
 
     if (type === 'success') {
-        toast.className = "fixed top-20 right-5 z-50 transform transition-transform duration-300 ease-in-out bg-emerald-600 text-white px-4 py-3 rounded-lg shadow-lg flex items-center space-x-3 max-w-md translate-x-0";
+        toast.className = "fixed top-20 right-5 z-50 transform transition-transform duration-300 ease-in-out bg-emerald-600 text-white px-4 py-3 rounded-lg shadow-lg flex items-center space-x-3 max-w-md translate-x-0 pointer-events-none";
     } else {
-        toast.className = "fixed top-20 right-5 z-50 transform transition-transform duration-300 ease-in-out bg-blue-800 text-white px-4 py-3 rounded-lg shadow-lg flex items-center space-x-3 max-w-md translate-x-0";
+        toast.className = "fixed top-20 right-5 z-50 transform transition-transform duration-300 ease-in-out bg-blue-800 text-white px-4 py-3 rounded-lg shadow-lg flex items-center space-x-3 max-w-md translate-x-0 pointer-events-none";
     }
 
-    setTimeout(() => {
+    if (toastTimer) clearTimeout(toastTimer);
+
+    toastTimer = setTimeout(() => {
         toast.classList.add('translate-x-full');
-    }, 3500);
+    }, 3000);
 }
