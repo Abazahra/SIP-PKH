@@ -176,7 +176,10 @@
             <!-- Tab Navigation Pendamping -->
             <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-2 flex space-x-2 overflow-x-auto">
                 <button id="pTabVerifikasi" onclick="switchPendampingTab('verifikasi')" class="py-3 px-4 rounded-xl bg-blue-900 text-white text-xs font-bold flex items-center space-x-2 shadow">
-                    <i class="fas fa-clipboard-check"></i> <span>Verifikasi Laporan KPM</span>
+                    <i class="fas fa-clipboard-check"></i> <span>Verifikasi Laporan</span>
+                </button>
+                <button id="pTabKelompok" onclick="switchPendampingTab('kelompok')" class="py-3 px-4 rounded-xl text-slate-600 hover:bg-slate-100 text-xs font-bold flex items-center space-x-2">
+                    <i class="fas fa-users-cog"></i> <span>Kelola Kelompok & Anggota</span>
                 </button>
                 <button id="pTabUndangan" onclick="switchPendampingTab('undangan')" class="py-3 px-4 rounded-xl text-slate-600 hover:bg-slate-100 text-xs font-bold flex items-center space-x-2">
                     <i class="fas fa-user-shield"></i> <span>Undang & Verifikasi Ketua</span>
@@ -214,9 +217,37 @@
                                 <th class="p-3 text-center">Aksi Verifikasi</th>
                             </tr>
                         </thead>
-                        <tbody id="tbodyPendampingVerifikasi" class="divide-y divide-slate-100">
-                            <!-- Data dinamis -->
-                        </tbody>
+                        <tbody id="tbodyPendampingVerifikasi" class="divide-y divide-slate-100"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Tab Content: Kelola Kelompok & Anggota (Poin 1) -->
+            <div id="pContentKelompok" class="hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-6">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-4 border-b border-slate-100">
+                    <div>
+                        <h3 class="font-bold text-slate-800 text-base">Manajemen Kelompok & Anggota KPM Binaan</h3>
+                        <p class="text-xs text-slate-500">Pantau kelompok binaan dan kelola data KPM di setiap kelompok.</p>
+                    </div>
+                    <div>
+                        <select id="pFilterKelompokManajemen" onchange="renderPendampingKelompokManajemen()" class="p-2 bg-slate-50 border border-slate-300 rounded-xl text-xs font-semibold">
+                            <option value="ALL">-- Filter Semua Kelompok --</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-xs">
+                        <thead>
+                            <tr class="bg-slate-100 text-slate-700 uppercase">
+                                <th class="p-3">Nama Kelompok</th>
+                                <th class="p-3">Ketua Kelompok</th>
+                                <th class="p-3">No HP Ketua</th>
+                                <th class="p-3">Jumlah KPM</th>
+                                <th class="p-3 text-center">Aksi / Kelola</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbodyPendampingKelompokList" class="divide-y divide-slate-100"></tbody>
                     </table>
                 </div>
             </div>
@@ -228,7 +259,6 @@
                         <h4 class="font-bold text-slate-800 text-sm flex items-center space-x-2">
                             <i class="fas fa-id-card text-blue-900"></i> <span>Pengaturan Tautan & Kode Undangan</span>
                         </h4>
-                        <p class="text-xs text-slate-500">Bagikan tautan ini ke WhatsApp Ketua Kelompok agar mereka bisa mendaftar otomatis.</p>
                         <div>
                             <label class="block text-[11px] font-bold text-slate-600 mb-1">Tautan Pendaftaran Otomatis:</label>
                             <div class="flex space-x-2">
@@ -236,27 +266,17 @@
                                 <button onclick="copyInviteUrl()" class="bg-blue-900 hover:bg-blue-800 text-white px-3 py-2 rounded-xl text-xs font-bold whitespace-nowrap">Salin</button>
                             </div>
                         </div>
-                        <div class="pt-2 border-t border-slate-200">
-                            <label class="block text-[11px] font-bold text-slate-600 mb-1">Ubah Kode Undangan:</label>
-                            <div class="flex space-x-2">
-                                <input type="text" id="inputCustomInviteCode" placeholder="KODEBARU" class="w-full p-2 bg-white border border-slate-300 rounded-xl text-xs font-mono uppercase">
-                                <button onclick="updateInviteCode()" class="bg-amber-600 hover:bg-amber-500 text-white px-3 py-2 rounded-xl text-xs font-bold whitespace-nowrap">Simpan</button>
-                            </div>
-                        </div>
                     </div>
-
                     <div class="bg-slate-50 p-5 rounded-2xl border border-slate-200 space-y-3">
                         <h4 class="font-bold text-slate-800 text-sm flex items-center space-x-2">
                             <i class="fas fa-user-plus text-emerald-700"></i> <span>Tambah Akun Ketua Manual</span>
                         </h4>
-                        <p class="text-xs text-slate-500">Jika ketua kelompok tidak mendaftar sendiri via web, Anda dapat membuatkannya.</p>
                         <button onclick="openTambahKetuaManualModal()" class="w-full bg-emerald-700 hover:bg-emerald-600 text-white py-2.5 rounded-xl text-xs font-bold shadow transition">
                             + Buat Akun Ketua Kelompok Baru
                         </button>
                     </div>
                 </div>
 
-                <!-- Antrean Pendaftaran -->
                 <div class="space-y-3 pt-4 border-t border-slate-100">
                     <h4 class="font-bold text-slate-800 text-sm">Antrean Pendaftaran Ketua Kelompok (Pending)</h4>
                     <div class="overflow-x-auto">
@@ -266,7 +286,7 @@
                                     <th class="p-3">Nama Ketua</th>
                                     <th class="p-3">No HP</th>
                                     <th class="p-3">Kelompok</th>
-                                    <th class="p-3">Tanggal Daftar</th>
+                                    <th class="p-3">Tanggal</th>
                                     <th class="p-3 text-center">Persetujuan</th>
                                 </tr>
                             </thead>
@@ -274,71 +294,57 @@
                         </table>
                     </div>
                 </div>
-
-                <!-- Ketua Aktif -->
-                <div class="space-y-3 pt-4 border-t border-slate-100">
-                    <h4 class="font-bold text-slate-800 text-sm">Daftar Ketua Kelompok Aktif Binaan</h4>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left border-collapse text-xs">
-                            <thead>
-                                <tr class="bg-slate-100 text-slate-700 uppercase">
-                                    <th class="p-3">Nama Ketua</th>
-                                    <th class="p-3">No HP</th>
-                                    <th class="p-3">Kelompok</th>
-                                    <th class="p-3">Status</th>
-                                    <th class="p-3 text-center">Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tbodyActiveKetua" class="divide-y divide-slate-100"></tbody>
-                        </table>
-                    </div>
-                </div>
             </div>
 
-            <!-- Tab Content 3: Cetak PDF & Rekapitulasi -->
+            <!-- Tab Content 3: Cetak PDF & Rekapitulasi (Poin 2 - Filter Kelompok & Bulan) -->
             <div id="pContentRekap" class="hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-6">
                 <div>
                     <h3 class="font-bold text-slate-800 text-base">Pusat Cetak Laporan Resmi Pendamping PKH</h3>
-                    <p class="text-xs text-slate-500">Pratinjau dokumen laporan lengkap dengan Kop Kementerian Sosial dan Tanda Tangan Pendamping.</p>
+                    <p class="text-xs text-slate-500">Pilih filter kelompok dan bulan sebelum melakukan pratinjau dan cetak laporan.</p>
+                </div>
+
+                <!-- Filter Bar untuk Cetak -->
+                <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Filter Berdasarkan Kelompok</label>
+                        <select id="printFilterKelompok" class="w-full p-2.5 bg-white border border-slate-300 rounded-xl text-xs font-semibold">
+                            <option value="ALL">-- Semua Kelompok --</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Filter Berdasarkan Bulan / Tahun</label>
+                        <input type="month" id="printFilterBulan" class="w-full p-2 bg-white border border-slate-300 rounded-xl text-xs font-semibold">
+                    </div>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <!-- Kartu Cetak P2K2 -->
                     <div class="bg-slate-50 p-5 rounded-2xl border border-slate-200 flex flex-col justify-between space-y-4">
                         <div>
-                            <div class="bg-blue-100 text-blue-900 w-10 h-10 rounded-xl flex items-center justify-center font-bold mb-3">
-                                <i class="fas fa-users"></i>
-                            </div>
+                            <div class="bg-blue-100 text-blue-900 w-10 h-10 rounded-xl flex items-center justify-center font-bold mb-3"><i class="fas fa-users"></i></div>
                             <h4 class="font-bold text-slate-800 text-sm">Laporan Kehadiran P2K2</h4>
-                            <p class="text-xs text-slate-500 mt-1">Laporan bulanan presensi modul P2K2 KPM per kelompok dilengkapi Kop Kemensos & TTD.</p>
+                            <p class="text-xs text-slate-500 mt-1">Presensi bulanan modul P2K2 KPM.</p>
                         </div>
                         <button onclick="openPrintModal('p2k2')" class="w-full bg-blue-900 hover:bg-blue-800 text-white py-2.5 rounded-xl font-semibold text-sm transition shadow flex items-center justify-center space-x-2">
                             <i class="fas fa-print"></i> <span>Pratinjau & Cetak PDF</span>
                         </button>
                     </div>
 
-                    <!-- Kartu Cetak Komitmen -->
                     <div class="bg-slate-50 p-5 rounded-2xl border border-slate-200 flex flex-col justify-between space-y-4">
                         <div>
-                            <div class="bg-emerald-100 text-emerald-800 w-10 h-10 rounded-xl flex items-center justify-center font-bold mb-3">
-                                <i class="fas fa-notes-medical"></i>
-                            </div>
+                            <div class="bg-emerald-100 text-emerald-800 w-10 h-10 rounded-xl flex items-center justify-center font-bold mb-3"><i class="fas fa-notes-medical"></i></div>
                             <h4 class="font-bold text-slate-800 text-sm">Laporan Verifikasi Komitmen</h4>
-                            <p class="text-xs text-slate-500 mt-1">Laporan pemeriksaan komitmen Kesehatan, Pendidikan, Lansia, & Disabilitas KPM.</p>
+                            <p class="text-xs text-slate-500 mt-1">Pemeriksaan layanan kesehatan & pendidikan.</p>
                         </div>
                         <button onclick="openPrintModal('komitmen')" class="w-full bg-emerald-700 hover:bg-emerald-600 text-white py-2.5 rounded-xl font-semibold text-sm transition shadow flex items-center justify-center space-x-2">
                             <i class="fas fa-print"></i> <span>Pratinjau & Cetak PDF</span>
                         </button>
                     </div>
 
-                    <!-- Kartu Cetak Rekonsiliasi -->
                     <div class="bg-slate-50 p-5 rounded-2xl border border-slate-200 flex flex-col justify-between space-y-4">
                         <div>
-                            <div class="bg-amber-100 text-amber-800 w-10 h-10 rounded-xl flex items-center justify-center font-bold mb-3">
-                                <i class="fas fa-wallet"></i>
-                            </div>
+                            <div class="bg-amber-100 text-amber-800 w-10 h-10 rounded-xl flex items-center justify-center font-bold mb-3"><i class="fas fa-wallet"></i></div>
                             <h4 class="font-bold text-slate-800 text-sm">Laporan Rekonsiliasi Pencairan</h4>
-                            <p class="text-xs text-slate-500 mt-1">Rekapitulasi bukti transaksi pencairan bantuan sosial PKH KPM per kelompok.</p>
+                            <p class="text-xs text-slate-500 mt-1">Rekapitulasi transaksi pencairan bantuan sosial.</p>
                         </div>
                         <button onclick="openPrintModal('rekonsiliasi')" class="w-full bg-amber-600 hover:bg-amber-500 text-white py-2.5 rounded-xl font-semibold text-sm transition shadow flex items-center justify-center space-x-2">
                             <i class="fas fa-print"></i> <span>Pratinjau & Cetak PDF</span>
@@ -350,7 +356,6 @@
 
         <!-- 3. KETUA KELOMPOK DASHBOARD VIEW -->
         <div id="ketuaDashboardView" class="hidden space-y-6">
-            <!-- Welcome Banner -->
             <div class="bg-gradient-to-r from-emerald-800 to-teal-900 text-white p-6 rounded-2xl shadow-lg flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
                     <span class="bg-emerald-700 text-emerald-100 text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider">Akses Ketua Kelompok</span>
@@ -379,7 +384,7 @@
                 </button>
             </div>
 
-            <!-- Tab Content 1: KPM Management -->
+            <!-- Tab Content 1: KPM Management (Poin 3: Jenis Bantuan PKH / BPNT / Keduanya) -->
             <div id="kContentKpm" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-6">
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     <form id="formKpm" onsubmit="handleSaveKpm(event)" class="bg-slate-50 p-5 rounded-2xl border border-slate-200 space-y-3">
@@ -394,14 +399,22 @@
                             <input type="text" id="kpmNik" required placeholder="16 digit NIK" maxlength="16" class="w-full p-2 bg-white border border-slate-300 rounded-xl text-xs font-mono">
                         </div>
                         <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1">Komponen Utama PKH (Bisa Pilih Lebih dari 1)</label>
-                            <div class="space-y-1.5 p-2 bg-white border border-slate-300 rounded-xl text-xs max-h-40 overflow-y-auto">
-                                <label class="flex items-center space-x-2"><input type="checkbox" name="kpmKomponen" value="Balita / PAUD" class="rounded text-emerald-700"> <span>Balita / Anak Usia Dini / PAUD</span></label>
-                                <label class="flex items-center space-x-2"><input type="checkbox" name="kpmKomponen" value="Anak Sekolah SD" class="rounded text-emerald-700"> <span>Anak Sekolah Tingkat SD</span></label>
-                                <label class="flex items-center space-x-2"><input type="checkbox" name="kpmKomponen" value="Anak Sekolah SMP" class="rounded text-emerald-700"> <span>Anak Sekolah Tingkat SMP</span></label>
-                                <label class="flex items-center space-x-2"><input type="checkbox" name="kpmKomponen" value="Anak Sekolah SMA" class="rounded text-emerald-700"> <span>Anak Sekolah Tingkat SMA</span></label>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Jenis Bantuan Sosial</label>
+                            <select id="kpmJenisBantuan" required class="w-full p-2 bg-white border border-slate-300 rounded-xl text-xs font-semibold text-emerald-800">
+                                <option value="PKH">PKH</option>
+                                <option value="BPNT">BPNT</option>
+                                <option value="PKH dan BPNT">PKH dan BPNT</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Komponen Utama PKH (Pilih Lebih dari 1)</label>
+                            <div class="space-y-1.5 p-2 bg-white border border-slate-300 rounded-xl text-xs max-h-32 overflow-y-auto">
+                                <label class="flex items-center space-x-2"><input type="checkbox" name="kpmKomponen" value="Balita / PAUD" class="rounded text-emerald-700"> <span>Balita / PAUD</span></label>
+                                <label class="flex items-center space-x-2"><input type="checkbox" name="kpmKomponen" value="Anak Sekolah SD" class="rounded text-emerald-700"> <span>Anak Sekolah SD</span></label>
+                                <label class="flex items-center space-x-2"><input type="checkbox" name="kpmKomponen" value="Anak Sekolah SMP" class="rounded text-emerald-700"> <span>Anak Sekolah SMP</span></label>
+                                <label class="flex items-center space-x-2"><input type="checkbox" name="kpmKomponen" value="Anak Sekolah SMA" class="rounded text-emerald-700"> <span>Anak Sekolah SMA</span></label>
                                 <label class="flex items-center space-x-2"><input type="checkbox" name="kpmKomponen" value="Ibu Hamil / Menyusui" class="rounded text-emerald-700"> <span>Ibu Hamil / Menyusui</span></label>
-                                <label class="flex items-center space-x-2"><input type="checkbox" name="kpmKomponen" value="Lansia (60+ Tahun)" class="rounded text-emerald-700"> <span>Lansia (60+ Tahun)</span></label>
+                                <label class="flex items-center space-x-2"><input type="checkbox" name="kpmKomponen" value="Lansia (60+)" class="rounded text-emerald-700"> <span>Lansia (60+)</span></label>
                                 <label class="flex items-center space-x-2"><input type="checkbox" name="kpmKomponen" value="Disabilitas Berat" class="rounded text-emerald-700"> <span>Disabilitas Berat</span></label>
                             </div>
                         </div>
@@ -425,6 +438,7 @@
                                     <tr class="bg-slate-100 text-slate-700 uppercase">
                                         <th class="p-3">Nama KPM</th>
                                         <th class="p-3">NIK</th>
+                                        <th class="p-3">Bantuan</th>
                                         <th class="p-3">Komponen</th>
                                         <th class="p-3">Alamat</th>
                                         <th class="p-3 text-center">Aksi</th>
@@ -455,7 +469,7 @@
                                 <option value="Modul Pendidikan dan Pengasuhan Anak">Modul Pendidikan dan Pengasuhan Anak</option>
                                 <option value="Modul Pengelolaan Keuangan Keluarga">Modul Pengelolaan Keuangan Keluarga</option>
                                 <option value="Modul Perlindungan Anak">Modul Perlindungan Anak</option>
-                                <option value="Modul Kesejahteraan Sosial (Lansia/Disabilitas)">Modul Kesejahteraan Sosial (Lansia/Disabilitas)</option>
+                                <option value="Modul Kesejahteraan Sosial">Modul Kesejahteraan Sosial</option>
                             </select>
                         </div>
                         <div>
@@ -464,12 +478,12 @@
                                 <option value="Hadir">Hadir</option>
                                 <option value="Izin">Izin</option>
                                 <option value="Sakit">Sakit</option>
-                                <option value="Alpa / Tanpa Keterangan">Alpa / Tanpa Keterangan</option>
+                                <option value="Alpa">Alpa</option>
                             </select>
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-slate-700 mb-1">Unggah Foto Kegiatan P2K2</label>
-                            <input type="file" id="p2k2Foto" accept="image/*" class="w-full p-1.5 bg-white border border-slate-300 rounded-xl text-xs file:mr-2 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100">
+                            <input type="file" id="p2k2Foto" accept="image/*" class="w-full p-1.5 bg-white border border-slate-300 rounded-xl text-xs">
                         </div>
                         <button type="submit" class="w-full bg-emerald-700 hover:bg-emerald-600 text-white py-2.5 rounded-xl font-bold text-xs shadow transition">
                             Simpan Presensi P2K2
@@ -497,7 +511,7 @@
                 </div>
             </div>
 
-            <!-- Tab Content 3: Laporan Komitmen -->
+            <!-- Tab Content 3: Laporan Komitmen (Poin 4: Upload Foto Ganda Sesuai Pilihan) -->
             <div id="kContentKomitmen" class="hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-6">
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     <form id="formKomitmen" onsubmit="handleSaveKomitmen(event)" class="bg-slate-50 p-5 rounded-2xl border border-slate-200 space-y-3">
@@ -509,12 +523,27 @@
                             </select>
                         </div>
                         <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1">Jenis Komitmen / Layanan (Bisa Pilih Lebih dari 1)</label>
-                            <div class="space-y-1.5 p-2 bg-white border border-slate-300 rounded-xl text-xs max-h-40 overflow-y-auto">
-                                <label class="flex items-center space-x-2"><input type="checkbox" name="komitmenJenisCheckbox" value="Posyandu / Layanan Kesehatan Balita" class="rounded text-emerald-700"> <span>Posyandu / Layanan Kesehatan Balita</span></label>
-                                <label class="flex items-center space-x-2"><input type="checkbox" name="komitmenJenisCheckbox" value="Pemeriksaan Ibu Hamil" class="rounded text-emerald-700"> <span>Pemeriksaan Ibu Hamil</span></label>
-                                <label class="flex items-center space-x-2"><input type="checkbox" name="komitmenJenisCheckbox" value="Kehadiran Sekolah Anak (Minimal 85%)" class="rounded text-emerald-700"> <span>Kehadiran Sekolah Anak (Minimal 85%)</span></label>
-                                <label class="flex items-center space-x-2"><input type="checkbox" name="komitmenJenisCheckbox" value="Layanan Kesehatan Lansia" class="rounded text-emerald-700"> <span>Layanan Kesehatan Lansia</span></label>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Jenis Komitmen / Layanan (Pilih & Upload Foto)</label>
+                            <div class="space-y-3 p-3 bg-white border border-slate-300 rounded-xl text-xs max-h-60 overflow-y-auto">
+                                <label class="flex items-center space-x-2 font-bold"><input type="checkbox" name="komitmenJenisCheckbox" value="Posyandu / Kesehatan Balita" onchange="toggleKomitmenFotoInput(this)" class="rounded text-emerald-700"> <span>Posyandu / Kesehatan Balita</span></label>
+                                <div id="fileContainer_Posyandu / Kesehatan Balita" class="hidden pl-5 pb-2">
+                                    <input type="file" accept="image/*" class="komitmen-dynamic-file w-full text-[10px]" data-jenis="Posyandu / Kesehatan Balita">
+                                </div>
+
+                                <label class="flex items-center space-x-2 font-bold"><input type="checkbox" name="komitmenJenisCheckbox" value="Pemeriksaan Ibu Hamil" onchange="toggleKomitmenFotoInput(this)" class="rounded text-emerald-700"> <span>Pemeriksaan Ibu Hamil</span></label>
+                                <div id="fileContainer_Pemeriksaan Ibu Hamil" class="hidden pl-5 pb-2">
+                                    <input type="file" accept="image/*" class="komitmen-dynamic-file w-full text-[10px]" data-jenis="Pemeriksaan Ibu Hamil">
+                                </div>
+
+                                <label class="flex items-center space-x-2 font-bold"><input type="checkbox" name="komitmenJenisCheckbox" value="Kehadiran Sekolah Anak (85%)" onchange="toggleKomitmenFotoInput(this)" class="rounded text-emerald-700"> <span>Kehadiran Sekolah Anak (85%)</span></label>
+                                <div id="fileContainer_Kehadiran Sekolah Anak (85%)" class="hidden pl-5 pb-2">
+                                    <input type="file" accept="image/*" class="komitmen-dynamic-file w-full text-[10px]" data-jenis="Kehadiran Sekolah Anak (85%)">
+                                </div>
+
+                                <label class="flex items-center space-x-2 font-bold"><input type="checkbox" name="komitmenJenisCheckbox" value="Layanan Kesehatan Lansia" onchange="toggleKomitmenFotoInput(this)" class="rounded text-emerald-700"> <span>Layanan Kesehatan Lansia</span></label>
+                                <div id="fileContainer_Layanan Kesehatan Lansia" class="hidden pl-5 pb-2">
+                                    <input type="file" accept="image/*" class="komitmen-dynamic-file w-full text-[10px]" data-jenis="Layanan Kesehatan Lansia">
+                                </div>
                             </div>
                         </div>
                         <div>
@@ -524,10 +553,6 @@
                                 <option value="Terpenuhi Sebagian">Terpenuhi Sebagian</option>
                                 <option value="Tidak Terpenuhi">Tidak Terpenuhi</option>
                             </select>
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1">Unggah Bukti Foto Layanan</label>
-                            <input type="file" id="komitmenFoto" accept="image/*" required class="w-full p-1.5 bg-white border border-slate-300 rounded-xl text-xs file:mr-2 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100">
                         </div>
                         <button type="submit" class="w-full bg-emerald-700 hover:bg-emerald-600 text-white py-2.5 rounded-xl font-bold text-xs shadow transition">
                             Kirim ke Pendamping
@@ -542,9 +567,8 @@
                                     <tr class="bg-slate-100 text-slate-700 uppercase">
                                         <th class="p-3">Tanggal</th>
                                         <th class="p-3">Nama KPM</th>
-                                        <th class="p-3">Jenis Layanan</th>
+                                        <th class="p-3">Jenis Layanan & Bukti Foto</th>
                                         <th class="p-3">Status</th>
-                                        <th class="p-3">Bukti</th>
                                         <th class="p-3 text-center">Aksi</th>
                                     </tr>
                                 </thead>
@@ -569,10 +593,10 @@
                         <div>
                             <label class="block text-xs font-bold text-slate-700 mb-1">Tahap Pencairan</label>
                             <select id="rekonTahap" class="w-full p-2 bg-white border border-slate-300 rounded-xl text-xs">
-                                <option value="Tahap 1 (Jan-Mar)">Tahap 1 (Jan - Mar)</option>
-                                <option value="Tahap 2 (Apr-Jun)">Tahap 2 (Apr - Jun)</option>
-                                <option value="Tahap 3 (Jul-Sep)">Tahap 3 (Jul - Sep)</option>
-                                <option value="Tahap 4 (Okt-Des)">Tahap 4 (Okt - Des)</option>
+                                <option value="Tahap 1">Tahap 1 (Jan - Mar)</option>
+                                <option value="Tahap 2">Tahap 2 (Apr - Jun)</option>
+                                <option value="Tahap 3">Tahap 3 (Jul - Sep)</option>
+                                <option value="Tahap 4">Tahap 4 (Okt - Des)</option>
                             </select>
                         </div>
                         <div>
@@ -581,7 +605,7 @@
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-slate-700 mb-1">Unggah Struk / Bukti Pencairan</label>
-                            <input type="file" id="rekonFoto" accept="image/*" required class="w-full p-1.5 bg-white border border-slate-300 rounded-xl text-xs file:mr-2 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100">
+                            <input type="file" id="rekonFoto" accept="image/*" required class="w-full p-1.5 bg-white border border-slate-300 rounded-xl text-xs">
                         </div>
                         <button type="submit" class="w-full bg-emerald-700 hover:bg-emerald-600 text-white py-2.5 rounded-xl font-bold text-xs shadow transition">
                             Simpan Rekonsiliasi
@@ -617,7 +641,7 @@
         <p>SIP-PKH &copy; 2026 - Sistem Informasi Pelaporan Komitmen KPM PKH</p>
     </footer>
 
-    <!-- MODAL CETAK / PRINT VIEWER -->
+    <!-- MODAL CETAK / PRINT VIEWER (Poin 5: Sesuai Gambar Kop Resmi) -->
     <div id="modalPrintViewer" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
         <div class="bg-white w-full max-w-4xl rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
             <div class="bg-blue-900 text-white p-4 flex justify-between items-center">
@@ -635,15 +659,19 @@
             </div>
 
             <div id="printAreaContent" class="p-8 bg-white overflow-y-auto space-y-6 text-slate-900">
-                <!-- KOP SURAT KEMENSOS -->
-                <div class="border-b-2 border-black pb-4 flex items-center space-x-4">
-                    <div class="w-16 h-16 bg-blue-900 text-white rounded-full flex items-center justify-center font-extrabold text-xl">
-                        PKH
+                <!-- KOP SURAT SESUAI GAMBAR RUJUKAN -->
+                <div class="border-b-4 border-black pb-3 flex items-center justify-between">
+                    <div class="flex items-center space-x-3">
+                        <div class="flex flex-col items-center">
+                            <div class="w-10 h-10 bg-blue-800 rounded-full flex items-center justify-center text-white font-bold text-lg"><i class="fas fa-hands-helping"></i></div>
+                            <div class="w-14 h-4 bg-amber-400 rounded-b-full mt-0.5"></div>
+                        </div>
                     </div>
-                    <div class="text-center flex-grow">
-                        <h4 class="font-bold text-sm uppercase tracking-wider">KEMENTERIAN SOSIAL REPUBLIK INDONESIA</h4>
-                        <h3 class="font-extrabold text-base uppercase">PROGRAM KELUARGA HARAPAN (PKH)</h3>
-                        <p class="text-[10px] text-slate-600">Sistem Informasi Pelaporan dan Pengawasan Komitmen KPM</p>
+                    <div class="text-center flex-grow px-2">
+                        <h4 class="font-extrabold text-sm uppercase tracking-wide text-black leading-tight">KEMENTERIAN SOSIAL REPUBLIK INDONESIA</h4>
+                        <h4 class="font-bold text-xs uppercase tracking-wide text-black leading-tight">DIREKTORAT JENDERAL PERLINDUNGAN DAN JAMINAN SOSIAL</h4>
+                        <h4 class="font-bold text-xs uppercase tracking-wide text-black leading-tight">DIREKTORAT PERLINDUNGAN SOSIAL NON KEBENCANAAN</h4>
+                        <p class="text-[10px] text-black mt-1">Jl. Salemba Raya No. 28 Jakarta Pusat Tlp (021)22804288 http://kemensos.go.id/</p>
                     </div>
                 </div>
 
@@ -652,9 +680,7 @@
                     <p id="printDocSubtitle" class="text-xs text-slate-600">Binaan Wilayah Kerja Pendamping</p>
                 </div>
 
-                <div id="printDocTableContainer" class="space-y-4">
-                    <!-- Tabel hasil render dinamis -->
-                </div>
+                <div id="printDocTableContainer" class="space-y-4"></div>
 
                 <!-- TANDA TANGAN -->
                 <div class="pt-8 flex justify-between items-end text-xs">
@@ -671,7 +697,38 @@
         </div>
     </div>
 
-    <!-- MODAL TAMBAH KETUA MANUAL -->
+    <!-- MODAL KELOLA ANGGOTA KELOMPOK (PENDAMPING) -->
+    <div id="modalPendampingKelompokDetail" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-white w-full max-w-3xl rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+            <div class="bg-blue-900 text-white p-4 flex justify-between items-center">
+                <h3 id="modalKelompokTitle" class="font-bold text-sm">Informasi Kelompok & Anggota KPM</h3>
+                <button onclick="closePendampingKelompokModal()" class="text-white hover:text-red-200"><i class="fas fa-times text-lg"></i></button>
+            </div>
+            <div class="p-6 overflow-y-auto space-y-4">
+                <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-xs space-y-1">
+                    <p><strong>Nama Ketua Kelompok:</strong> <span id="infoKetuaNama">-</span></p>
+                    <p><strong>Nomor HP / WhatsApp:</strong> <span id="infoKetuaHp">-</span></p>
+                </div>
+                <h4 class="font-bold text-slate-800 text-xs uppercase">Daftar Anggota KPM Kelompok Ini:</h4>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-xs">
+                        <thead>
+                            <tr class="bg-slate-100 text-slate-700 uppercase">
+                                <th class="p-2">Nama KPM</th>
+                                <th class="p-2">NIK</th>
+                                <th class="p-2">Bantuan</th>
+                                <th class="p-2">Komponen</th>
+                                <th class="p-2">Alamat</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbodyModalKpmList" class="divide-y divide-slate-100"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL TAMBAH KETUA MANUAL & TENTANG -->
     <div id="modalTambahKetua" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <div class="bg-white w-full max-w-md rounded-2xl shadow-xl overflow-hidden p-6 space-y-4">
             <div class="flex justify-between items-center pb-3 border-b border-slate-100">
@@ -702,7 +759,6 @@
         </div>
     </div>
 
-    <!-- MODAL TENTANG APLIKASI -->
     <div id="modalAboutApp" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <div class="bg-white w-full max-w-md rounded-2xl shadow-xl overflow-hidden p-6 space-y-4">
             <div class="flex justify-between items-center pb-3 border-b border-slate-100">
@@ -710,22 +766,16 @@
                 <button onclick="closeAboutModal()" class="text-slate-400 hover:text-slate-700"><i class="fas fa-times"></i></button>
             </div>
             <div class="space-y-3 text-xs text-slate-600">
-                <p><strong>SIP-PKH (Sistem Informasi Pelaporan Komitmen KPM PKH)</strong> adalah aplikasi web kolaboratif yang dirancang khusus untuk mempermudah Pendamping dan Ketua Kelompok PKH dalam mengelola presensi P2K2, verifikasi komitmen, serta rekonsiliasi pencairan bantuan.</p>
-                <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-1">
-                    <p class="font-bold text-slate-800">Dibuat & Dikembangkan oleh:</p>
+                <p><strong>SIP-PKH</strong> adalah sistem pelaporan komitmen KPM PKH.</p>
+                <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+                    <p class="font-bold text-slate-800">Dikembangkan oleh:</p>
                     <p class="text-blue-900 font-bold">Encep Yuyus Syamsul Firdaus, S.Sos.I</p>
-                    <p class="text-[11px] text-slate-500">Pendamping PKH Profesional</p>
-                </div>
-                <div class="p-3 bg-blue-50 rounded-xl border border-blue-100 space-y-1">
-                    <p class="font-bold text-blue-900">Dukungan / Donasi Pengembangan:</p>
-                    <p class="font-mono text-slate-800">BSI: <strong>7211585298</strong></p>
-                    <button onclick="copyAccountNo()" class="mt-1 w-full bg-blue-900 text-white py-1 rounded text-[11px] font-bold">Salin No. Rekening</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- TOAST NOTIFICATION -->
+    <!-- TOAST -->
     <div id="toast" class="fixed top-20 right-5 z-50 transform transition-transform duration-300 ease-in-out translate-x-full bg-emerald-600 text-white px-4 py-3 rounded-lg shadow-lg flex items-center space-x-3 max-w-md pointer-events-none">
         <div>
             <h4 id="toastTitle" class="font-bold text-sm">Notifikasi</h4>
@@ -733,11 +783,8 @@
         </div>
     </div>
 
-    <!-- Firebase SDK Compat Scripts -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
-    
-    <!-- Main Application Script -->
     <script src="app.js"></script>
 </body>
 </html>
