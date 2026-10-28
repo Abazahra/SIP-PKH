@@ -209,7 +209,7 @@
                                 <th class="p-3">Kelompok</th>
                                 <th class="p-3">Jenis Laporan</th>
                                 <th class="p-3">Nama KPM & Keterangan</th>
-                                <th class="p-3">Bukti Foto</th>
+                                <th class="p-3">Bukti Foto / Struk</th>
                                 <th class="p-3">Status</th>
                                 <th class="p-3 text-center">Aksi Verifikasi</th>
                             </tr>
@@ -383,7 +383,8 @@
             <div id="kContentKpm" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-6">
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     <form id="formKpm" onsubmit="handleSaveKpm(event)" class="bg-slate-50 p-5 rounded-2xl border border-slate-200 space-y-3">
-                        <h4 class="font-bold text-slate-800 text-sm">Tambah Anggota KPM Baru</h4>
+                        <h4 id="formKpmTitle" class="font-bold text-slate-800 text-sm">Tambah Anggota KPM Baru</h4>
+                        <input type="hidden" id="editKpmId" value="">
                         <div>
                             <label class="block text-xs font-bold text-slate-700 mb-1">Nama KPM (Ibu / Pengurus)</label>
                             <input type="text" id="kpmNama" required placeholder="Nama Lengkap KPM" class="w-full p-2 bg-white border border-slate-300 rounded-xl text-xs">
@@ -408,9 +409,12 @@
                             <label class="block text-xs font-bold text-slate-700 mb-1">Alamat / RT / RW</label>
                             <input type="text" id="kpmAlamat" required placeholder="Kampung / RT 01 / RW 02" class="w-full p-2 bg-white border border-slate-300 rounded-xl text-xs">
                         </div>
-                        <button type="submit" class="w-full bg-emerald-700 hover:bg-emerald-600 text-white py-2.5 rounded-xl font-bold text-xs shadow transition">
-                            Simpan Anggota KPM
-                        </button>
+                        <div class="flex space-x-2">
+                            <button type="submit" id="btnSubmitKpm" class="flex-grow bg-emerald-700 hover:bg-emerald-600 text-white py-2.5 rounded-xl font-bold text-xs shadow transition">
+                                Simpan Anggota KPM
+                            </button>
+                            <button type="button" id="btnCancelKpmEdit" onclick="cancelKpmEdit()" class="hidden bg-slate-500 text-white px-3 py-2.5 rounded-xl text-xs font-bold">Batal</button>
+                        </div>
                     </form>
 
                     <div class="lg:col-span-2 space-y-3">
@@ -463,6 +467,10 @@
                                 <option value="Alpa / Tanpa Keterangan">Alpa / Tanpa Keterangan</option>
                             </select>
                         </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Unggah Foto Kegiatan P2K2</label>
+                            <input type="file" id="p2k2Foto" accept="image/*" class="w-full p-1.5 bg-white border border-slate-300 rounded-xl text-xs file:mr-2 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100">
+                        </div>
                         <button type="submit" class="w-full bg-emerald-700 hover:bg-emerald-600 text-white py-2.5 rounded-xl font-bold text-xs shadow transition">
                             Simpan Presensi P2K2
                         </button>
@@ -501,13 +509,13 @@
                             </select>
                         </div>
                         <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1">Jenis Komitmen / Layanan</label>
-                            <select id="komitmenJenis" class="w-full p-2 bg-white border border-slate-300 rounded-xl text-xs">
-                                <option value="Posyandu / Layanan Kesehatan Balita">Posyandu / Layanan Kesehatan Balita</option>
-                                <option value="Pemeriksaan Ibu Hamil">Pemeriksaan Ibu Hamil</option>
-                                <option value="Kehadiran Sekolah Anak (Minimal 85%)">Kehadiran Sekolah Anak (Minimal 85%)</option>
-                                <option value="Layanan Kesehatan Lansia">Layanan Kesehatan Lansia</option>
-                            </select>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Jenis Komitmen / Layanan (Bisa Pilih Lebih dari 1)</label>
+                            <div class="space-y-1.5 p-2 bg-white border border-slate-300 rounded-xl text-xs max-h-40 overflow-y-auto">
+                                <label class="flex items-center space-x-2"><input type="checkbox" name="komitmenJenisCheckbox" value="Posyandu / Layanan Kesehatan Balita" class="rounded text-emerald-700"> <span>Posyandu / Layanan Kesehatan Balita</span></label>
+                                <label class="flex items-center space-x-2"><input type="checkbox" name="komitmenJenisCheckbox" value="Pemeriksaan Ibu Hamil" class="rounded text-emerald-700"> <span>Pemeriksaan Ibu Hamil</span></label>
+                                <label class="flex items-center space-x-2"><input type="checkbox" name="komitmenJenisCheckbox" value="Kehadiran Sekolah Anak (Minimal 85%)" class="rounded text-emerald-700"> <span>Kehadiran Sekolah Anak (Minimal 85%)</span></label>
+                                <label class="flex items-center space-x-2"><input type="checkbox" name="komitmenJenisCheckbox" value="Layanan Kesehatan Lansia" class="rounded text-emerald-700"> <span>Layanan Kesehatan Lansia</span></label>
+                            </div>
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-slate-700 mb-1">Status Pemenuhan</label>
@@ -516,6 +524,10 @@
                                 <option value="Terpenuhi Sebagian">Terpenuhi Sebagian</option>
                                 <option value="Tidak Terpenuhi">Tidak Terpenuhi</option>
                             </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Unggah Bukti Foto Layanan</label>
+                            <input type="file" id="komitmenFoto" accept="image/*" required class="w-full p-1.5 bg-white border border-slate-300 rounded-xl text-xs file:mr-2 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100">
                         </div>
                         <button type="submit" class="w-full bg-emerald-700 hover:bg-emerald-600 text-white py-2.5 rounded-xl font-bold text-xs shadow transition">
                             Kirim ke Pendamping
@@ -566,6 +578,10 @@
                         <div>
                             <label class="block text-xs font-bold text-slate-700 mb-1">Nominal Diterima (Rp)</label>
                             <input type="number" id="rekonNominal" required placeholder="Contoh: 750000" class="w-full p-2 bg-white border border-slate-300 rounded-xl text-xs">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Unggah Struk / Bukti Pencairan</label>
+                            <input type="file" id="rekonFoto" accept="image/*" required class="w-full p-1.5 bg-white border border-slate-300 rounded-xl text-xs file:mr-2 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100">
                         </div>
                         <button type="submit" class="w-full bg-emerald-700 hover:bg-emerald-600 text-white py-2.5 rounded-xl font-bold text-xs shadow transition">
                             Simpan Rekonsiliasi
@@ -709,7 +725,7 @@
         </div>
     </div>
 
-    <!-- TOAST NOTIFICATION (DIAMANKAN DENGAN TRANSLATE-X-FULL) -->
+    <!-- TOAST NOTIFICATION -->
     <div id="toast" class="fixed top-20 right-5 z-50 transform transition-transform duration-300 ease-in-out translate-x-full bg-emerald-600 text-white px-4 py-3 rounded-lg shadow-lg flex items-center space-x-3 max-w-md pointer-events-none">
         <div>
             <h4 id="toastTitle" class="font-bold text-sm">Notifikasi</h4>

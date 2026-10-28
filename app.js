@@ -397,9 +397,6 @@ function renderPendampingVerifikasiTable() {
         }
     });
 
-    const totalCountEl = document.getElementById('pTotalLaporanCount');
-    if (totalCountEl) totalCountEl.innerText = allReports.length;
-
     if (allReports.length === 0) {
         tbody.innerHTML = `<tr><td colspan="7" class="text-center p-6 text-slate-400">Belum ada laporan masuk.</td></tr>`;
         return;
@@ -421,7 +418,7 @@ function renderPendampingVerifikasiTable() {
                     <div class="font-bold">${r.kpmNama}</div>
                     <div class="text-[11px] text-slate-500">${r.jenis || r.tahap || ''}</div>
                 </td>
-                <td class="p-3">${r.foto ? `<a href="${r.foto}" target="_blank" class="text-blue-600 underline font-semibold">Lihat Foto</a>` : '-'}</td>
+                <td class="p-3">${r.foto ? `<a href="${r.foto}" target="_blank" class="text-blue-600 underline font-semibold">Lihat Bukti</a>` : '-'}</td>
                 <td class="p-3">${statusBadge}</td>
                 <td class="p-3 text-center space-x-1">
                     <button onclick="approveReport('${r.id}', '${r.reportType}')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-2 py-1 rounded text-[11px] font-bold">Setuju</button>
@@ -656,6 +653,7 @@ function renderKetuaAllTables() {
                         <td class="p-3">${k.komponen}</td>
                         <td class="p-3">${k.alamat}</td>
                         <td class="p-3 text-center space-x-1">
+                            <button onclick="editKpm('${k.id}')" class="bg-amber-500 hover:bg-amber-600 text-white px-2 py-1 rounded text-xs font-bold">Edit</button>
                             <button onclick="deleteKpm('${k.id}')" class="bg-red-600 hover:bg-red-700 text-white px-2 py-1 rounded text-xs font-bold">Hapus</button>
                         </td>
                     </tr>
@@ -678,7 +676,7 @@ function renderKetuaAllTables() {
                         <td class="p-3 font-bold text-slate-800">${p.kpmNama}</td>
                         <td class="p-3">${p.modul}</td>
                         <td class="p-3"><span class="bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full font-bold">${p.status}</span></td>
-                        <td class="p-3">${p.foto ? `<a href="${p.foto}" target="_blank" class="text-blue-600 underline font-semibold">Foto</a>` : '-'}</td>
+                        <td class="p-3">${p.foto ? `<a href="${p.foto}" target="_blank" class="text-blue-600 underline font-semibold">Lihat Foto</a>` : '-'}</td>
                         <td class="p-3 text-center">
                             <button onclick="deleteP2k2('${p.id}')" class="bg-red-600 hover:bg-red-700 text-white px-2 py-1 rounded text-xs font-bold">Hapus</button>
                         </td>
@@ -702,7 +700,7 @@ function renderKetuaAllTables() {
                         <td class="p-3 font-bold text-slate-800">${k.kpmNama}</td>
                         <td class="p-3">${k.jenis}</td>
                         <td class="p-3"><span class="bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full font-bold">${k.status}</span></td>
-                        <td class="p-3">${k.foto ? `<a href="${k.foto}" target="_blank" class="text-blue-600 underline font-semibold">Bukti</a>` : '-'}</td>
+                        <td class="p-3">${k.foto ? `<a href="${k.foto}" target="_blank" class="text-blue-600 underline font-semibold">Lihat Bukti</a>` : '-'}</td>
                         <td class="p-3 text-center">
                             <button onclick="deleteKomitmen('${k.id}')" class="bg-red-600 hover:bg-red-700 text-white px-2 py-1 rounded text-xs font-bold">Hapus</button>
                         </td>
@@ -726,7 +724,7 @@ function renderKetuaAllTables() {
                         <td class="p-3 font-bold text-slate-800">${r.kpmNama}</td>
                         <td class="p-3 font-semibold">${r.tahap}</td>
                         <td class="p-3 font-bold text-emerald-700">Rp ${r.nominal.toLocaleString('id-ID')}</td>
-                        <td class="p-3">${r.foto ? `<a href="${r.foto}" target="_blank" class="text-blue-600 underline font-semibold">Struk</a>` : '-'}</td>
+                        <td class="p-3">${r.foto ? `<a href="${r.foto}" target="_blank" class="text-blue-600 underline font-semibold">Lihat Struk</a>` : '-'}</td>
                         <td class="p-3 text-center">
                             <button onclick="deleteRekonsiliasi('${r.id}')" class="bg-red-600 hover:bg-red-700 text-white px-2 py-1 rounded text-xs font-bold">Hapus</button>
                         </td>
@@ -739,39 +737,78 @@ function renderKetuaAllTables() {
 
 function handleSaveKpm(e) {
     e.preventDefault();
+    const editId = document.getElementById('editKpmId').value;
     const nama = document.getElementById('kpmNama').value.trim();
     const nik = document.getElementById('kpmNik').value.trim();
     const alamat = document.getElementById('kpmAlamat').value.trim();
 
-    // Ambil semua komponen yang dicentang
     const checkboxes = document.querySelectorAll('input[name="kpmKomponen"]:checked');
     let selectedKomponen = [];
-    checkboxes.forEach((cb) => {
-        selectedKomponen.push(cb.value);
-    });
+    checkboxes.forEach((cb) => { selectedKomponen.push(cb.value); });
 
     if (selectedKomponen.length === 0) {
         alert("Pilih minimal satu Komponen Utama PKH.");
         return;
     }
-
     const komponenStr = selectedKomponen.join(', ');
 
-    appState.kpmList.push({ 
-        id: "KPM-" + Date.now(), 
-        nama, 
-        nik, 
-        komponen: komponenStr, 
-        alamat, 
-        kelompok: currentUser.kelompok 
-    });
-    
+    if (editId) {
+        const kpm = appState.kpmList.find(k => k.id === editId);
+        if (kpm) {
+            kpm.nama = nama;
+            kpm.nik = nik;
+            kpm.komponen = komponenStr;
+            kpm.alamat = alamat;
+        }
+        document.getElementById('editKpmId').value = '';
+        document.getElementById('formKpmTitle').innerText = "Tambah Anggota KPM Baru";
+        document.getElementById('btnSubmitKpm').innerText = "Simpan Anggota KPM";
+        document.getElementById('btnCancelKpmEdit').classList.add('hidden');
+        showToast("KPM Diperbarui", "Data berhasil diubah.", "success");
+    } else {
+        appState.kpmList.push({ 
+            id: "KPM-" + Date.now(), 
+            nama, 
+            nik, 
+            komponen: komponenStr, 
+            alamat, 
+            kelompok: currentUser.kelompok 
+        });
+        showToast("KPM Disimpan", "Anggota berhasil ditambahkan.", "success");
+    }
+
     saveState();
-    
     document.getElementById('formKpm').reset();
     populateKetuaKpmSelects();
     renderKetuaAllTables();
-    showToast("KPM Disimpan", "Anggota berhasil ditambahkan.", "success");
+}
+
+function editKpm(id) {
+    const kpm = appState.kpmList.find(k => k.id === id);
+    if (!kpm) return;
+
+    document.getElementById('editKpmId').value = kpm.id;
+    document.getElementById('kpmNama').value = kpm.nama;
+    document.getElementById('kpmNik').value = kpm.nik;
+    document.getElementById('kpmAlamat').value = kpm.alamat;
+
+    const checkboxes = document.querySelectorAll('input[name="kpmKomponen"]');
+    checkboxes.forEach(cb => {
+        cb.checked = kpm.komponen.includes(cb.value);
+    });
+
+    document.getElementById('formKpmTitle').innerText = "Edit Anggota KPM";
+    document.getElementById('btnSubmitKpm').innerText = "Perbarui KPM";
+    document.getElementById('btnCancelKpmEdit').classList.remove('hidden');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function cancelKpmEdit() {
+    document.getElementById('editKpmId').value = '';
+    document.getElementById('formKpm').reset();
+    document.getElementById('formKpmTitle').innerText = "Tambah Anggota KPM Baru";
+    document.getElementById('btnSubmitKpm').innerText = "Simpan Anggota KPM";
+    document.getElementById('btnCancelKpmEdit').classList.add('hidden');
 }
 
 function handleSaveP2k2(e) {
@@ -779,8 +816,24 @@ function handleSaveP2k2(e) {
     const kpmNama = document.getElementById('p2k2KpmSelect').value;
     const modul = document.getElementById('p2k2Modul').value;
     const status = document.getElementById('p2k2Status').value;
+    const fotoInput = document.getElementById('p2k2Foto');
+    
     if (!kpmNama) return alert("Pilih KPM.");
 
+    let fotoUrl = "";
+    if (fotoInput.files && fotoInput.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(uploadEvent) {
+            fotoUrl = uploadEvent.target.result;
+            saveP2k2Data(kpmNama, modul, status, fotoUrl);
+        };
+        reader.readAsDataURL(fotoInput.files[0]);
+    } else {
+        saveP2k2Data(kpmNama, modul, status, "");
+    }
+}
+
+function saveP2k2Data(kpmNama, modul, status, foto) {
     appState.p2k2List.push({
         id: "P2K2-" + Date.now(),
         tanggal: new Date().toISOString().split('T')[0],
@@ -788,7 +841,7 @@ function handleSaveP2k2(e) {
         modul,
         status,
         kelompok: currentUser.kelompok,
-        foto: ""
+        foto: foto
     });
     saveState();
     document.getElementById('formP2k2').reset();
@@ -799,24 +852,45 @@ function handleSaveP2k2(e) {
 function handleSaveKomitmen(e) {
     e.preventDefault();
     const kpmNama = document.getElementById('komitmenKpmSelect').value;
-    const jenis = document.getElementById('komitmenJenis').value;
     const status = document.getElementById('komitmenStatus').value;
+    const fotoInput = document.getElementById('komitmenFoto');
+
     if (!kpmNama) return alert("Pilih KPM.");
 
-    appState.komitmenList.push({
-        id: "KOM-" + Date.now(),
-        tanggal: new Date().toISOString().split('T')[0],
-        kpmNama,
-        jenis,
-        status,
-        kelompok: currentUser.kelompok,
-        statusVerifikasi: "PENDING",
-        foto: ""
-    });
-    saveState();
-    document.getElementById('formKomitmen').reset();
-    renderKetuaAllTables();
-    showToast("Komitmen Saved", "Laporan dikirim.", "success");
+    const checkboxes = document.querySelectorAll('input[name="komitmenJenisCheckbox"]:checked');
+    let selectedJenis = [];
+    checkboxes.forEach(cb => selectedJenis.push(cb.value));
+
+    if (selectedJenis.length === 0) {
+        alert("Pilih minimal satu Jenis Komitmen / Layanan.");
+        return;
+    }
+    const jenisStr = selectedJenis.join(', ');
+
+    if (!fotoInput.files || !fotoInput.files[0]) {
+        alert("Harap unggah bukti foto layanan komitmen.");
+        return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = function(uploadEvent) {
+        const fotoUrl = uploadEvent.target.result;
+        appState.komitmenList.push({
+            id: "KOM-" + Date.now(),
+            tanggal: new Date().toISOString().split('T')[0],
+            kpmNama,
+            jenis: jenisStr,
+            status,
+            kelompok: currentUser.kelompok,
+            statusVerifikasi: "PENDING",
+            foto: fotoUrl
+        });
+        saveState();
+        document.getElementById('formKomitmen').reset();
+        renderKetuaAllTables();
+        showToast("Komitmen Saved", "Laporan dikirim dengan foto.", "success");
+    };
+    reader.readAsDataURL(fotoInput.files[0]);
 }
 
 function handleSaveRekonsiliasi(e) {
@@ -824,22 +898,33 @@ function handleSaveRekonsiliasi(e) {
     const kpmNama = document.getElementById('rekonKpmSelect').value;
     const nominal = parseFloat(document.getElementById('rekonNominal').value);
     const tahap = document.getElementById('rekonTahap').value;
-    if (!kpmNama) return alert("Pilih KPM.");
+    const fotoInput = document.getElementById('rekonFoto');
 
-    appState.rekonsiliasiList.push({
-        id: "REK-" + Date.now(),
-        tanggal: new Date().toISOString().split('T')[0],
-        kpmNama,
-        nominal,
-        tahap,
-        kelompok: currentUser.kelompok,
-        statusVerifikasi: "PENDING",
-        foto: ""
-    });
-    saveState();
-    document.getElementById('formRekonsiliasi').reset();
-    renderKetuaAllTables();
-    showToast("Rekonsiliasi Saved", "Pencairan disimpan.", "success");
+    if (!kpmNama) return alert("Pilih KPM.");
+    if (!fotoInput.files || !fotoInput.files[0]) {
+        alert("Harap unggah struk / bukti pencairan bantuan.");
+        return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = function(uploadEvent) {
+        const fotoUrl = uploadEvent.target.result;
+        appState.rekonsiliasiList.push({
+            id: "REK-" + Date.now(),
+            tanggal: new Date().toISOString().split('T')[0],
+            kpmNama,
+            nominal,
+            tahap,
+            kelompok: currentUser.kelompok,
+            statusVerifikasi: "PENDING",
+            foto: fotoUrl
+        });
+        saveState();
+        document.getElementById('formRekonsiliasi').reset();
+        renderKetuaAllTables();
+        showToast("Rekonsiliasi Saved", "Pencairan disimpan dengan struk.", "success");
+    };
+    reader.readAsDataURL(fotoInput.files[0]);
 }
 
 function deleteKpm(id) {
