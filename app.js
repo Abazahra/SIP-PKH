@@ -70,10 +70,6 @@ async function saveState() {
 
 function openAboutModal() { document.getElementById('modalAboutApp').classList.remove('hidden'); }
 function closeAboutModal() { document.getElementById('modalAboutApp').classList.add('hidden'); }
-function copyAccountNo() {
-    navigator.clipboard.writeText('7211585298');
-    showToast("Berhasil Disalin", "Nomor rekening BSI telah disalin.", "success");
-}
 
 function checkUrlInviteParams() {
     const urlParams = new URLSearchParams(window.location.search);
@@ -88,9 +84,12 @@ function checkUrlInviteParams() {
 
 function updateShareInviteUrl() {
     const shareInput = document.getElementById('shareInviteUrl');
-    if (shareInput && currentUser && currentUser.role === 'pendamping') {
+    const displayCode = document.getElementById('displayInviteCode');
+    const currentCode = appState.inviteCode || "PKH-SUKAMAJU";
+    if (displayCode) displayCode.innerText = currentCode;
+    if (shareInput) {
         const baseUrl = window.location.origin + window.location.pathname;
-        shareInput.value = `${baseUrl}?invite=${currentUser.inviteCode || appState.inviteCode}`;
+        shareInput.value = `${baseUrl}?invite=${currentCode}`;
     }
 }
 
@@ -102,7 +101,7 @@ function copyInviteUrl() {
 }
 
 function shareInviteWhatsApp() {
-    const code = currentUser && currentUser.inviteCode ? currentUser.inviteCode : appState.inviteCode;
+    const code = appState.inviteCode || "PKH-SUKAMAJU";
     const fullUrl = encodeURIComponent(window.location.origin + window.location.pathname + `?invite=${code}`);
     const text = encodeURIComponent(`Silakan daftarkan akun Ketua Kelompok PKH melalui tautan berikut:\n\n👉 ${decodeURIComponent(fullUrl)}\n\nKode Undangan: ${code}`);
     window.open(`https://wa.me/?text=${text}`, '_blank');
@@ -159,20 +158,25 @@ function handleLogin(e) {
             currentUser = { role: 'pendamping', ...pendamping };
             showToast("Login Berhasil", "Selamat datang " + pendamping.nama, "success");
             renderUI();
-        } else { alert("Login Pendamping gagal."); }
+        } else { alert("Login Pendamping gagal. Periksa kembali NIP/Nama dan PIN."); }
     } else {
         const ketua = appState.ketuaUsers.find(k => (k.nama.toLowerCase().includes(identifier.toLowerCase()) || k.hp === identifier) && k.pin === pin);
         if (ketua) {
-            if (ketua.status !== 'VERIFIED') return alert("Akun masih PENDING verifikasi.");
+            if (ketua.status !== 'VERIFIED') return alert("Akun ketua masih PENDING menunggu verifikasi pendamping.");
             currentUser = { role: 'ketua', ...ketua };
             showToast("Login Berhasil", "Selamat datang Ketua " + ketua.nama, "success");
             renderUI();
-        } else { alert("Login Ketua gagal."); }
+        } else { alert("Login Ketua gagal. Periksa kembali Nama/HP dan PIN."); }
     }
 }
 
 function handleRegisterKetua(e) {
     e.preventDefault();
+    const inviteCodeInput = document.getElementById('regKetuaInviteCode').value.trim().toUpperCase();
+    if (inviteCodeInput !== (appState.inviteCode || "PKH-SUKAMAJU")) {
+        return alert("Kode undangan salah! Gunakan kode undangan yang valid dari Pendamping.");
+    }
+
     const nama = document.getElementById('regKetuaNama').value.trim();
     const hp = document.getElementById('regKetuaHp').value.trim();
     const kelompok = document.getElementById('regKetuaKelompok').value.trim();
@@ -186,7 +190,7 @@ function handleRegisterKetua(e) {
         date: new Date().toISOString().split('T')[0]
     });
     saveState();
-    alert("Pendaftaran berhasil! Menunggu verifikasi pendamping.");
+    alert("Pendaftaran berhasil! Silakan tunggu verifikasi dari Pendamping PKH.");
     switchMainTab('login');
 }
 
@@ -194,11 +198,13 @@ function handleRegisterPendamping(e) {
     e.preventDefault();
     const nama = document.getElementById('regPndNama').value.trim();
     const nip = document.getElementById('regPndNip').value.trim();
+    const invite = document.getElementById('regPndInvite').value.trim().toUpperCase();
     const pin = document.getElementById('regPndPin').value.trim();
 
-    appState.pendampingProfiles.push({ id: "PND-" + Date.now(), nama, nip, pin, inviteCode: "PKH-" + Math.floor(1000+Math.random()*9000) });
+    appState.pendampingProfiles.push({ id: "PND-" + Date.now(), nama, nip, pin, inviteCode: invite });
+    appState.inviteCode = invite;
     saveState();
-    showToast("Berhasil", "Akun pendamping dibuat.", "success");
+    showToast("Berhasil", "Akun pendamping terdaftar.", "success");
     switchMainTab('login');
 }
 
@@ -265,6 +271,7 @@ function switchPendampingTab(tab) {
     } else if (tab === 'undangan') {
         document.getElementById('pContentUndangan').classList.remove('hidden');
         document.getElementById('pTabUndangan').className = "py-3 px-4 rounded-xl bg-blue-900 text-white text-xs font-bold flex items-center space-x-2 shadow";
+        renderPendampingKetuaManagement();
     } else if (tab === 'rekap') {
         document.getElementById('pContentRekap').classList.remove('hidden');
         document.getElementById('pTabRekap').className = "py-3 px-4 rounded-xl bg-blue-900 text-white text-xs font-bold flex items-center space-x-2 shadow";
@@ -282,13 +289,12 @@ function populatePendampingFilters() {
     });
 }
 
-// (Poir 1): Kelola Kelompok & Anggota di Pendamping dengan Filter, Edit, Hapus
 function renderPendampingKelompokManajemen() {
     const filter = document.getElementById('pFilterKelompokManajemen').value;
     const tbody = document.getElementById('tbodyPendampingKelompokList');
     tbody.innerHTML = '';
 
-    const ketuaList = filter === 'ALL' ? appState.ketuaUsers : appState.ketuaUsers.filter(k => k.kelompok === filter);
+    const ketuaList = filter === 'ALL' ? appState.ketuaUsers.filter(k => k.status === 'VERIFIED') : appState.ketuaUsers.filter(k => k.status === 'VERIFIED' && k.kelompok === filter);
 
     if (ketuaList.length === 0) {
         tbody.innerHTML = `<tr><td colspan="5" class="text-center p-4 text-slate-400">Tidak ada kelompok ditemukan.</td></tr>`;
@@ -390,6 +396,10 @@ function renderPendampingVerifikasiTable() {
             fotoHtml = `<a href="${r.foto}" target="_blank" class="text-blue-600 underline font-semibold">Lihat Bukti</a>`;
         }
 
+        let badgeStatus = 'bg-amber-100 text-amber-800';
+        if (r.statusVerifikasi === 'DISETUJUI') badgeStatus = 'bg-emerald-100 text-emerald-800';
+        if (r.statusVerifikasi === 'DITOLAK') badgeStatus = 'bg-red-100 text-red-800';
+
         tbody.innerHTML += `
             <tr>
                 <td class="p-3">${r.tanggal}</td>
@@ -397,10 +407,10 @@ function renderPendampingVerifikasiTable() {
                 <td class="p-3">${r.reportType}</td>
                 <td class="p-3"><div class="font-bold">${r.kpmNama}</div><div class="text-[11px] text-slate-500">${r.jenis || r.tahap || ''}</div></td>
                 <td class="p-3">${fotoHtml}</td>
-                <td class="p-3"><span class="px-2 py-0.5 rounded-full font-bold ${r.statusVerifikasi==='DISETUJUI'?'bg-emerald-100 text-emerald-800':'bg-amber-100 text-amber-800'}">${r.statusVerifikasi||'PENDING'}</span></td>
+                <td class="p-3"><span class="px-2.5 py-1 rounded-full font-bold ${badgeStatus}">${r.statusVerifikasi||'PENDING'}</span></td>
                 <td class="p-3 text-center space-x-1">
-                    <button onclick="approveReport('${r.id}', '${r.reportType}')" class="bg-emerald-600 text-white px-2 py-1 rounded text-[11px] font-bold">Setuju</button>
-                    <button onclick="rejectReport('${r.id}', '${r.reportType}')" class="bg-red-600 text-white px-2 py-1 rounded text-[11px] font-bold">Tolak</button>
+                    <button onclick="approveReport('${r.id}', '${r.reportType}')" class="bg-emerald-600 text-white px-2.5 py-1 rounded text-xs font-bold">Setuju</button>
+                    <button onclick="rejectReport('${r.id}', '${r.reportType}')" class="bg-red-600 text-white px-2.5 py-1 rounded text-xs font-bold">Tolak</button>
                 </td>
             </tr>
         `;
@@ -427,9 +437,19 @@ function rejectReport(id, type) {
 
 function renderPendampingKetuaManagement() {
     const tbodyPending = document.getElementById('tbodyPendingKetua');
-    if (!tbodyPending) return;
+    const tbodyActive = document.getElementById('tbodyActiveKetua');
+    const badgePending = document.getElementById('badgePendingKetua');
+
+    if (!tbodyPending || !tbodyActive) return;
+
+    // Render Pending Ketua
     tbodyPending.innerHTML = '';
     const pending = appState.ketuaUsers.filter(k => k.status === 'PENDING');
+    if (badgePending) {
+        if (pending.length > 0) { badgePending.innerText = pending.length; badgePending.classList.remove('hidden'); }
+        else { badgePending.classList.add('hidden'); }
+    }
+
     if (pending.length === 0) {
         tbodyPending.innerHTML = `<tr><td colspan="5" class="text-center p-4 text-slate-400">Tidak ada antrean pendaftaran.</td></tr>`;
     } else {
@@ -441,7 +461,29 @@ function renderPendampingKetuaManagement() {
                     <td class="p-3">${k.kelompok}</td>
                     <td class="p-3">${k.date}</td>
                     <td class="p-3 text-center">
-                        <button onclick="verifyKetua('${k.id}', true)" class="bg-emerald-600 text-white px-2.5 py-1 rounded text-xs font-bold">Setujui</button>
+                        <button onclick="verifyKetua('${k.id}', true)" class="bg-emerald-600 text-white px-3 py-1 rounded text-xs font-bold shadow">Setujui</button>
+                    </td>
+                </tr>
+            `;
+        });
+    }
+
+    // Render Active Ketua (Dilengkapi Tombol Ganti PIN / Password & Hapus)
+    tbodyActive.innerHTML = '';
+    const active = appState.ketuaUsers.filter(k => k.status === 'VERIFIED');
+    if (active.length === 0) {
+        tbodyActive.innerHTML = `<tr><td colspan="5" class="text-center p-4 text-slate-400">Belum ada ketua kelompok aktif.</td></tr>`;
+    } else {
+        active.forEach(k => {
+            tbodyActive.innerHTML += `
+                <tr>
+                    <td class="p-3 font-bold">${k.nama}</td>
+                    <td class="p-3">${k.hp}</td>
+                    <td class="p-3 font-semibold text-blue-900">${k.kelompok}</td>
+                    <td class="p-3 font-mono">••••••</td>
+                    <td class="p-3 text-center space-x-1">
+                        <button onclick="openEditKetuaPinModal('${k.id}')" class="bg-amber-600 text-white px-2.5 py-1 rounded text-xs font-bold"><i class="fas fa-key"></i> Ganti Password</button>
+                        <button onclick="deleteKetuaAccount('${k.id}')" class="bg-red-600 text-white px-2.5 py-1 rounded text-xs font-bold"><i class="fas fa-trash"></i> Hapus</button>
                     </td>
                 </tr>
             `;
@@ -456,19 +498,76 @@ function verifyKetua(id, approve) {
         saveState();
         renderPendampingKetuaManagement();
         populatePendampingFilters();
-        showToast("Berhasil", "Akun ketua diaktifkan.", "success");
+        showToast("Berhasil", "Akun ketua berhasil diaktifkan.", "success");
     }
 }
 
 function deleteKetuaAccount(id) {
-    if (confirm("Hapus kelompok & akun ketua ini?")) {
+    if (confirm("Hapus kelompok & akun ketua ini secara permanen?")) {
         appState.ketuaUsers = appState.ketuaUsers.filter(k => k.id !== id);
         saveState();
         renderPendampingKelompokManajemen();
         renderPendampingKetuaManagement();
         populatePendampingFilters();
-        showToast("Dihapus", "Akun kelompok dihapus.", "info");
+        showToast("Dihapus", "Akun kelompok telah dihapus.", "info");
     }
+}
+
+function openEditKetuaPinModal(id) {
+    const k = appState.ketuaUsers.find(item => item.id === id);
+    if (!k) return;
+    document.getElementById('editKetuaId').value = k.id;
+    document.getElementById('editKetuaInfoName').value = `${k.nama} (Kelompok: ${k.kelompok})`;
+    document.getElementById('editKetuaNewPin').value = '';
+    document.getElementById('modalEditKetuaPin').classList.remove('hidden');
+}
+
+function closeEditKetuaPinModal() {
+    document.getElementById('modalEditKetuaPin').classList.add('hidden');
+}
+
+function handleSaveKetuaPin(e) {
+    e.preventDefault();
+    const id = document.getElementById('editKetuaId').value;
+    const newPin = document.getElementById('editKetuaNewPin').value.trim();
+    const k = appState.ketuaUsers.find(item => item.id === id);
+    if (k && newPin) {
+        k.pin = newPin;
+        saveState();
+        closeEditKetuaPinModal();
+        renderPendampingKetuaManagement();
+        showToast("Berhasil", "Password / PIN ketua kelompok berhasil diperbarui.", "success");
+    }
+}
+
+function openTambahKetuaManualModal() {
+    document.getElementById('modalTambahKetua').classList.remove('hidden');
+}
+
+function closeTambahKetuaManualModal() {
+    document.getElementById('modalTambahKetua').classList.add('hidden');
+}
+
+function handleTambahKetuaManual(e) {
+    e.preventDefault();
+    const nama = document.getElementById('mKetuaNama').value.trim();
+    const hp = document.getElementById('mKetuaHp').value.trim();
+    const kelompok = document.getElementById('mKetuaKelompok').value.trim();
+    const pin = document.getElementById('mKetuaPin').value.trim();
+
+    appState.ketuaUsers.push({
+        id: "KET-" + Date.now(),
+        nama, hp, kelompok, pin,
+        status: "VERIFIED",
+        pendampingId: currentUser.id,
+        date: new Date().toISOString().split('T')[0]
+    });
+    saveState();
+    closeTambahKetuaManualModal();
+    renderPendampingKelompokManajemen();
+    renderPendampingKetuaManagement();
+    populatePendampingFilters();
+    showToast("Berhasil", "Akun ketua kelompok manual ditambahkan.", "success");
 }
 
 // --- KETUA KELOMPOK ---
@@ -545,6 +644,7 @@ function renderKetuaAllTables() {
         });
     }
 
+    // (Sinkronisasi Poin Penting): Riwayat Komitmen Ketua Menampilkan Status Verifikasi Terbaru dari Pendamping
     const tbodyKomitmen = document.getElementById('tbodyKetuaKomitmen');
     if (tbodyKomitmen) {
         tbodyKomitmen.innerHTML = '';
@@ -553,13 +653,19 @@ function renderKetuaAllTables() {
             if (Array.isArray(k.foto)) {
                 fotoLinks = k.foto.map((f, i) => `<a href="${f}" target="_blank" class="text-blue-600 underline text-[11px] block">Foto ${i+1}</a>`).join('');
             }
+
+            let badgeStatus = 'bg-amber-100 text-amber-800';
+            if (k.statusVerifikasi === 'DISETUJUI') badgeStatus = 'bg-emerald-100 text-emerald-800';
+            if (k.statusVerifikasi === 'DITOLAK') badgeStatus = 'bg-red-100 text-red-800';
+
             tbodyKomitmen.innerHTML += `
                 <tr>
                     <td class="p-3">${k.tanggal}</td>
                     <td class="p-3 font-bold">${k.kpmNama}</td>
                     <td class="p-3">${k.jenis}<div class="mt-1">${fotoLinks}</div></td>
                     <td class="p-3">${k.status}</td>
-                    <td class="p-3 text-center"><button onclick="deleteKomitmen('${k.id}')" class="bg-red-600 text-white px-2 py-1 rounded text-xs">Hapus</button></td>
+                    <td class="p-3"><span class="px-2.5 py-1 rounded-full font-bold ${badgeStatus}">${k.statusVerifikasi || 'PENDING'}</span></td>
+                    <td class="p-3 text-center"><button onclick="deleteKomitmen('${k.id}')" class="bg-red-600 text-white px-2 py-1 rounded text-xs font-bold">Hapus</button></td>
                 </tr>
             `;
         });
@@ -583,7 +689,6 @@ function renderKetuaAllTables() {
     }
 }
 
-// (Poin 3): Simpan KPM dengan Jenis Bantuan
 function handleSaveKpm(e) {
     e.preventDefault();
     const editId = document.getElementById('editKpmId').value;
@@ -663,7 +768,6 @@ function handleSaveP2k2(e) {
     }
 }
 
-// (Poin 4): Toggle Input File Dinamis Sesuai Jumlah Pilihan Komitmen
 function toggleKomitmenFotoInput(cb) {
     const container = document.getElementById('fileContainer_' + cb.value);
     if (cb.checked) {
@@ -709,13 +813,13 @@ function handleSaveKomitmen(e) {
             status,
             kelompok: currentUser.kelompok,
             statusVerifikasi: "PENDING",
-            foto: base64Images // Simpan array foto sesuai jumlah pilihan
+            foto: base64Images
         });
         saveState();
         document.getElementById('formKomitmen').reset();
         document.querySelectorAll('[id^="fileContainer_"]').forEach(el => el.classList.add('hidden'));
         renderKetuaAllTables();
-        showToast("Berhasil", "Laporan komitmen dikirim.", "success");
+        showToast("Berhasil", "Laporan komitmen dikirim ke Pendamping.", "success");
     });
 }
 
@@ -743,13 +847,12 @@ function deleteP2k2(id) { if (confirm("Hapus presensi?")) { appState.p2k2List = 
 function deleteKomitmen(id) { if (confirm("Hapus komitmen?")) { appState.komitmenList = appState.komitmenList.filter(k => k.id !== id); saveState(); renderKetuaAllTables(); } }
 function deleteRekonsiliasi(id) { if (confirm("Hapus rekon?")) { appState.rekonsiliasiList = appState.rekonsiliasiList.filter(r => r.id !== id); saveState(); renderKetuaAllTables(); } }
 
-// (Poin 2 & 5): Pusat Cetak dengan Filter Kelompok & Bulan serta Kop Surat Resmi
 function openPrintModal(type) {
     const modal = document.getElementById('modalPrintViewer');
     const titleEl = document.getElementById('printDocTitle');
     const tableContainer = document.getElementById('printDocTableContainer');
     const filterKelompok = document.getElementById('printFilterKelompok').value;
-    const filterBulan = document.getElementById('printFilterBulan').value; // Format: YYYY-MM
+    const filterBulan = document.getElementById('printFilterBulan').value;
 
     const currentPendamping = (currentUser && currentUser.role === 'pendamping') ? currentUser : (appState.pendampingProfiles[0] || { nama: "Pendamping PKH", nip: "-" });
     document.getElementById('printPendampingTtdNama').innerText = currentPendamping.nama;
@@ -758,7 +861,6 @@ function openPrintModal(type) {
 
     tableContainer.innerHTML = '';
 
-    // Helper filter kelayakan
     const checkFilter = (itemKelompok, itemTanggal) => {
         if (filterKelompok !== 'ALL' && itemKelompok !== filterKelompok) return false;
         if (filterBulan && itemTanggal) {
@@ -783,13 +885,13 @@ function openPrintModal(type) {
 
     } else if (type === 'komitmen') {
         titleEl.innerText = "LAPORAN VERIFIKASI KOMITMEN KPM PKH";
-        let html = `<table class="w-full border-collapse border border-black text-xs text-black"><thead><tr class="bg-gray-100 text-center font-bold"><th class="border border-black p-2">No</th><th class="border border-black p-2">Tanggal</th><th class="border border-black p-2">Kelompok</th><th class="border border-black p-2">Nama KPM</th><th class="border border-black p-2">Jenis Layanan</th><th class="border border-black p-2">Status</th></tr></thead><tbody>`;
+        let html = `<table class="w-full border-collapse border border-black text-xs text-black"><thead><tr class="bg-gray-100 text-center font-bold"><th class="border border-black p-2">No</th><th class="border border-black p-2">Tanggal</th><th class="border border-black p-2">Kelompok</th><th class="border border-black p-2">Nama KPM</th><th class="border border-black p-2">Jenis Layanan</th><th class="border border-black p-2">Status</th><th class="border border-black p-2">Verifikasi</th></tr></thead><tbody>`;
         
         const data = appState.komitmenList.filter(k => checkFilter(k.kelompok, k.tanggal));
-        if (data.length === 0) { html += `<tr><td colspan="6" class="border border-black p-4 text-center">Tidak ada data sesuai filter.</td></tr>`; }
+        if (data.length === 0) { html += `<tr><td colspan="7" class="border border-black p-4 text-center">Tidak ada data sesuai filter.</td></tr>`; }
         else {
             data.forEach((k, idx) => {
-                html += `<tr><td class="border border-black p-2 text-center">${idx+1}</td><td class="border border-black p-2 text-center">${k.tanggal}</td><td class="border border-black p-2 text-center">${k.kelompok}</td><td class="border border-black p-2 font-bold">${k.kpmNama}</td><td class="border border-black p-2">${k.jenis}</td><td class="border border-black p-2 text-center">${k.status}</td></tr>`;
+                html += `<tr><td class="border border-black p-2 text-center">${idx+1}</td><td class="border border-black p-2 text-center">${k.tanggal}</td><td class="border border-black p-2 text-center">${k.kelompok}</td><td class="border border-black p-2 font-bold">${k.kpmNama}</td><td class="border border-black p-2">${k.jenis}</td><td class="border border-black p-2 text-center">${k.status}</td><td class="border border-black p-2 text-center font-bold">${k.statusVerifikasi || 'PENDING'}</td></tr>`;
             });
         }
         html += `</tbody></table>`;
@@ -798,16 +900,16 @@ function openPrintModal(type) {
     } else if (type === 'rekonsiliasi') {
         titleEl.innerText = "LAPORAN REKONSILIASI PENCAIRAN BANTUAN SOSIAL PKH";
         let total = 0;
-        let html = `<table class="w-full border-collapse border border-black text-xs text-black"><thead><tr class="bg-gray-100 text-center font-bold"><th class="border border-black p-2">No</th><th class="border border-black p-2">Tanggal</th><th class="border border-black p-2">Kelompok</th><th class="border border-black p-2">Nama KPM</th><th class="border border-black p-2">Tahap</th><th class="border border-black p-2 text-right">Nominal (Rp)</th></tr></thead><tbody>`;
+        let html = `<table class="w-full border-collapse border border-black text-xs text-black"><thead><tr class="bg-gray-100 text-center font-bold"><th class="border border-black p-2">No</th><th class="border border-black p-2">Tanggal</th><th class="border border-black p-2">Kelompok</th><th class="border border-black p-2">Nama KPM</th><th class="border border-black p-2">Tahap</th><th class="border border-black p-2 text-right">Nominal (Rp)</th><th class="border border-black p-2">Verifikasi</th></tr></thead><tbody>`;
         
         const data = appState.rekonsiliasiList.filter(r => checkFilter(r.kelompok, r.tanggal));
-        if (data.length === 0) { html += `<tr><td colspan="6" class="border border-black p-4 text-center">Tidak ada data sesuai filter.</td></tr>`; }
+        if (data.length === 0) { html += `<tr><td colspan="7" class="border border-black p-4 text-center">Tidak ada data sesuai filter.</td></tr>`; }
         else {
             data.forEach((r, idx) => {
                 total += r.nominal;
-                html += `<tr><td class="border border-black p-2 text-center">${idx+1}</td><td class="border border-black p-2 text-center">${r.tanggal}</td><td class="border border-black p-2 text-center">${r.kelompok}</td><td class="border border-black p-2 font-bold">${r.kpmNama}</td><td class="border border-black p-2 text-center">${r.tahap}</td><td class="border border-black p-2 text-right">Rp ${r.nominal.toLocaleString('id-ID')}</td></tr>`;
+                html += `<tr><td class="border border-black p-2 text-center">${idx+1}</td><td class="border border-black p-2 text-center">${r.tanggal}</td><td class="border border-black p-2 text-center">${r.kelompok}</td><td class="border border-black p-2 font-bold">${r.kpmNama}</td><td class="border border-black p-2 text-center">${r.tahap}</td><td class="border border-black p-2 text-right">Rp ${r.nominal.toLocaleString('id-ID')}</td><td class="border border-black p-2 text-center font-bold">${r.statusVerifikasi || 'PENDING'}</td></tr>`;
             });
-            html += `<tr class="bg-gray-100 font-bold"><td colspan="5" class="border border-black p-2 text-right">Total:</td><td class="border border-black p-2 text-right">Rp ${total.toLocaleString('id-ID')}</td></tr>`;
+            html += `<tr class="bg-gray-100 font-bold"><td colspan="5" class="border border-black p-2 text-right">Total:</td><td colspan="2" class="border border-black p-2 text-right">Rp ${total.toLocaleString('id-ID')}</td></tr>`;
         }
         html += `</tbody></table>`;
         tableContainer.innerHTML = html;

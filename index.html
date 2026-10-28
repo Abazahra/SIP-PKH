@@ -222,7 +222,7 @@
                 </div>
             </div>
 
-            <!-- Tab Content: Kelola Kelompok & Anggota (Poin 1) -->
+            <!-- Tab Content 2: Kelola Kelompok & Anggota -->
             <div id="pContentKelompok" class="hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-6">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-4 border-b border-slate-100">
                     <div>
@@ -252,7 +252,7 @@
                 </div>
             </div>
 
-            <!-- Tab Content 2: Manajemen & Undangan Ketua -->
+            <!-- Tab Content 3: Undang & Verifikasi Ketua (Lengkap dengan Edit Password & Pengaturan Kode) -->
             <div id="pContentUndangan" class="hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-6">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div class="bg-slate-50 p-5 rounded-2xl border border-slate-200 space-y-3">
@@ -266,17 +266,27 @@
                                 <button onclick="copyInviteUrl()" class="bg-blue-900 hover:bg-blue-800 text-white px-3 py-2 rounded-xl text-xs font-bold whitespace-nowrap">Salin</button>
                             </div>
                         </div>
+                        <div class="pt-2 border-t border-slate-200">
+                            <label class="block text-[11px] font-bold text-slate-600 mb-1">Ubah Kode Undangan:</label>
+                            <div class="flex space-x-2">
+                                <input type="text" id="inputCustomInviteCode" placeholder="KODEBARU" class="w-full p-2 bg-white border border-slate-300 rounded-xl text-xs font-mono uppercase">
+                                <button onclick="updateInviteCode()" class="bg-amber-600 hover:bg-amber-500 text-white px-3 py-2 rounded-xl text-xs font-bold whitespace-nowrap">Simpan</button>
+                            </div>
+                        </div>
                     </div>
+
                     <div class="bg-slate-50 p-5 rounded-2xl border border-slate-200 space-y-3">
                         <h4 class="font-bold text-slate-800 text-sm flex items-center space-x-2">
                             <i class="fas fa-user-plus text-emerald-700"></i> <span>Tambah Akun Ketua Manual</span>
                         </h4>
+                        <p class="text-xs text-slate-500">Buat akun ketua kelompok baru secara langsung tanpa tautan.</p>
                         <button onclick="openTambahKetuaManualModal()" class="w-full bg-emerald-700 hover:bg-emerald-600 text-white py-2.5 rounded-xl text-xs font-bold shadow transition">
                             + Buat Akun Ketua Kelompok Baru
                         </button>
                     </div>
                 </div>
 
+                <!-- Antrean Pendaftaran Ketua (Pending) -->
                 <div class="space-y-3 pt-4 border-t border-slate-100">
                     <h4 class="font-bold text-slate-800 text-sm">Antrean Pendaftaran Ketua Kelompok (Pending)</h4>
                     <div class="overflow-x-auto">
@@ -294,16 +304,34 @@
                         </table>
                     </div>
                 </div>
+
+                <!-- Daftar Ketua Kelompok Aktif (Dilengkapi Ubah Password/PIN & Edit) -->
+                <div class="space-y-3 pt-4 border-t border-slate-100">
+                    <h4 class="font-bold text-slate-800 text-sm">Daftar Ketua Kelompok Aktif Binaan</h4>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse text-xs">
+                            <thead>
+                                <tr class="bg-slate-100 text-slate-700 uppercase">
+                                    <th class="p-3">Nama Ketua</th>
+                                    <th class="p-3">No HP</th>
+                                    <th class="p-3">Kelompok</th>
+                                    <th class="p-3">PIN / Password</th>
+                                    <th class="p-3 text-center">Aksi (Edit / Ganti Password / Hapus)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbodyActiveKetua" class="divide-y divide-slate-100"></tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
 
-            <!-- Tab Content 3: Cetak PDF & Rekapitulasi (Poin 2 - Filter Kelompok & Bulan) -->
+            <!-- Tab Content 4: Cetak PDF & Rekapitulasi -->
             <div id="pContentRekap" class="hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-6">
                 <div>
                     <h3 class="font-bold text-slate-800 text-base">Pusat Cetak Laporan Resmi Pendamping PKH</h3>
                     <p class="text-xs text-slate-500">Pilih filter kelompok dan bulan sebelum melakukan pratinjau dan cetak laporan.</p>
                 </div>
 
-                <!-- Filter Bar untuk Cetak -->
                 <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-xs font-bold text-slate-700 mb-1">Filter Berdasarkan Kelompok</label>
@@ -384,7 +412,7 @@
                 </button>
             </div>
 
-            <!-- Tab Content 1: KPM Management (Poin 3: Jenis Bantuan PKH / BPNT / Keduanya) -->
+            <!-- Tab Content 1: KPM Management -->
             <div id="kContentKpm" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-6">
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     <form id="formKpm" onsubmit="handleSaveKpm(event)" class="bg-slate-50 p-5 rounded-2xl border border-slate-200 space-y-3">
@@ -511,7 +539,7 @@
                 </div>
             </div>
 
-            <!-- Tab Content 3: Laporan Komitmen (Poin 4: Upload Foto Ganda Sesuai Pilihan) -->
+            <!-- Tab Content 3: Laporan Komitmen (Tersinkron dengan Status Verifikasi Pendamping) -->
             <div id="kContentKomitmen" class="hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-6">
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     <form id="formKomitmen" onsubmit="handleSaveKomitmen(event)" class="bg-slate-50 p-5 rounded-2xl border border-slate-200 space-y-3">
@@ -560,15 +588,16 @@
                     </form>
 
                     <div class="lg:col-span-2 space-y-3">
-                        <h4 class="font-bold text-slate-800 text-sm">Riwayat Laporan Komitmen Kelompok</h4>
+                        <h4 class="font-bold text-slate-800 text-sm">Riwayat Laporan Komitmen Kelompok & Status Verifikasi</h4>
                         <div class="overflow-x-auto">
                             <table class="w-full text-left border-collapse text-xs">
                                 <thead>
                                     <tr class="bg-slate-100 text-slate-700 uppercase">
                                         <th class="p-3">Tanggal</th>
                                         <th class="p-3">Nama KPM</th>
-                                        <th class="p-3">Jenis Layanan & Bukti Foto</th>
+                                        <th class="p-3">Jenis Layanan & Bukti</th>
                                         <th class="p-3">Status</th>
+                                        <th class="p-3">Verifikasi Pendamping</th>
                                         <th class="p-3 text-center">Aksi</th>
                                     </tr>
                                 </thead>
@@ -641,7 +670,7 @@
         <p>SIP-PKH &copy; 2026 - Sistem Informasi Pelaporan Komitmen KPM PKH</p>
     </footer>
 
-    <!-- MODAL CETAK / PRINT VIEWER (Poin 5: Sesuai Gambar Kop Resmi) -->
+    <!-- MODAL CETAK / PRINT VIEWER -->
     <div id="modalPrintViewer" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
         <div class="bg-white w-full max-w-4xl rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
             <div class="bg-blue-900 text-white p-4 flex justify-between items-center">
@@ -659,7 +688,7 @@
             </div>
 
             <div id="printAreaContent" class="p-8 bg-white overflow-y-auto space-y-6 text-slate-900">
-                <!-- KOP SURAT SESUAI GAMBAR RUJUKAN -->
+                <!-- KOP SURAT SESUAI RUJUKAN RESMI -->
                 <div class="border-b-4 border-black pb-3 flex items-center justify-between">
                     <div class="flex items-center space-x-3">
                         <div class="flex flex-col items-center">
@@ -682,7 +711,6 @@
 
                 <div id="printDocTableContainer" class="space-y-4"></div>
 
-                <!-- TANDA TANGAN -->
                 <div class="pt-8 flex justify-between items-end text-xs">
                     <div></div>
                     <div class="text-center space-y-16">
@@ -725,6 +753,30 @@
                     </table>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- MODAL EDIT PASSWORD / PIN KETUA KELOMPOK -->
+    <div id="modalEditKetuaPin" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-md rounded-2xl shadow-xl overflow-hidden p-6 space-y-4">
+            <div class="flex justify-between items-center pb-3 border-b border-slate-100">
+                <h3 class="font-bold text-slate-800 text-sm">Ganti Password / PIN Ketua Kelompok</h3>
+                <button onclick="closeEditKetuaPinModal()" class="text-slate-400 hover:text-slate-700"><i class="fas fa-times"></i></button>
+            </div>
+            <form onsubmit="handleSaveKetuaPin(event)" class="space-y-3">
+                <input type="hidden" id="editKetuaId" value="">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Nama Ketua / Kelompok</label>
+                    <input type="text" id="editKetuaInfoName" readonly class="w-full p-2 bg-slate-100 border border-slate-300 rounded-xl text-xs font-bold text-slate-700">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">PIN / Password Baru (6 Digit)</label>
+                    <input type="text" id="editKetuaNewPin" required maxlength="6" placeholder="Masukkan PIN baru" class="w-full p-2 bg-slate-50 border border-slate-300 rounded-xl text-xs">
+                </div>
+                <button type="submit" class="w-full bg-blue-900 hover:bg-blue-800 text-white py-2.5 rounded-xl font-bold text-xs shadow transition">
+                    Simpan Password Baru
+                </button>
+            </form>
         </div>
     </div>
 
