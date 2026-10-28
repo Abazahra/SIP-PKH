@@ -25,18 +25,11 @@ let appState = {
         { id: "KET-02", nama: "Dewi Lestari", hp: "089876543210", kelompok: "Melati 02", pin: "123456", status: "VERIFIED", pendampingId: "PND-01", date: "2026-10-05" }
     ],
     kpmList: [
-        { id: "KPM-01", nama: "Ratna Sari", nik: "3201123456780001", komponen: "Balita / PAUD", alamat: "Jl. Melati No. 12", kelompok: "Mawar 01" },
-        { id: "KPM-02", nama: "Sri Wahyuni", nik: "3201123456780002", komponen: "Lansia", alamat: "Jl. Mawar No. 05", kelompok: "Mawar 01" }
+        { id: "KPM-01", nama: "Ratna Sari", nik: "3201123456780001", komponen: "Balita / PAUD", alamat: "Jl. Melati No. 12", kelompok: "Mawar 01" }
     ],
-    p2k2List: [
-        { id: "P2K2-01", tanggal: "2026-10-20", kpmNama: "Ratna Sari", kelompok: "Mawar 01", modul: "Modul Kesehatan dan Gizi", status: "Hadir", foto: "" }
-    ],
-    komitmenList: [
-        { id: "KOM-01", tanggal: "2026-10-22", kpmNama: "Ratna Sari", kelompok: "Mawar 01", jenis: "Posyandu / Layanan Kesehatan Balita", status: "Terpenuhi 100%", foto: "", statusVerifikasi: "DISETUJUI" }
-    ],
-    rekonsiliasiList: [
-        { id: "REK-01", tanggal: "2026-10-25", kpmNama: "Ratna Sari", kelompok: "Mawar 01", tahap: "Tahap 3", nominal: 750000, foto: "", statusVerifikasi: "DISETUJUI" }
-    ]
+    p2k2List: [],
+    komitmenList: [],
+    rekonsiliasiList: []
 };
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -748,10 +741,31 @@ function handleSaveKpm(e) {
     e.preventDefault();
     const nama = document.getElementById('kpmNama').value.trim();
     const nik = document.getElementById('kpmNik').value.trim();
-    const komponen = document.getElementById('kpmKomponen').value;
     const alamat = document.getElementById('kpmAlamat').value.trim();
 
-    appState.kpmList.push({ id: "KPM-" + Date.now(), nama, nik, komponen, alamat, kelompok: currentUser.kelompok });
+    // Ambil semua komponen yang dicentang
+    const checkboxes = document.querySelectorAll('input[name="kpmKomponen"]:checked');
+    let selectedKomponen = [];
+    checkboxes.forEach((cb) => {
+        selectedKomponen.push(cb.value);
+    });
+
+    if (selectedKomponen.length === 0) {
+        alert("Pilih minimal satu Komponen Utama PKH.");
+        return;
+    }
+
+    const komponenStr = selectedKomponen.join(', ');
+
+    appState.kpmList.push({ 
+        id: "KPM-" + Date.now(), 
+        nama, 
+        nik, 
+        komponen: komponenStr, 
+        alamat, 
+        kelompok: currentUser.kelompok 
+    });
+    
     saveState();
     
     document.getElementById('formKpm').reset();
@@ -1018,7 +1032,7 @@ function executeWindowPrint() {
     window.print();
 }
 
-// --- FUNGSI TOAST AMAN DARI NULL ERROR ---
+// --- FUNGSI TOAST ---
 let toastTimer = null;
 function showToast(title, message, type = 'success') {
     const toast = document.getElementById('toast');

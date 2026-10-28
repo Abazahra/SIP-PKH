@@ -8,6 +8,14 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @media print {
+            body { background: white; font-size: 11px; }
+            header, footer, button, .no-print { display: none !important; }
+            #modalPrintViewer { position: absolute; left: 0; top: 0; width: 100%; height: auto; background: white; }
+            .max-h-\[90vh\] { max-height: none !important; }
+        }
+    </style>
 </head>
 <body class="bg-slate-50 font-sans text-slate-900 min-h-screen flex flex-col justify-between">
 
@@ -385,16 +393,16 @@
                             <input type="text" id="kpmNik" required placeholder="16 digit NIK" maxlength="16" class="w-full p-2 bg-white border border-slate-300 rounded-xl text-xs font-mono">
                         </div>
                         <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1">Komponen Utama PKH</label>
-                            <select id="kpmKomponen" class="w-full p-2 bg-white border border-slate-300 rounded-xl text-xs">
-                                <option value="Balita / PAUD">Balita / Anak Usia Dini / PAUD</option>
-                                <option value="Anak Sekolah SD">Anak Sekolah Tingkat SD</option>
-                                <option value="Anak Sekolah SMP">Anak Sekolah Tingkat SMP</option>
-                                <option value="Anak Sekolah SMA">Anak Sekolah Tingkat SMA</option>
-                                <option value="Ibu Hamil / Menyusui">Ibu Hamil / Menyusui</option>
-                                <option value="Lansia (60+ Tahun)">Lansia (60+ Tahun)</option>
-                                <option value="Disabilitas Berat">Disabilitas Berat</option>
-                            </select>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Komponen Utama PKH (Bisa Pilih Lebih dari 1)</label>
+                            <div class="space-y-1.5 p-2 bg-white border border-slate-300 rounded-xl text-xs max-h-40 overflow-y-auto">
+                                <label class="flex items-center space-x-2"><input type="checkbox" name="kpmKomponen" value="Balita / PAUD" class="rounded text-emerald-700"> <span>Balita / Anak Usia Dini / PAUD</span></label>
+                                <label class="flex items-center space-x-2"><input type="checkbox" name="kpmKomponen" value="Anak Sekolah SD" class="rounded text-emerald-700"> <span>Anak Sekolah Tingkat SD</span></label>
+                                <label class="flex items-center space-x-2"><input type="checkbox" name="kpmKomponen" value="Anak Sekolah SMP" class="rounded text-emerald-700"> <span>Anak Sekolah Tingkat SMP</span></label>
+                                <label class="flex items-center space-x-2"><input type="checkbox" name="kpmKomponen" value="Anak Sekolah SMA" class="rounded text-emerald-700"> <span>Anak Sekolah Tingkat SMA</span></label>
+                                <label class="flex items-center space-x-2"><input type="checkbox" name="kpmKomponen" value="Ibu Hamil / Menyusui" class="rounded text-emerald-700"> <span>Ibu Hamil / Menyusui</span></label>
+                                <label class="flex items-center space-x-2"><input type="checkbox" name="kpmKomponen" value="Lansia (60+ Tahun)" class="rounded text-emerald-700"> <span>Lansia (60+ Tahun)</span></label>
+                                <label class="flex items-center space-x-2"><input type="checkbox" name="kpmKomponen" value="Disabilitas Berat" class="rounded text-emerald-700"> <span>Disabilitas Berat</span></label>
+                            </div>
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-slate-700 mb-1">Alamat / RT / RW</label>
@@ -701,7 +709,7 @@
         </div>
     </div>
 
-    <!-- TOAST NOTIFICATION (Diperbaiki dengan translate-x-full dan pointer-events-none) -->
+    <!-- TOAST NOTIFICATION (DIAMANKAN DENGAN TRANSLATE-X-FULL) -->
     <div id="toast" class="fixed top-20 right-5 z-50 transform transition-transform duration-300 ease-in-out translate-x-full bg-emerald-600 text-white px-4 py-3 rounded-lg shadow-lg flex items-center space-x-3 max-w-md pointer-events-none">
         <div>
             <h4 id="toastTitle" class="font-bold text-sm">Notifikasi</h4>
