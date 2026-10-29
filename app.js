@@ -856,8 +856,9 @@ function handleSaveKomitmen(e) {
     if (checkboxes.length === 0) return alert("Pilih minimal satu layanan komitmen.");
 
     let selectedJenis = [];
-    let filePromises = [];
+    let fotoBuktiList = [];
 
+    // Mengambil teks jenis layanan dan file foto secara langsung dan aman
     checkboxes.forEach(cb => {
         const jenisVal = cb.value;
         const idx = cb.getAttribute('data-index');
@@ -865,45 +866,41 @@ function handleSaveKomitmen(e) {
 
         const fileInput = document.querySelector(`.komitmen-file-input-${idx}`);
         if (fileInput && fileInput.files && fileInput.files[0]) {
-            filePromises.push(new Promise((resolve) => {
-                const reader = new FileReader();
-                reader.onload = (ev) => resolve(ev.target.result);
-                reader.onerror = () => resolve(null);
-                reader.readAsDataURL(fileInput.files[0]);
-            }));
+            // Menggunakan URL objek lokal sementara agar tidak gagal akibat ukuran base64 yang terlalu besar
+            fotoBuktiList.push(URL.createObjectURL(fileInput.files[0]));
         }
     });
 
-    Promise.all(filePromises).then(results => {
-        const validImages = results.filter(img => img !== null);
+    const newReport = {
+        id: "KOM-" + Date.now(),
+        tanggal: new Date().toISOString().split('T')[0],
+        kpmNama,
+        jenis: selectedJenis.join(', '),
+        status,
+        kelompok: currentUser.kelompok ? currentUser.kelompok.trim() : "",
+        statusVerifikasi: "PENDING",
+        foto: fotoBuktiList.length > 0 ? fotoBuktiList : ""
+    };
 
-        const newReport = {
-            id: "KOM-" + Date.now(),
-            tanggal: new Date().toISOString().split('T')[0],
-            kpmNama,
-            jenis: selectedJenis.join(', '),
-            status,
-            kelompok: currentUser.kelompok ? currentUser.kelompok.trim() : "",
-            statusVerifikasi: "PENDING",
-            foto: validImages.length > 0 ? validImages : ""
-        };
+    if (!appState.komitmenList) appState.komitmenList = [];
+    
+    // Masukkan ke array utama
+    appState.komitmenList.push(newReport);
+    
+    // Simpan permanen ke Firebase & LocalStorage
+    saveState();
 
-        if (!appState.komitmenList) appState.komitmenList = [];
-        appState.komitmenList.push(newReport);
-        saveState();
-
-        document.getElementById('formKomitmen').reset();
-        const dynContainer = document.getElementById('dynamicKomitmenContainer');
-        if (dynContainer) {
-            dynContainer.innerHTML = `<p class="text-slate-400 italic">Silakan pilih KPM terlebih dahulu untuk memunculkan pilihan komitmen.</p>`;
-        }
-        
-        renderKetuaAllTables();
-        showToast("Berhasil", "Laporan komitmen berhasil dikirim ke Pendamping.", "success");
-    }).catch(err => {
-        console.error("Gagal memproses file foto:", err);
-        alert("Terjadi kesalahan saat memproses foto bukti komitmen.");
-    });
+    // Reset form
+    document.getElementById('formKomitmen').reset();
+    const dynContainer = document.getElementById('dynamicKomitmenContainer');
+    if (dynContainer) {
+        dynContainer.innerHTML = `<p class="text-slate-400 italic">Silakan pilih KPM terlebih dahulu untuk memunculkan pilihan komitmen.</p>`;
+    }
+    
+    // Refresh tampilan tabel ketua
+    renderKetuaAllTables();
+    
+    showToast("Berhasil", "Laporan komitmen berhasil dikirim ke Pendamping.", "success");
 }
 
 function handleSaveRekonsiliasi(e) {
