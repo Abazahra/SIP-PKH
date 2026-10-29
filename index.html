@@ -521,6 +521,7 @@
                                         <th class="p-3">Nama KPM</th>
                                         <th class="p-3">Modul</th>
                                         <th class="p-3">Status</th>
+                                        <th class="p-3">Verifikasi</th>
                                         <th class="p-3">Foto</th>
                                         <th class="p-3 text-center rounded-r-xl">Aksi</th>
                                     </tr>
@@ -622,6 +623,7 @@
                                         <th class="p-3">Nama KPM</th>
                                         <th class="p-3">Tahap</th>
                                         <th class="p-3">Nominal</th>
+                                        <th class="p-3">Verifikasi</th>
                                         <th class="p-3">Struk</th>
                                         <th class="p-3 text-center rounded-r-xl">Aksi</th>
                                     </tr>
@@ -984,6 +986,14 @@
         });
 
         async function loadLocalStorageData() {
+            // Force clean stale localStorage cache by checking V6 version key
+            const VERSION_KEY = 'SIP_PKH_STATE_VERSION_V6';
+            if (!localStorage.getItem(VERSION_KEY)) {
+                localStorage.removeItem('SIP_PKH_STATE_V5');
+                localStorage.removeItem('SIP_PKH_STATE_V4');
+                localStorage.setItem(VERSION_KEY, 'true');
+            }
+
             try {
                 if (db) {
                     const docRef = db.collection("pkh_database").doc("main_state");
@@ -994,12 +1004,11 @@
                 }
             } catch (e) {}
 
-            const saved = localStorage.getItem('SIP_PKH_STATE_V5');
+            const saved = localStorage.getItem('SIP_PKH_STATE_V6');
             if (saved) {
                 try { 
                     const parsed = JSON.parse(saved);
                     if (parsed && parsed.pendampingProfiles) {
-                        // Gabungkan data state lokal dengan state utama
                         appState = { ...appState, ...parsed };
                     }
                 } catch (err) {}
@@ -1016,7 +1025,7 @@
 
         async function saveState() {
             try {
-                localStorage.setItem('SIP_PKH_STATE_V5', JSON.stringify(appState));
+                localStorage.setItem('SIP_PKH_STATE_V6', JSON.stringify(appState));
             } catch (e) {
                 console.error("LocalStorage quota exceeded, attempting partial save", e);
             }
@@ -1438,7 +1447,6 @@
 
             let allReports = [];
             
-            // Ambil laporan P2K2 yang dimiliki oleh ketua kelompok aktif yang terdaftar
             if (filterJenis === 'ALL' || filterJenis === 'P2K2') {
                 if (appState.p2k2List && Array.isArray(appState.p2k2List)) {
                     appState.p2k2List.forEach(item => {
@@ -1457,7 +1465,6 @@
                 }
             }
 
-            // Ambil laporan Komitmen yang dimiliki oleh ketua kelompok aktif yang terdaftar
             if (filterJenis === 'ALL' || filterJenis === 'Komitmen') {
                 if (appState.komitmenList && Array.isArray(appState.komitmenList)) {
                     appState.komitmenList.forEach(item => {
@@ -1476,7 +1483,6 @@
                 }
             }
 
-            // Ambil laporan Rekonsiliasi yang dimiliki oleh ketua kelompok aktif yang terdaftar
             if (filterJenis === 'ALL' || filterJenis === 'Rekonsiliasi') {
                 if (appState.rekonsiliasiList && Array.isArray(appState.rekonsiliasiList)) {
                     appState.rekonsiliasiList.forEach(item => {
@@ -1830,12 +1836,17 @@
                 tbodyP2k2.innerHTML = '';
                 appState.p2k2List.filter(p => p.kelompok === myKelompok).forEach(p => {
                     let p2k2Thumb = p.foto ? `<img src="${p.foto}" alt="Foto" onclick="openImageViewer('${p.foto}')" class="w-10 h-10 object-cover rounded border border-slate-300 cursor-pointer hover:opacity-80" title="Klik untuk memperbesar">` : '-';
+                    let badgeStatus = 'bg-amber-100 text-amber-800';
+                    if (p.statusVerifikasi === 'DISETUJUI') badgeStatus = 'bg-emerald-100 text-emerald-800';
+                    if (p.statusVerifikasi === 'DITOLAK') badgeStatus = 'bg-red-100 text-red-800';
+
                     tbodyP2k2.innerHTML += `
                         <tr>
                             <td class="p-3">${p.tanggal}</td>
                             <td class="p-3 font-bold">${p.kpmNama}</td>
                             <td class="p-3">${p.modul}</td>
                             <td class="p-3">${p.status}</td>
+                            <td class="p-3"><span class="px-2.5 py-1 rounded-full font-bold text-[10px] ${badgeStatus}">${p.statusVerifikasi || 'PENDING'}</span></td>
                             <td class="p-3">${p2k2Thumb}</td>
                             <td class="p-3 text-center"><button onclick="deleteP2k2('${p.id}')" class="bg-red-600 text-white px-2 py-1 rounded text-xs">Hapus</button></td>
                         </tr>
@@ -1868,7 +1879,7 @@
                             <td class="p-3 font-bold">${k.kpmNama}</td>
                             <td class="p-3">${k.jenis}<div class="mt-1">${fotoLinks}</div></td>
                             <td class="p-3">${k.status}</td>
-                            <td class="p-3"><span class="px-2.5 py-1 rounded-full font-bold ${badgeStatus}">${k.statusVerifikasi || 'PENDING'}</span></td>
+                            <td class="p-3"><span class="px-2.5 py-1 rounded-full font-bold text-[10px] ${badgeStatus}">${k.statusVerifikasi || 'PENDING'}</span></td>
                             <td class="p-3 text-center"><button onclick="deleteKomitmen('${k.id}')" class="bg-red-600 text-white px-2 py-1 rounded text-xs font-bold">Hapus</button></td>
                         </tr>
                     `;
@@ -1880,12 +1891,17 @@
                 tbodyRekon.innerHTML = '';
                 appState.rekonsiliasiList.filter(r => r.kelompok === myKelompok).forEach(r => {
                     let rekonFotoThumb = r.foto ? `<img src="${r.foto}" alt="Struk" onclick="openImageViewer('${r.foto}')" class="w-10 h-10 object-cover rounded border border-slate-300 cursor-pointer hover:opacity-80" title="Klik untuk memperbesar">` : '-';
+                    let badgeStatus = 'bg-amber-100 text-amber-800';
+                    if (r.statusVerifikasi === 'DISETUJUI') badgeStatus = 'bg-emerald-100 text-emerald-800';
+                    if (r.statusVerifikasi === 'DITOLAK') badgeStatus = 'bg-red-100 text-red-800';
+
                     tbodyRekon.innerHTML += `
                         <tr>
                             <td class="p-3">${r.tanggal}</td>
                             <td class="p-3 font-bold">${r.kpmNama}</td>
                             <td class="p-3">${r.tahap}</td>
                             <td class="p-3 font-bold text-emerald-700">Rp ${r.nominal.toLocaleString('id-ID')}</td>
+                            <td class="p-3"><span class="px-2.5 py-1 rounded-full font-bold text-[10px] ${badgeStatus}">${r.statusVerifikasi || 'PENDING'}</span></td>
                             <td class="p-3">${rekonFotoThumb}</td>
                             <td class="p-3 text-center"><button onclick="deleteRekonsiliasi('${r.id}')" class="bg-red-600 text-white px-2 py-1 rounded text-xs">Hapus</button></td>
                         </tr>
@@ -2125,7 +2141,7 @@
 
         async function saveState() {
             try {
-                localStorage.setItem('SIP_PKH_STATE_V5', JSON.stringify(appState));
+                localStorage.setItem('SIP_PKH_STATE_V6', JSON.stringify(appState));
             } catch (e) {
                 console.error("LocalStorage quota exceeded", e);
             }
