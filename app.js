@@ -1041,23 +1041,22 @@ function renderUI() {
         userNavProfile.classList.remove('hidden');
         userNavProfile.classList.add('flex');
 
-        // Mengatur informasi lengkap Pendamping (Nama, NIP, dan Kecamatan)
-        const pNip = currentUser.nip || "198805122020121001";
-        const pKec = currentUser.kecamatan || "Sukamaju";
+        // Pastikan bagian renderUI untuk pendamping memiliki baris ini:
+const pNip = currentUser.nip || "198805122020121001";
+const pKec = currentUser.kecamatan || "Sukamaju";
 
-        document.getElementById('navUserName').innerText = currentUser.nama;
-        document.getElementById('navUserRole').innerText = "Pendamping PKH";
-        
-        // Menampilkan NIP dan Wilayah Kecamatan di Navbar & Banner
-        const navNipKec = document.getElementById('navUserNipKec');
-        if (navNipKec) navNipKec.innerText = `NIP: ${pNip} | Kec: ${pKec}`;
+document.getElementById('navUserName').innerText = currentUser.nama;
+document.getElementById('navUserRole').innerText = "Pendamping PKH";
 
-        document.getElementById('pendampingWelcomeName').innerText = `Selamat Datang, ${currentUser.nama}`;
-        
-        const welcomeDetail = document.getElementById('pendampingWelcomeDetail');
-        if (welcomeDetail) {
-            welcomeDetail.innerText = `NIP: ${pNip} | Wilayah Kerja Kecamatan: ${pKec} — Kelola verifikasi laporan dan kelompok binaan Anda di sini.`;
-        }
+const navNipKec = document.getElementById('navUserNipKec');
+if (navNipKec) navNipKec.innerText = `NIP: ${pNip} | Kec: ${pKec}`;
+
+document.getElementById('pendampingWelcomeName').innerText = `Selamat Datang, ${currentUser.nama}`;
+
+const welcomeDetail = document.getElementById('pendampingWelcomeDetail');
+if (welcomeDetail) {
+    welcomeDetail.innerText = `NIP: ${pNip} | Wilayah Kerja Kecamatan: ${pKec} — Kelola verifikasi laporan dan kelompok binaan Anda di sini.`;
+}
         
         populatePendampingFilters();
         renderPendampingVerifikasiTable();
@@ -1082,4 +1081,58 @@ function renderUI() {
         renderKetuaAllTables();
         populateKetuaKpmSelects();
     }
+}
+
+// Buka Modal Edit Profil Pendamping
+function openEditPendampingProfileModal() {
+    if (!currentUser || currentUser.role !== 'pendamping') return;
+    
+    document.getElementById('editPndNama').value = currentUser.nama || '';
+    document.getElementById('editPndNip').value = currentUser.nip || '';
+    document.getElementById('editPndKecamatan').value = currentUser.kecamatan || 'Sukamaju';
+    
+    document.getElementById('modalEditPendampingProfile').classList.remove('hidden');
+}
+
+// Tutup Modal Edit Profil Pendamping
+function closeEditPendampingProfileModal() {
+    document.getElementById('modalEditPendampingProfile').classList.add('hidden');
+}
+
+// Simpan Perubahan Profil Pendamping
+function handleSavePendampingProfile(e) {
+    e.preventDefault();
+    const namaBaru = document.getElementById('editPndNama').value.trim();
+    const nipBaru = document.getElementById('editPndNip').value.trim();
+    const kecamatanBaru = document.getElementById('editPndKecamatan').value.trim();
+
+    if (!namaBaru || !nipBaru || !kecamatanBaru) {
+        return alert("Semua kolom wajib diisi.");
+    }
+
+    // Perbarui data pada currentUser yang sedang aktif
+    currentUser.nama = namaBaru;
+    currentUser.nip = nipBaru;
+    currentUser.kecamatan = kecamatanBaru;
+
+    // Perbarui juga data di dalam array pendampingProfiles di appState
+    const pIndex = appState.pendampingProfiles.findIndex(p => p.id === currentUser.id);
+    if (pIndex !== -1) {
+        appState.pendampingProfiles[pIndex].nama = namaBaru;
+        appState.pendampingProfiles[pIndex].nip = nipBaru;
+        appState.pendampingProfiles[pIndex].kecamatan = kecamatanBaru;
+    } else if (appState.pendampingProfiles.length > 0) {
+        appState.pendampingProfiles[0].nama = namaBaru;
+        appState.pendampingProfiles[0].nip = nipBaru;
+        appState.pendampingProfiles[0].kecamatan = kecamatanBaru;
+    }
+
+    // Simpan ke database / localstorage
+    saveState();
+
+    // Tutup modal dan refresh tampilan UI
+    closeEditPendampingProfileModal();
+    renderUI();
+
+    showToast("Berhasil", "Profil dan wilayah kerja pendamping diperbarui.", "success");
 }
