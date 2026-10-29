@@ -20,14 +20,24 @@
                 left: 0 !important;
                 top: 0 !important;
                 width: 100% !important;
-                height: auto !important;
+                height: 100% !important;
                 background: white !important;
                 padding: 0 !important;
                 margin: 0 !important;
+                box-shadow: none !important;
+                border: none !important;
             }
             .no-print { display: none !important; }
-            table { width: 100% !important; border-collapse: collapse !important; font-size: 10pt; }
+            #printAreaContainer {
+                padding: 10px !important;
+                margin: 0 !important;
+                width: 100% !important;
+                max-width: 100% !important;
+                background: white !important;
+            }
+            table { width: 100% !important; border-collapse: collapse !important; font-size: 10pt; page-break-inside: avoid; }
             th, td { border: 1px solid #000 !important; padding: 6px !important; }
+            @page { size: A4 portrait; margin: 15mm; }
         }
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: #f1f5f9; }
@@ -883,16 +893,16 @@
                 </div>
             </div>
 
-            <div id="printAreaContainer" class="p-8 overflow-y-auto bg-white flex-grow space-y-6 text-black">
+            <div id="printAreaContainer" class="p-6 overflow-y-auto bg-white flex-grow space-y-4 text-black">
                 <div id="printDocTitle" class="hidden"></div>
                 <div id="printDocTableContainer"></div>
 
                 <!-- Tanda Tangan -->
-                <div class="flex justify-end pt-8 text-xs text-black">
+                <div class="flex justify-end pt-6 text-xs text-black page-break-inside-avoid">
                     <div class="text-center">
                         <p id="printTtdTanggal">Jakarta, 29 Oktober 2026</p>
                         <p class="font-bold mt-1">Pendamping Sosial PKH,</p>
-                        <div class="h-16"></div>
+                        <div class="h-14"></div>
                         <p id="printPendampingTtdNama" class="font-bold underline">E. Yuyus Syamsul Firdaus, S.Sos.I</p>
                         <p id="printPendampingTtdNip">NIP. 198310102025211098</p>
                     </div>
