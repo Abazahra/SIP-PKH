@@ -379,31 +379,31 @@ function renderPendampingVerifikasiTable() {
 
     let allReports = [];
     
-    // Ambil data komitmen dan pastikan semua properti terbaca
-    appState.komitmenList.forEach(item => {
-        if (filterKelompok === 'ALL' || item.kelompok === filterKelompok) {
-            allReports.push({ ...item, reportType: 'Komitmen' });
-        }
-    });
-    
-    appState.rekonsiliasiList.forEach(item => {
-        if (filterKelompok === 'ALL' || item.kelompok === filterKelompok) {
-            allReports.push({ ...item, reportType: 'Rekonsiliasi' });
-        }
-    });
+    if (appState.komitmenList && Array.isArray(appState.komitmenList)) {
+        appState.komitmenList.forEach(item => {
+            if (filterKelompok === 'ALL' || (item.kelompok && item.kelompok.toLowerCase() === filterKelompok.toLowerCase())) {
+                allReports.push({ ...item, reportType: 'Komitmen' });
+            }
+        });
+    }
+
+    if (appState.rekonsiliasiList && Array.isArray(appState.rekonsiliasiList)) {
+        appState.rekonsiliasiList.forEach(item => {
+            if (filterKelompok === 'ALL' || (item.kelompok && item.kelompok.toLowerCase() === filterKelompok.toLowerCase())) {
+                allReports.push({ ...item, reportType: 'Rekonsiliasi' });
+            }
+        });
+    }
 
     if (allReports.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="7" class="text-center p-6 text-slate-400">Belum ada laporan masuk.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="7" class="text-center p-6 text-slate-400 font-semibold">Belum ada laporan masuk dari ketua kelompok.</td></tr>`;
         return;
     }
 
-    // Urutkan dari laporan terbaru
     allReports.sort((a, b) => new Date(b.tanggal) - new Date(a.tanggal));
 
     allReports.forEach(r => {
         let fotoHtml = '-';
-        
-        // PERBAIKAN UTAMA: Menangani foto ganda / array foto dari laporan multi-komponen
         if (Array.isArray(r.foto) && r.foto.length > 0) {
             fotoHtml = r.foto.map((f, i) => `<a href="${f}" target="_blank" class="text-blue-600 underline text-[11px] block font-semibold hover:text-blue-800">Foto ${i+1}</a>`).join('');
         } else if (r.foto && typeof r.foto === 'string' && r.foto.trim() !== '') {
@@ -416,15 +416,15 @@ function renderPendampingVerifikasiTable() {
 
         tbody.innerHTML += `
             <tr>
-                <td class="p-3">${r.tanggal}</td>
+                <td class="p-3">${r.tanggal || '-'}</td>
                 <td class="p-3 font-semibold text-blue-900">${r.kelompok || '-'}</td>
                 <td class="p-3 font-bold text-slate-700">${r.reportType}</td>
                 <td class="p-3">
-                    <div class="font-bold text-slate-900">${r.kpmNama}</div>
+                    <div class="font-bold text-slate-900">${r.kpmNama || '-'}</div>
                     <div class="text-[11px] text-slate-500 font-medium">${r.jenis || r.tahap || ''}</div>
                 </td>
                 <td class="p-3 space-y-0.5">${fotoHtml}</td>
-                <td class="p-3"><span class="px-2.5 py-1 rounded-full font-bold ${badgeStatus}">${r.statusVerifikasi || 'PENDING'}</span></td>
+                <td class="p-3"><span class="px-2.5 py-1 rounded-full font-bold text-[10px] ${badgeStatus}">${r.statusVerifikasi || 'PENDING'}</span></td>
                 <td class="p-3 text-center space-x-1 whitespace-nowrap">
                     <button onclick="approveReport('${r.id}', '${r.reportType}')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-2.5 py-1 rounded text-xs font-bold shadow">Setuju</button>
                     <button onclick="rejectReport('${r.id}', '${r.reportType}')" class="bg-red-600 hover:bg-red-700 text-white px-2.5 py-1 rounded text-xs font-bold shadow">Tolak</button>
@@ -616,7 +616,6 @@ function populateKetuaKpmSelects() {
     });
 }
 
-// FUNGSI OTOMATIS: Menampilkan opsi komitmen sesuai komponen KPM yang dipilih
 function updateDynamicKomitmenCheckboxes() {
     const kpmNama = document.getElementById('komitmenKpmSelect').value;
     const container = document.getElementById('dynamicKomitmenContainer');
@@ -647,7 +646,6 @@ function updateDynamicKomitmenCheckboxes() {
         else if (comp.includes('Disabilitas')) labelName = 'Layanan Disabilitas Berat';
         else labelName = comp;
 
-        // Menggunakan index unik (idx) agar tidak terjadi duplikasi ID/element pada KPM multi-komponen
         html += `
             <div class="space-y-1 pb-3 border-b border-slate-100 last:border-0" data-komponen-block="${idx}">
                 <label class="flex items-center space-x-2 font-bold text-slate-700">
@@ -730,6 +728,8 @@ function renderKetuaAllTables() {
             let fotoLinks = '-';
             if (Array.isArray(k.foto)) {
                 fotoLinks = k.foto.map((f, i) => `<a href="${f}" target="_blank" class="text-blue-600 underline text-[11px] block">Foto ${i+1}</a>`).join('');
+            } else if (k.foto) {
+                fotoLinks = `<a href="${k.foto}" target="_blank" class="text-blue-600 underline text-[11px] block">Lihat Bukti</a>`;
             }
 
             let badgeStatus = 'bg-amber-100 text-amber-800';
@@ -846,22 +846,6 @@ function handleSaveP2k2(e) {
     }
 }
 
-function toggleKomitmenFotoInput(cb) {
-    const container = document.getElementById('fileContainer_' + cb.value);
-    if (!container) return;
-    const fileInput = container.querySelector('input');
-    if (cb.checked) {
-        container.classList.remove('hidden');
-        if (fileInput) fileInput.setAttribute('required', 'true');
-    } else {
-        container.classList.add('hidden');
-        if (fileInput) {
-            fileInput.removeAttribute('required');
-            fileInput.value = '';
-        }
-    }
-}
-
 function handleSaveKomitmen(e) {
     e.preventDefault();
     const kpmNama = document.getElementById('komitmenKpmSelect').value;
@@ -899,26 +883,22 @@ function handleSaveKomitmen(e) {
             kpmNama,
             jenis: selectedJenis.join(', '),
             status,
-            kelompok: currentUser.kelompok, // Menggunakan kelompok ketua yang sedang login
+            kelompok: currentUser.kelompok ? currentUser.kelompok.trim() : "",
             statusVerifikasi: "PENDING",
             foto: validImages.length > 0 ? validImages : ""
         };
 
-        // Masukkan ke array dan simpan
+        if (!appState.komitmenList) appState.komitmenList = [];
         appState.komitmenList.push(newReport);
         saveState();
 
-        // Reset form
         document.getElementById('formKomitmen').reset();
-        document.getElementById('dynamicKomitmenContainer').innerHTML = `<p class="text-slate-400 italic">Silakan pilih KPM terlebih dahulu untuk memunculkan pilihan komitmen.</p>`;
+        const dynContainer = document.getElementById('dynamicKomitmenContainer');
+        if (dynContainer) {
+            dynContainer.innerHTML = `<p class="text-slate-400 italic">Silakan pilih KPM terlebih dahulu untuk memunculkan pilihan komitmen.</p>`;
+        }
         
         renderKetuaAllTables();
-        
-        // Panggil render pendamping secara otomatis jika akun sedang login sebagai pendamping
-        if (currentUser && currentUser.role === 'pendamping') {
-            renderPendampingVerifikasiTable();
-        }
-
         showToast("Berhasil", "Laporan komitmen berhasil dikirim ke Pendamping.", "success");
     }).catch(err => {
         console.error("Gagal memproses file foto:", err);
