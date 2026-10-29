@@ -250,12 +250,43 @@ function renderUI() {
 
         document.getElementById('navUserName').innerText = currentUser.nama;
         document.getElementById('navUserRole').innerText = "Ketua " + currentUser.kelompok;
+        
+        const navNipKec = document.getElementById('navUserNipKec');
+        if (navNipKec) navNipKec.innerText = `Kelompok: ${currentUser.kelompok}`;
+
         document.getElementById('ketuaWelcomeName').innerText = "Selamat Datang, " + currentUser.nama;
+
+        // 1. Otomatis Mencari Nama Pendamping Binaan yang Sesuai
+        let namaPendampingBinaan = "Budi Santoso, S.Sos"; // Default fallback
+        if (currentUser.pendampingId) {
+            const pnd = appState.pendampingProfiles.find(p => p.id === currentUser.pendampingId);
+            if (pnd) namaPendampingBinaan = pnd.nama;
+        } else if (appState.pendampingProfiles.length > 0) {
+            // Ambil pendamping pertama jika pendampingId belum terset
+            namaPendampingBinaan = appState.pendampingProfiles[0].nama;
+        }
+        
+        const elPendamping = document.getElementById('ketuaPendampingNama');
+        if (elPendamping) elPendamping.innerText = namaPendampingBinaan;
+
+        // 2. Menampilkan Nama Kelompok dan Alamat / Keterangan Anggota KPM di Kelompok Tersebut
+        const myKpmList = appState.kpmList.filter(k => k.kelompok === currentUser.kelompok);
+        let alamatKelompokStr = `Kelompok ${currentUser.kelompok}`;
+        if (myKpmList.length > 0 && myKpmList[0].alamat) {
+            alamatKelompokStr = `Kelompok ${currentUser.kelompok} (${myKpmList[0].alamat})`;
+        }
+
+        const elAlamat = document.getElementById('ketuaAlamatKelompokText');
+        if (elAlamat) elAlamat.innerText = alamatKelompokStr;
+
+        const welcomeDetail = document.getElementById('ketuaWelcomeDetail');
+        if (welcomeDetail) {
+            welcomeDetail.innerText = `Kelompok: ${currentUser.kelompok} — Kelola anggota KPM dan input laporan bulanan kelompok Anda.`;
+        }
 
         renderKetuaAllTables();
         populateKetuaKpmSelects();
     }
-}
 
 function switchPendampingTab(tab) {
     ['pContentVerifikasi', 'pContentKelompok', 'pContentUndangan', 'pContentRekap'].forEach(id => document.getElementById(id).classList.add('hidden'));
@@ -1078,10 +1109,37 @@ if (welcomeDetail) {
 
         document.getElementById('ketuaWelcomeName').innerText = "Selamat Datang, " + currentUser.nama;
 
+        // 1. Otomatis Mencari Nama Pendamping Binaan yang Sesuai
+        let namaPendampingBinaan = "Budi Santoso, S.Sos"; // Default fallback
+        if (currentUser.pendampingId) {
+            const pnd = appState.pendampingProfiles.find(p => p.id === currentUser.pendampingId);
+            if (pnd) namaPendampingBinaan = pnd.nama;
+        } else if (appState.pendampingProfiles.length > 0) {
+            // Ambil pendamping pertama jika pendampingId belum terset
+            namaPendampingBinaan = appState.pendampingProfiles[0].nama;
+        }
+        
+        const elPendamping = document.getElementById('ketuaPendampingNama');
+        if (elPendamping) elPendamping.innerText = namaPendampingBinaan;
+
+        // 2. Menampilkan Nama Kelompok dan Alamat / Keterangan Anggota KPM di Kelompok Tersebut
+        const myKpmList = appState.kpmList.filter(k => k.kelompok === currentUser.kelompok);
+        let alamatKelompokStr = `Kelompok ${currentUser.kelompok}`;
+        if (myKpmList.length > 0 && myKpmList[0].alamat) {
+            alamatKelompokStr = `Kelompok ${currentUser.kelompok} (${myKpmList[0].alamat})`;
+        }
+
+        const elAlamat = document.getElementById('ketuaAlamatKelompokText');
+        if (elAlamat) elAlamat.innerText = alamatKelompokStr;
+
+        const welcomeDetail = document.getElementById('ketuaWelcomeDetail');
+        if (welcomeDetail) {
+            welcomeDetail.innerText = `Kelompok: ${currentUser.kelompok} — Kelola anggota KPM dan input laporan bulanan kelompok Anda.`;
+        }
+
         renderKetuaAllTables();
         populateKetuaKpmSelects();
     }
-}
 
 // Buka Modal Edit Profil Pendamping
 function openEditPendampingProfileModal() {
