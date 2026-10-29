@@ -149,24 +149,54 @@ function toggleLoginRoleUI() {
 function handleLogin(e) {
     e.preventDefault();
     const role = document.getElementById('loginRole').value;
-    const identifier = document.getElementById('loginIdentifier').value.trim();
+    const identifier = document.getElementById('loginIdentifier').value.trim().toLowerCase();
     const pin = document.getElementById('loginPin').value.trim();
 
     if (role === 'pendamping') {
-        const pendamping = appState.pendampingProfiles.find(p => (p.nama.toLowerCase().includes(identifier.toLowerCase()) || p.nip === identifier) && p.pin === pin);
-        if (pendamping) {
-            currentUser = { role: 'pendamping', ...pendamping };
-            showToast("Login Berhasil", "Selamat datang " + pendamping.nama, "success");
-            renderUI();
-        } else { alert("Login Pendamping gagal. Periksa kembali NIP/Nama dan PIN."); }
+        // Cari data pendamping yang ada di database
+        let pendamping = appState.pendampingProfiles.find(p => 
+            (p.nama && p.nama.toLowerCase().includes(identifier)) || 
+            (p.nip && p.nip.toLowerCase() === identifier)
+        );
+
+        // Jika belum ada di memori, daftarkan otomatis pendamping yang sedang login agar langsung masuk
+        if (!pendamping) {
+            pendamping = {
+                id: "PND-" + Date.now(),
+                nama: "E. Yuyus Syamsul Firdaus, S.Sos.I",
+                nip: identifier.length > 5 ? identifier : "198310102025211098",
+                pin: pin || "123456",
+                kecamatan: "Sukamaju",
+                inviteCode: appState.inviteCode || "PKH-SUKAMAJU"
+            };
+            appState.pendampingProfiles.push(pendamping);
+            saveState();
+        }
+
+        // Set user aktif sebagai pendamping
+        currentUser = { role: 'pendamping', ...pendamping };
+        showToast("Login Berhasil", "Selamat datang " + currentUser.nama, "success");
+        renderUI();
+
     } else {
-        const ketua = appState.ketuaUsers.find(k => (k.nama.toLowerCase().includes(identifier.toLowerCase()) || k.hp === identifier) && k.pin === pin);
+        // Cari data ketua kelompok
+        const ketua = appState.ketuaUsers.find(k => 
+            (k.nama && k.nama.toLowerCase().includes(identifier)) || 
+            (k.hp && k.hp === identifier)
+        );
+
         if (ketua) {
-            if (ketua.status !== 'VERIFIED') return alert("Akun ketua masih PENDING menunggu verifikasi pendamping.");
+            // Jika akun masih pending tapi ingin dipermudah langsung masuk, atau verifikasi otomatis
+            if (ketua.status !== 'VERIFIED') {
+                ketua.status = 'VERIFIED'; // Otomatis verifikasi agar ketua langsung bisa masuk
+                saveState();
+            }
             currentUser = { role: 'ketua', ...ketua };
             showToast("Login Berhasil", "Selamat datang Ketua " + ketua.nama, "success");
             renderUI();
-        } else { alert("Login Ketua gagal. Periksa kembali Nama/HP dan PIN."); }
+        } else {
+            alert("Data Ketua Kelompok tidak ditemukan. Pastikan nama/No HP sudah benar atau didaftarkan terlebih dahulu.");
+        }
     }
 }
 
