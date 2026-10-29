@@ -16,7 +16,7 @@ let currentUser = null;
 let appState = {
     inviteCode: "PKH-SUKAMAJU",
     pendampingProfiles: [
-        { id: "PND-01", nama: "Budi Santoso, S.Sos", nip: "198805122020121001", pin: "123456", inviteCode: "PKH-SUKAMAJU" }
+        { id: "PND-01", nama: "Budi Santoso, S.Sos", nip: "198805122020121001", pin: "123456", kecamatan: "Sukamaju", inviteCode: "PKH-SUKAMAJU" }
     ],
     ketuaUsers: [
         { id: "KET-01", nama: "Siti Aminah", hp: "081234567890", kelompok: "Mawar 01", pin: "123456", status: "VERIFIED", pendampingId: "PND-01", date: "2026-10-01" }
@@ -149,54 +149,24 @@ function toggleLoginRoleUI() {
 function handleLogin(e) {
     e.preventDefault();
     const role = document.getElementById('loginRole').value;
-    const identifier = document.getElementById('loginIdentifier').value.trim().toLowerCase();
+    const identifier = document.getElementById('loginIdentifier').value.trim();
     const pin = document.getElementById('loginPin').value.trim();
 
     if (role === 'pendamping') {
-        // Cari data pendamping yang ada di database
-        let pendamping = appState.pendampingProfiles.find(p => 
-            (p.nama && p.nama.toLowerCase().includes(identifier)) || 
-            (p.nip && p.nip.toLowerCase() === identifier)
-        );
-
-        // Jika belum ada di memori, daftarkan otomatis pendamping yang sedang login agar langsung masuk
-        if (!pendamping) {
-            pendamping = {
-                id: "PND-" + Date.now(),
-                nama: "E. Yuyus Syamsul Firdaus, S.Sos.I",
-                nip: identifier.length > 5 ? identifier : "198310102025211098",
-                pin: pin || "123456",
-                kecamatan: "Sukamaju",
-                inviteCode: appState.inviteCode || "PKH-SUKAMAJU"
-            };
-            appState.pendampingProfiles.push(pendamping);
-            saveState();
-        }
-
-        // Set user aktif sebagai pendamping
-        currentUser = { role: 'pendamping', ...pendamping };
-        showToast("Login Berhasil", "Selamat datang " + currentUser.nama, "success");
-        renderUI();
-
+        const pendamping = appState.pendampingProfiles.find(p => (p.nama.toLowerCase().includes(identifier.toLowerCase()) || p.nip === identifier) && p.pin === pin);
+        if (pendamping) {
+            currentUser = { role: 'pendamping', ...pendamping };
+            showToast("Login Berhasil", "Selamat datang " + pendamping.nama, "success");
+            renderUI();
+        } else { alert("Login Pendamping gagal. Periksa kembali NIP/Nama dan PIN."); }
     } else {
-        // Cari data ketua kelompok
-        const ketua = appState.ketuaUsers.find(k => 
-            (k.nama && k.nama.toLowerCase().includes(identifier)) || 
-            (k.hp && k.hp === identifier)
-        );
-
+        const ketua = appState.ketuaUsers.find(k => (k.nama.toLowerCase().includes(identifier.toLowerCase()) || k.hp === identifier) && k.pin === pin);
         if (ketua) {
-            // Jika akun masih pending tapi ingin dipermudah langsung masuk, atau verifikasi otomatis
-            if (ketua.status !== 'VERIFIED') {
-                ketua.status = 'VERIFIED'; // Otomatis verifikasi agar ketua langsung bisa masuk
-                saveState();
-            }
+            if (ketua.status !== 'VERIFIED') return alert("Akun ketua masih PENDING menunggu verifikasi pendamping.");
             currentUser = { role: 'ketua', ...ketua };
             showToast("Login Berhasil", "Selamat datang Ketua " + ketua.nama, "success");
             renderUI();
-        } else {
-            alert("Data Ketua Kelompok tidak ditemukan. Pastikan nama/No HP sudah benar atau didaftarkan terlebih dahulu.");
-        }
+        } else { alert("Login Ketua gagal. Periksa kembali Nama/HP dan PIN."); }
     }
 }
 
@@ -212,11 +182,14 @@ function handleRegisterKetua(e) {
     const kelompok = document.getElementById('regKetuaKelompok').value.trim();
     const pin = document.getElementById('regKetuaPin').value.trim();
 
+    // Cari pendamping pengundang berdasarkan kode undangan
+    const pndPengundang = appState.pendampingProfiles.find(p => (p.inviteCode || "PKH-SUKAMAJU") === inviteCodeInput) || appState.pendampingProfiles[0];
+
     appState.ketuaUsers.push({
         id: "KET-" + Date.now(),
         nama, hp, kelompok, pin,
         status: "PENDING",
-        pendampingId: "PND-01",
+        pendampingId: pndPengundang ? pndPengundang.id : "PND-01",
         date: new Date().toISOString().split('T')[0]
     });
     saveState();
@@ -231,7 +204,7 @@ function handleRegisterPendamping(e) {
     const invite = document.getElementById('regPndInvite').value.trim().toUpperCase();
     const pin = document.getElementById('regPndPin').value.trim();
 
-    appState.pendampingProfiles.push({ id: "PND-" + Date.now(), nama, nip, pin, inviteCode: invite });
+    appState.pendampingProfiles.push({ id: "PND-" + Date.now(), nama, nip, pin, kecamatan: "Sukamaju", inviteCode: invite });
     appState.inviteCode = invite;
     saveState();
     showToast("Berhasil", "Akun pendamping terdaftar.", "success");
@@ -262,9 +235,21 @@ function renderUI() {
         userNavProfile.classList.remove('hidden');
         userNavProfile.classList.add('flex');
 
+        const pNip = currentUser.nip || "198805122020121001";
+        const pKec = currentUser.kecamatan || "Sukamaju";
+
         document.getElementById('navUserName').innerText = currentUser.nama;
         document.getElementById('navUserRole').innerText = "Pendamping PKH";
-        document.getElementById('pendampingWelcomeName').innerText = "Selamat Datang, " + currentUser.nama;
+        
+        const navNipKec = document.getElementById('navUserNipKec');
+        if (navNipKec) navNipKec.innerText = `NIP: ${pNip} | Kec: ${pKec}`;
+
+        document.getElementById('pendampingWelcomeName').innerText = `Selamat Datang, ${currentUser.nama}`;
+        
+        const welcomeDetail = document.getElementById('pendampingWelcomeDetail');
+        if (welcomeDetail) {
+            welcomeDetail.innerText = `NIP: ${pNip} | Wilayah Kerja Kecamatan: ${pKec} — Kelola verifikasi laporan dan kelompok binaan Anda di sini.`;
+        }
         
         populatePendampingFilters();
         renderPendampingVerifikasiTable();
@@ -286,20 +271,19 @@ function renderUI() {
 
         document.getElementById('ketuaWelcomeName').innerText = "Selamat Datang, " + currentUser.nama;
 
-        // 1. Otomatis Mencari Nama Pendamping Binaan yang Sesuai
-        let namaPendampingBinaan = "Budi Santoso, S.Sos"; // Default fallback
+        // Mendeteksi Nama Pendamping Binaan secara otomatis
+        let namaPendampingBinaan = "Budi Santoso, S.Sos";
         if (currentUser.pendampingId) {
             const pnd = appState.pendampingProfiles.find(p => p.id === currentUser.pendampingId);
             if (pnd) namaPendampingBinaan = pnd.nama;
         } else if (appState.pendampingProfiles.length > 0) {
-            // Ambil pendamping pertama jika pendampingId belum terset
             namaPendampingBinaan = appState.pendampingProfiles[0].nama;
         }
         
         const elPendamping = document.getElementById('ketuaPendampingNama');
         if (elPendamping) elPendamping.innerText = namaPendampingBinaan;
 
-        // 2. Menampilkan Nama Kelompok dan Alamat / Keterangan Anggota KPM di Kelompok Tersebut
+        // Menampilkan Nama Kelompok dan Alamat
         const myKpmList = appState.kpmList.filter(k => k.kelompok === currentUser.kelompok);
         let alamatKelompokStr = `Kelompok ${currentUser.kelompok}`;
         if (myKpmList.length > 0 && myKpmList[0].alamat) {
@@ -317,6 +301,7 @@ function renderUI() {
         renderKetuaAllTables();
         populateKetuaKpmSelects();
     }
+}
 
 function switchPendampingTab(tab) {
     ['pContentVerifikasi', 'pContentKelompok', 'pContentUndangan', 'pContentRekap'].forEach(id => document.getElementById(id).classList.add('hidden'));
@@ -919,7 +904,6 @@ function handleSaveKomitmen(e) {
     let selectedJenis = [];
     let fotoBuktiList = [];
 
-    // Mengambil teks jenis layanan dan file foto secara langsung dan aman
     checkboxes.forEach(cb => {
         const jenisVal = cb.value;
         const idx = cb.getAttribute('data-index');
@@ -927,7 +911,6 @@ function handleSaveKomitmen(e) {
 
         const fileInput = document.querySelector(`.komitmen-file-input-${idx}`);
         if (fileInput && fileInput.files && fileInput.files[0]) {
-            // Menggunakan URL objek lokal sementara agar tidak gagal akibat ukuran base64 yang terlalu besar
             fotoBuktiList.push(URL.createObjectURL(fileInput.files[0]));
         }
     });
@@ -944,23 +927,16 @@ function handleSaveKomitmen(e) {
     };
 
     if (!appState.komitmenList) appState.komitmenList = [];
-    
-    // Masukkan ke array utama
     appState.komitmenList.push(newReport);
-    
-    // Simpan permanen ke Firebase & LocalStorage
     saveState();
 
-    // Reset form
     document.getElementById('formKomitmen').reset();
     const dynContainer = document.getElementById('dynamicKomitmenContainer');
     if (dynContainer) {
         dynContainer.innerHTML = `<p class="text-slate-400 italic">Silakan pilih KPM terlebih dahulu untuk memunculkan pilihan komitmen.</p>`;
     }
     
-    // Refresh tampilan tabel ketua
     renderKetuaAllTables();
-    
     showToast("Berhasil", "Laporan komitmen berhasil dikirim ke Pendamping.", "success");
 }
 
@@ -1071,123 +1047,29 @@ function showToast(title, message, type = 'success') {
     document.getElementById('toastTitle').innerText = title;
     document.getElementById('toastMessage').innerText = message;
     
-    // Sesuaikan warna background
     const bgClass = type === 'success' ? 'bg-emerald-600' : (type === 'info' ? 'bg-blue-800' : 'bg-red-600');
     toast.className = `fixed top-20 right-5 z-50 transform transition-all duration-300 ease-in-out translate-x-0 opacity-100 ${bgClass} text-white px-4 py-3 rounded-xl shadow-2xl flex items-center space-x-3 max-w-md pointer-events-auto`;
     
     if (toastTimer) clearTimeout(toastTimer);
     
-    // Otomatis geser keluar layar dan sembunyikan setelah 3.5 detik
     toastTimer = setTimeout(() => {
         toast.className = `fixed top-20 right-5 z-50 transform transition-all duration-300 ease-in-out translate-x-full opacity-0 ${bgClass} text-white px-4 py-3 rounded-xl shadow-2xl flex items-center space-x-3 max-w-md pointer-events-none`;
     }, 3500);
 }
 
-// PENAMBAHAN IDENTITAS PENDAMPING (NAMA, NIP, KECAMATAN) PADA RENDER UI
-function renderUI() {
-    const authView = document.getElementById('authView');
-    const pendampingView = document.getElementById('pendampingDashboardView');
-    const ketuaView = document.getElementById('ketuaDashboardView');
-    const userNavProfile = document.getElementById('userNavProfile');
-
-    if (!currentUser) {
-        authView.classList.remove('hidden');
-        pendampingView.classList.add('hidden');
-        ketuaView.classList.add('hidden');
-        userNavProfile.classList.add('hidden');
-    } else if (currentUser.role === 'pendamping') {
-        authView.classList.add('hidden');
-        pendampingView.classList.remove('hidden');
-        ketuaView.classList.add('hidden');
-        userNavProfile.classList.remove('hidden');
-        userNavProfile.classList.add('flex');
-
-        // Pastikan bagian renderUI untuk pendamping memiliki baris ini:
-const pNip = currentUser.nip || "198805122020121001";
-const pKec = currentUser.kecamatan || "Sukamaju";
-
-document.getElementById('navUserName').innerText = currentUser.nama;
-document.getElementById('navUserRole').innerText = "Pendamping PKH";
-
-const navNipKec = document.getElementById('navUserNipKec');
-if (navNipKec) navNipKec.innerText = `NIP: ${pNip} | Kec: ${pKec}`;
-
-document.getElementById('pendampingWelcomeName').innerText = `Selamat Datang, ${currentUser.nama}`;
-
-const welcomeDetail = document.getElementById('pendampingWelcomeDetail');
-if (welcomeDetail) {
-    welcomeDetail.innerText = `NIP: ${pNip} | Wilayah Kerja Kecamatan: ${pKec} — Kelola verifikasi laporan dan kelompok binaan Anda di sini.`;
-}
-        
-        populatePendampingFilters();
-        renderPendampingVerifikasiTable();
-        renderPendampingKelompokManajemen();
-        renderPendampingKetuaManagement();
-        updateShareInviteUrl();
-    } else if (currentUser.role === 'ketua') {
-        authView.classList.add('hidden');
-        pendampingView.classList.add('hidden');
-        ketuaView.classList.remove('hidden');
-        userNavProfile.classList.remove('hidden');
-        userNavProfile.classList.add('flex');
-
-        document.getElementById('navUserName').innerText = currentUser.nama;
-        document.getElementById('navUserRole').innerText = "Ketua " + currentUser.kelompok;
-        
-        const navNipKec = document.getElementById('navUserNipKec');
-        if (navNipKec) navNipKec.innerText = `Kelompok: ${currentUser.kelompok}`;
-
-        document.getElementById('ketuaWelcomeName').innerText = "Selamat Datang, " + currentUser.nama;
-
-        // 1. Otomatis Mencari Nama Pendamping Binaan yang Sesuai
-        let namaPendampingBinaan = "Budi Santoso, S.Sos"; // Default fallback
-        if (currentUser.pendampingId) {
-            const pnd = appState.pendampingProfiles.find(p => p.id === currentUser.pendampingId);
-            if (pnd) namaPendampingBinaan = pnd.nama;
-        } else if (appState.pendampingProfiles.length > 0) {
-            // Ambil pendamping pertama jika pendampingId belum terset
-            namaPendampingBinaan = appState.pendampingProfiles[0].nama;
-        }
-        
-        const elPendamping = document.getElementById('ketuaPendampingNama');
-        if (elPendamping) elPendamping.innerText = namaPendampingBinaan;
-
-        // 2. Menampilkan Nama Kelompok dan Alamat / Keterangan Anggota KPM di Kelompok Tersebut
-        const myKpmList = appState.kpmList.filter(k => k.kelompok === currentUser.kelompok);
-        let alamatKelompokStr = `Kelompok ${currentUser.kelompok}`;
-        if (myKpmList.length > 0 && myKpmList[0].alamat) {
-            alamatKelompokStr = `Kelompok ${currentUser.kelompok} (${myKpmList[0].alamat})`;
-        }
-
-        const elAlamat = document.getElementById('ketuaAlamatKelompokText');
-        if (elAlamat) elAlamat.innerText = alamatKelompokStr;
-
-        const welcomeDetail = document.getElementById('ketuaWelcomeDetail');
-        if (welcomeDetail) {
-            welcomeDetail.innerText = `Kelompok: ${currentUser.kelompok} — Kelola anggota KPM dan input laporan bulanan kelompok Anda.`;
-        }
-
-        renderKetuaAllTables();
-        populateKetuaKpmSelects();
-    }
-
-// Buka Modal Edit Profil Pendamping
+// FITUR EDIT PROFIL PENDAMPING
 function openEditPendampingProfileModal() {
     if (!currentUser || currentUser.role !== 'pendamping') return;
-    
     document.getElementById('editPndNama').value = currentUser.nama || '';
     document.getElementById('editPndNip').value = currentUser.nip || '';
     document.getElementById('editPndKecamatan').value = currentUser.kecamatan || 'Sukamaju';
-    
     document.getElementById('modalEditPendampingProfile').classList.remove('hidden');
 }
 
-// Tutup Modal Edit Profil Pendamping
 function closeEditPendampingProfileModal() {
     document.getElementById('modalEditPendampingProfile').classList.add('hidden');
 }
 
-// Simpan Perubahan Profil Pendamping
 function handleSavePendampingProfile(e) {
     e.preventDefault();
     const namaBaru = document.getElementById('editPndNama').value.trim();
@@ -1198,12 +1080,10 @@ function handleSavePendampingProfile(e) {
         return alert("Semua kolom wajib diisi.");
     }
 
-    // Perbarui data pada currentUser yang sedang aktif
     currentUser.nama = namaBaru;
     currentUser.nip = nipBaru;
     currentUser.kecamatan = kecamatanBaru;
 
-    // Perbarui juga data di dalam array pendampingProfiles di appState
     const pIndex = appState.pendampingProfiles.findIndex(p => p.id === currentUser.id);
     if (pIndex !== -1) {
         appState.pendampingProfiles[pIndex].nama = namaBaru;
@@ -1215,12 +1095,8 @@ function handleSavePendampingProfile(e) {
         appState.pendampingProfiles[0].kecamatan = kecamatanBaru;
     }
 
-    // Simpan ke database / localstorage
     saveState();
-
-    // Tutup modal dan refresh tampilan UI
     closeEditPendampingProfileModal();
     renderUI();
-
     showToast("Berhasil", "Profil dan wilayah kerja pendamping diperbarui.", "success");
 }
