@@ -1438,49 +1438,58 @@
 
             let allReports = [];
             
-            // Ambil laporan P2K2
+            // Ambil laporan P2K2 yang dimiliki oleh ketua kelompok aktif yang terdaftar
             if (filterJenis === 'ALL' || filterJenis === 'P2K2') {
                 if (appState.p2k2List && Array.isArray(appState.p2k2List)) {
                     appState.p2k2List.forEach(item => {
-                        const itemKelompok = item.kelompok ? item.kelompok.trim().toLowerCase() : "";
-                        const filterKlpVal = filterKelompok ? filterKelompok.trim().toLowerCase() : "all";
-                        let passKelompok = (filterKlpVal === 'all' || itemKelompok === filterKlpVal);
-                        let passBulan = (!filterBulan || (item.tanggal && item.tanggal.startsWith(filterBulan)));
+                        const ketuaExists = appState.ketuaUsers.some(k => k.kelompok.trim().toLowerCase() === (item.kelompok || "").trim().toLowerCase() && k.status === 'VERIFIED');
+                        if (ketuaExists) {
+                            const itemKelompok = item.kelompok ? item.kelompok.trim().toLowerCase() : "";
+                            const filterKlpVal = filterKelompok ? filterKelompok.trim().toLowerCase() : "all";
+                            let passKelompok = (filterKlpVal === 'all' || itemKelompok === filterKlpVal);
+                            let passBulan = (!filterBulan || (item.tanggal && item.tanggal.startsWith(filterBulan)));
 
-                        if (passKelompok && passBulan) {
-                            allReports.push({ ...item, reportType: 'P2K2' });
+                            if (passKelompok && passBulan) {
+                                allReports.push({ ...item, reportType: 'P2K2' });
+                            }
                         }
                     });
                 }
             }
 
-            // Ambil laporan Komitmen
+            // Ambil laporan Komitmen yang dimiliki oleh ketua kelompok aktif yang terdaftar
             if (filterJenis === 'ALL' || filterJenis === 'Komitmen') {
                 if (appState.komitmenList && Array.isArray(appState.komitmenList)) {
                     appState.komitmenList.forEach(item => {
-                        const itemKelompok = item.kelompok ? item.kelompok.trim().toLowerCase() : "";
-                        const filterKlpVal = filterKelompok ? filterKelompok.trim().toLowerCase() : "all";
-                        let passKelompok = (filterKlpVal === 'all' || itemKelompok === filterKlpVal);
-                        let passBulan = (!filterBulan || (item.tanggal && item.tanggal.startsWith(filterBulan)));
+                        const ketuaExists = appState.ketuaUsers.some(k => k.kelompok.trim().toLowerCase() === (item.kelompok || "").trim().toLowerCase() && k.status === 'VERIFIED');
+                        if (ketuaExists) {
+                            const itemKelompok = item.kelompok ? item.kelompok.trim().toLowerCase() : "";
+                            const filterKlpVal = filterKelompok ? filterKelompok.trim().toLowerCase() : "all";
+                            let passKelompok = (filterKlpVal === 'all' || itemKelompok === filterKlpVal);
+                            let passBulan = (!filterBulan || (item.tanggal && item.tanggal.startsWith(filterBulan)));
 
-                        if (passKelompok && passBulan) {
-                            allReports.push({ ...item, reportType: 'Komitmen' });
+                            if (passKelompok && passBulan) {
+                                allReports.push({ ...item, reportType: 'Komitmen' });
+                            }
                         }
                     });
                 }
             }
 
-            // Ambil laporan Rekonsiliasi
+            // Ambil laporan Rekonsiliasi yang dimiliki oleh ketua kelompok aktif yang terdaftar
             if (filterJenis === 'ALL' || filterJenis === 'Rekonsiliasi') {
                 if (appState.rekonsiliasiList && Array.isArray(appState.rekonsiliasiList)) {
                     appState.rekonsiliasiList.forEach(item => {
-                        const itemKelompok = item.kelompok ? item.kelompok.trim().toLowerCase() : "";
-                        const filterKlpVal = filterKelompok ? filterKelompok.trim().toLowerCase() : "all";
-                        let passKelompok = (filterKlpVal === 'all' || itemKelompok === filterKlpVal);
-                        let passBulan = (!filterBulan || (item.tanggal && item.tanggal.startsWith(filterBulan)));
+                        const ketuaExists = appState.ketuaUsers.some(k => k.kelompok.trim().toLowerCase() === (item.kelompok || "").trim().toLowerCase() && k.status === 'VERIFIED');
+                        if (ketuaExists) {
+                            const itemKelompok = item.kelompok ? item.kelompok.trim().toLowerCase() : "";
+                            const filterKlpVal = filterKelompok ? filterKelompok.trim().toLowerCase() : "all";
+                            let passKelompok = (filterKlpVal === 'all' || itemKelompok === filterKlpVal);
+                            let passBulan = (!filterBulan || (item.tanggal && item.tanggal.startsWith(filterBulan)));
 
-                        if (passKelompok && passBulan) {
-                            allReports.push({ ...item, reportType: 'Rekonsiliasi' });
+                            if (passKelompok && passBulan) {
+                                allReports.push({ ...item, reportType: 'Rekonsiliasi' });
+                            }
                         }
                     });
                 }
