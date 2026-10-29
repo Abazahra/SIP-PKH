@@ -103,9 +103,9 @@
             </div>
 
             <!-- Tab Switcher -->
-            <div class="flex bg-slate-100 p-1.5 m-4 rounded-xl text-xs font-bold">
-                <button id="mainTabLogin" onclick="switchMainTab('login')" class="flex-1 py-2 rounded-lg bg-blue-900 text-white shadow transition">Masuk Aplikasi</button>
-                <button id="mainTabRegister" onclick="switchMainTab('register')" class="flex-1 py-2 rounded-lg text-slate-600 hover:text-slate-900 transition">Daftar Akun Baru</button>
+            <div class="grid grid-cols-2 bg-slate-100 p-1.5 m-4 rounded-xl text-xs font-bold gap-1">
+                <button id="mainTabLogin" type="button" onclick="switchMainTab('login')" class="py-2 px-3 rounded-lg bg-blue-900 text-white shadow text-center transition-all">Masuk Aplikasi</button>
+                <button id="mainTabRegister" type="button" onclick="switchMainTab('register')" class="py-2 px-3 rounded-lg text-slate-600 hover:text-slate-900 text-center transition-all">Daftar Akun Baru</button>
             </div>
 
             <!-- FORM LOGIN -->
@@ -683,7 +683,7 @@
                 <div class="bg-blue-50 border border-blue-100 p-4 rounded-xl space-y-2">
                     <h4 class="font-bold text-blue-900 text-sm">Informasi Pengembang & Rekening Donasi / Operasional</h4>
                     <p><strong>Dikembangkan oleh:</strong> Encep Yuyus Syamsul Firdaus, S.Sos.I</p>
-                    <p><strong>Jabatan / Peran:</strong> Pendamping Sosial PKH / Dosen / Kreator Media & Sistem Digital</p>
+                    <p><strong>Jabatan / Peran:</strong> ASN PPPK KEMENSOS - Penata Layanan Operasional / Pendamping Sosial PKH</p>
                     <div class="pt-2 border-t border-blue-200">
                         <span class="block font-semibold text-slate-700">Nomor Rekening Resmi (BSI / Bank Syariah Indonesia):</span>
                         <div class="flex items-center justify-between mt-1 bg-white p-2.5 rounded-lg border border-blue-200">
@@ -1160,13 +1160,13 @@
             if (tab === 'login') {
                 formLogin.classList.remove('hidden');
                 regContainer.classList.add('hidden');
-                btnLogin.className = "py-2 rounded-lg bg-blue-900 text-white shadow font-semibold";
-                btnReg.className = "py-2 rounded-lg text-slate-600 font-semibold";
+                btnLogin.className = "py-2 px-3 rounded-lg bg-blue-900 text-white shadow text-center transition-all font-bold";
+                btnReg.className = "py-2 px-3 rounded-lg text-slate-600 hover:text-slate-900 text-center transition-all font-bold";
             } else {
                 formLogin.classList.add('hidden');
                 regContainer.classList.remove('hidden');
-                btnReg.className = "py-2 rounded-lg bg-blue-900 text-white shadow font-semibold";
-                btnLogin.className = "py-2 rounded-lg text-slate-600 font-semibold";
+                btnReg.className = "py-2 px-3 rounded-lg bg-blue-900 text-white shadow text-center transition-all font-bold";
+                btnLogin.className = "py-2 px-3 rounded-lg text-slate-600 hover:text-slate-900 text-center transition-all font-bold";
             }
         }
 
