@@ -416,34 +416,47 @@ function editKelompokName(id) {
 
 function renderPendampingVerifikasiTable() {
     const filterKelompok = document.getElementById('pFilterKelompokVerifikasi').value;
+    const filterJenis = document.getElementById('pFilterJenisVerifikasi') ? document.getElementById('pFilterJenisVerifikasi').value : 'ALL';
+    const filterBulan = document.getElementById('pFilterBulanVerifikasi') ? document.getElementById('pFilterBulanVerifikasi').value : '';
+    
     const tbody = document.getElementById('tbodyPendampingVerifikasi');
     if (!tbody) return;
     tbody.innerHTML = '';
 
     let allReports = [];
     
-    if (appState.komitmenList && Array.isArray(appState.komitmenList)) {
-        appState.komitmenList.forEach(item => {
-            const itemKelompok = item.kelompok ? item.kelompok.trim().toLowerCase() : "";
-            const filterVal = filterKelompok ? filterKelompok.trim().toLowerCase() : "all";
-            if (filterVal === 'all' || itemKelompok === filterVal) {
-                allReports.push({ ...item, reportType: 'Komitmen' });
-            }
-        });
+    if (filterJenis === 'ALL' || filterJenis === 'Komitmen') {
+        if (appState.komitmenList && Array.isArray(appState.komitmenList)) {
+            appState.komitmenList.forEach(item => {
+                const itemKelompok = item.kelompok ? item.kelompok.trim().toLowerCase() : "";
+                const filterKlpVal = filterKelompok ? filterKelompok.trim().toLowerCase() : "all";
+                let passKelompok = (filterKlpVal === 'all' || itemKelompok === filterKlpVal);
+                let passBulan = (!filterBulan || (item.tanggal && item.tanggal.startsWith(filterBulan)));
+
+                if (passKelompok && passBulan) {
+                    allReports.push({ ...item, reportType: 'Komitmen' });
+                }
+            });
+        }
     }
 
-    if (appState.rekonsiliasiList && Array.isArray(appState.rekonsiliasiList)) {
-        appState.rekonsiliasiList.forEach(item => {
-            const itemKelompok = item.kelompok ? item.kelompok.trim().toLowerCase() : "";
-            const filterVal = filterKelompok ? filterKelompok.trim().toLowerCase() : "all";
-            if (filterVal === 'all' || itemKelompok === filterVal) {
-                allReports.push({ ...item, reportType: 'Rekonsiliasi' });
-            }
-        });
+    if (filterJenis === 'ALL' || filterJenis === 'Rekonsiliasi') {
+        if (appState.rekonsiliasiList && Array.isArray(appState.rekonsiliasiList)) {
+            appState.rekonsiliasiList.forEach(item => {
+                const itemKelompok = item.kelompok ? item.kelompok.trim().toLowerCase() : "";
+                const filterKlpVal = filterKelompok ? filterKelompok.trim().toLowerCase() : "all";
+                let passKelompok = (filterKlpVal === 'all' || itemKelompok === filterKlpVal);
+                let passBulan = (!filterBulan || (item.tanggal && item.tanggal.startsWith(filterBulan)));
+
+                if (passKelompok && passBulan) {
+                    allReports.push({ ...item, reportType: 'Rekonsiliasi' });
+                }
+            });
+        }
     }
 
     if (allReports.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="7" class="text-center p-6 text-slate-400 font-semibold">Belum ada laporan masuk dari ketua kelompok.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="7" class="text-center p-6 text-slate-400 font-semibold">Belum ada laporan masuk sesuai filter.</td></tr>`;
         return;
     }
 
@@ -883,7 +896,29 @@ function handleSaveP2k2(e) {
 
     if (!kpmNama) return alert("Pilih KPM.");
 
-    const simpanDataP2k2 = (fotoUrl = "") => {
+    if (fileInput.files && fileInput.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(ev) {
+            const newP2k2 = {
+                id: "P2K2-" + Date.now(),
+                tanggal: new Date().toISOString().split('T')[0],
+                kpmNama,
+                modul,
+                status,
+                kelompok: currentUser.kelompok ? currentUser.kelompok.trim() : "",
+                foto: ev.target.result
+            };
+
+            if (!appState.p2k2List) appState.p2k2List = [];
+            appState.p2k2List.push(newP2k2);
+            saveState();
+
+            document.getElementById('formP2k2').reset();
+            renderKetuaAllTables();
+            showToast("Berhasil", "Presensi P2K2 berhasil dikirim.", "success");
+        };
+        reader.readAsDataURL(fileInput.files[0]);
+    } else {
         const newP2k2 = {
             id: "P2K2-" + Date.now(),
             tanggal: new Date().toISOString().split('T')[0],
@@ -891,7 +926,7 @@ function handleSaveP2k2(e) {
             modul,
             status,
             kelompok: currentUser.kelompok ? currentUser.kelompok.trim() : "",
-            foto: fotoUrl
+            foto: ""
         };
 
         if (!appState.p2k2List) appState.p2k2List = [];
@@ -901,12 +936,6 @@ function handleSaveP2k2(e) {
         document.getElementById('formP2k2').reset();
         renderKetuaAllTables();
         showToast("Berhasil", "Presensi P2K2 berhasil dikirim.", "success");
-    };
-
-    if (fileInput.files && fileInput.files[0]) {
-        simpanDataP2k2(URL.createObjectURL(fileInput.files[0]));
-    } else {
-        simpanDataP2k2("");
     }
 }
 
@@ -920,7 +949,7 @@ function handleSaveKomitmen(e) {
     if (checkboxes.length === 0) return alert("Pilih minimal satu layanan komitmen.");
 
     let selectedJenis = [];
-    let fotoBuktiList = [];
+    let filePromises = [];
 
     checkboxes.forEach(cb => {
         const jenisVal = cb.value;
@@ -929,33 +958,45 @@ function handleSaveKomitmen(e) {
 
         const fileInput = document.querySelector(`.komitmen-file-input-${idx}`);
         if (fileInput && fileInput.files && fileInput.files[0]) {
-            fotoBuktiList.push(URL.createObjectURL(fileInput.files[0]));
+            filePromises.push(new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.onload = (ev) => resolve(ev.target.result);
+                reader.onerror = () => resolve(null);
+                reader.readAsDataURL(fileInput.files[0]);
+            }));
         }
     });
 
-    const newReport = {
-        id: "KOM-" + Date.now(),
-        tanggal: new Date().toISOString().split('T')[0],
-        kpmNama,
-        jenis: selectedJenis.join(', '),
-        status,
-        kelompok: currentUser.kelompok ? currentUser.kelompok.trim() : "",
-        statusVerifikasi: "PENDING",
-        foto: fotoBuktiList.length > 0 ? fotoBuktiList : ""
-    };
+    Promise.all(filePromises).then(results => {
+        const validImages = results.filter(img => img !== null);
 
-    if (!appState.komitmenList) appState.komitmenList = [];
-    appState.komitmenList.push(newReport);
-    saveState();
+        const newReport = {
+            id: "KOM-" + Date.now(),
+            tanggal: new Date().toISOString().split('T')[0],
+            kpmNama,
+            jenis: selectedJenis.join(', '),
+            status,
+            kelompok: currentUser.kelompok ? currentUser.kelompok.trim() : "",
+            statusVerifikasi: "PENDING",
+            foto: validImages.length > 0 ? validImages : ""
+        };
 
-    document.getElementById('formKomitmen').reset();
-    const dynContainer = document.getElementById('dynamicKomitmenContainer');
-    if (dynContainer) {
-        dynContainer.innerHTML = `<p class="text-slate-400 italic">Silakan pilih KPM terlebih dahulu untuk memunculkan pilihan komitmen.</p>`;
-    }
-    
-    renderKetuaAllTables();
-    showToast("Berhasil", "Laporan komitmen berhasil dikirim ke Pendamping.", "success");
+        if (!appState.komitmenList) appState.komitmenList = [];
+        appState.komitmenList.push(newReport);
+        saveState();
+
+        document.getElementById('formKomitmen').reset();
+        const dynContainer = document.getElementById('dynamicKomitmenContainer');
+        if (dynContainer) {
+            dynContainer.innerHTML = `<p class="text-slate-400 italic">Silakan pilih KPM terlebih dahulu untuk memunculkan pilihan komitmen.</p>`;
+        }
+        
+        renderKetuaAllTables();
+        showToast("Berhasil", "Laporan komitmen berhasil dikirim ke Pendamping.", "success");
+    }).catch(err => {
+        console.error("Gagal memproses file foto:", err);
+        alert("Terjadi kesalahan saat memproses foto bukti komitmen.");
+    });
 }
 
 function handleSaveRekonsiliasi(e) {
@@ -966,31 +1007,31 @@ function handleSaveRekonsiliasi(e) {
     const fileInput = document.getElementById('rekonFoto');
     if (!kpmNama) return alert("Pilih KPM.");
 
-    const simpanDataRekon = (fotoUrl = "") => {
-        const newRekon = {
-            id: "REK-" + Date.now(),
-            tanggal: new Date().toISOString().split('T')[0],
-            kpmNama,
-            nominal,
-            tahap,
-            kelompok: currentUser.kelompok ? currentUser.kelompok.trim() : "",
-            statusVerifikasi: "PENDING",
-            foto: fotoUrl
-        };
-
-        if (!appState.rekonsiliasiList) appState.rekonsiliasiList = [];
-        appState.rekonsiliasiList.push(newRekon);
-        saveState();
-        
-        document.getElementById('formRekonsiliasi').reset();
-        renderKetuaAllTables();
-        showToast("Berhasil", "Laporan rekonsiliasi berhasil dikirim ke Pendamping.", "success");
-    };
-
     if (fileInput.files && fileInput.files[0]) {
-        simpanDataRekon(URL.createObjectURL(fileInput.files[0]));
+        const reader = new FileReader();
+        reader.onload = function(ev) {
+            const newRekon = {
+                id: "REK-" + Date.now(),
+                tanggal: new Date().toISOString().split('T')[0],
+                kpmNama,
+                nominal,
+                tahap,
+                kelompok: currentUser.kelompok ? currentUser.kelompok.trim() : "",
+                statusVerifikasi: "PENDING",
+                foto: ev.target.result
+            };
+
+            if (!appState.rekonsiliasiList) appState.rekonsiliasiList = [];
+            appState.rekonsiliasiList.push(newRekon);
+            saveState();
+            
+            document.getElementById('formRekonsiliasi').reset();
+            renderKetuaAllTables();
+            showToast("Berhasil", "Laporan rekonsiliasi berhasil dikirim ke Pendamping.", "success");
+        };
+        reader.readAsDataURL(fileInput.files[0]);
     } else {
-        simpanDataRekon("");
+        alert("Lampirkan foto bukti struk pencairan.");
     }
 }
 
@@ -1000,6 +1041,7 @@ function deleteKomitmen(id) { if (confirm("Hapus komitmen?")) { appState.komitme
 function deleteRekonsiliasi(id) { if (confirm("Hapus rekon?")) { appState.rekonsiliasiList = appState.rekonsiliasiList.filter(r => r.id !== id); saveState(); renderKetuaAllTables(); } }
 
 function openPrintModal(type) {
+    window.currentPrintType = type;
     const modal = document.getElementById('modalPrintViewer');
     const titleEl = document.getElementById('printDocTitle');
     const tableContainer = document.getElementById('printDocTableContainer');
@@ -1007,19 +1049,15 @@ function openPrintModal(type) {
     const filterBulan = document.getElementById('printFilterBulan').value;
 
     const currentPendamping = (currentUser && currentUser.role === 'pendamping') ? currentUser : (appState.pendampingProfiles[0] || { nama: "Pendamping PKH", nip: "-" });
-    
-    // Header Tanda Tangan Pendamping
     document.getElementById('printPendampingTtdNama').innerText = currentPendamping.nama;
     document.getElementById('printPendampingTtdNip').innerText = "NIP. " + (currentPendamping.nip || "-");
     document.getElementById('printTtdTanggal').innerText = (currentPendamping.kecamatan || "Sukamaju") + ", " + new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
 
     tableContainer.innerHTML = '';
 
-    // KOP SURAT RESMI KEMENSOS SESUAI GAMBAR REFERENSI
     let kopSuratHtml = `
         <div class="flex items-center border-b-2 border-black pb-3 mb-4">
             <div class="w-24 flex-shrink-0 flex items-center justify-center pr-2">
-                <!-- Logo Resmi Kemensos -->
                 <svg viewBox="0 0 150 140" class="w-20 h-20">
                     <circle cx="35" cy="30" r="18" fill="#1e3a8a"/>
                     <path d="M15 100 Q 35 60 70 80 Q 105 100 135 65" stroke="#15803d" stroke-width="14" fill="none" stroke-linecap="round"/>
@@ -1045,7 +1083,6 @@ function openPrintModal(type) {
         return true;
     };
 
-    // Fungsi bantu mencari NIK KPM berdasarkan Nama & Kelompok
     const cariNikKpm = (namaKpm, kelompokKpm) => {
         const found = appState.kpmList.find(k => k.nama.toLowerCase() === (namaKpm || "").toLowerCase() && k.kelompok === kelompokKpm);
         return found ? found.nik : "-";
@@ -1076,7 +1113,6 @@ function openPrintModal(type) {
         } else {
             data.forEach((p, idx) => {
                 const nikVal = cariNikKpm(p.kpmNama, p.kelompok);
-                // Nomor urut ganjil/genap untuk tanda tangan interaktif (misal: 1.      2.     dst)
                 const ttdNum = (idx % 2 === 0) ? `${idx+1}. ........` : `     ${idx+1}. ........`;
                 html += `
                     <tr>
