@@ -1029,7 +1029,7 @@
             }
         }
 
-        function compressImage(file, callback, maxWidth = 600, quality = 0.6) {
+        function compressImage(file, callback, maxWidth = 400, quality = 0.5) {
             const reader = new FileReader();
             reader.onload = function(e) {
                 const img = new Image();
@@ -1438,6 +1438,7 @@
 
             let allReports = [];
             
+            // Ambil laporan P2K2
             if (filterJenis === 'ALL' || filterJenis === 'P2K2') {
                 if (appState.p2k2List && Array.isArray(appState.p2k2List)) {
                     appState.p2k2List.forEach(item => {
@@ -1453,6 +1454,7 @@
                 }
             }
 
+            // Ambil laporan Komitmen
             if (filterJenis === 'ALL' || filterJenis === 'Komitmen') {
                 if (appState.komitmenList && Array.isArray(appState.komitmenList)) {
                     appState.komitmenList.forEach(item => {
@@ -1468,6 +1470,7 @@
                 }
             }
 
+            // Ambil laporan Rekonsiliasi
             if (filterJenis === 'ALL' || filterJenis === 'Rekonsiliasi') {
                 if (appState.rekonsiliasiList && Array.isArray(appState.rekonsiliasiList)) {
                     appState.rekonsiliasiList.forEach(item => {
@@ -2048,36 +2051,94 @@
             const fileInput = document.getElementById('rekonFoto');
             if (!kpmNama) return alert("Pilih KPM.");
 
+            const saveRekonRecord = (fotoUrl = "") => {
+                const newRekon = {
+                    id: "REKON-" + Date.now(),
+                    tanggal: new Date().toISOString().split('T')[0],
+                    kpmNama,
+                    tahap,
+                    nominal,
+                    kelompok: currentUser.kelompok ? currentUser.kelompok.trim() : "",
+                    statusVerifikasi: "PENDING",
+                    foto: fotoUrl
+                };
+
+                if (!appState.rekonsiliasiList) appState.rekonsiliasiList = [];
+                appState.rekonsiliasiList.push(newRekon);
+                saveState();
+
+                document.getElementById('formRekonsiliasi').reset();
+                renderKetuaAllTables();
+                showToast("Berhasil", "Laporan rekonsiliasi berhasil dikirim.", "success");
+            };
+
             if (fileInput.files && fileInput.files[0]) {
                 compressImage(fileInput.files[0], (compressedBase64) => {
-                    const newRekon = {
-                        id: "REK-" + Date.now(),
-                        tanggal: new Date().toISOString().split('T')[0],
-                        kpmNama,
-                        nominal,
-                        tahap,
-                        kelompok: currentUser.kelompok ? currentUser.kelompok.trim() : "",
-                        statusVerifikasi: "PENDING",
-                        foto: compressedBase64
-                    };
-
-                    if (!appState.rekonsiliasiList) appState.rekonsiliasiList = [];
-                    appState.rekonsiliasiList.push(newRekon);
-                    saveState();
-                    
-                    document.getElementById('formRekonsiliasi').reset();
-                    renderKetuaAllTables();
-                    showToast("Berhasil", "Laporan rekonsiliasi berhasil dikirim ke Pendamping.", "success");
+                    saveRekonRecord(compressedBase64);
                 });
             } else {
-                alert("Lampirkan foto bukti struk pencairan.");
+                saveRekonRecord("");
             }
         }
 
-        function deleteKpm(id) { if (confirm("Hapus KPM?")) { appState.kpmList = appState.kpmList.filter(k => k.id !== id); saveState(); populateKetuaKpmSelects(); renderKetuaAllTables(); } }
-        function deleteP2k2(id) { if (confirm("Hapus presensi?")) { appState.p2k2List = appState.p2k2List.filter(p => p.id !== id); saveState(); renderKetuaAllTables(); } }
-        function deleteKomitmen(id) { if (confirm("Hapus komitmen?")) { appState.komitmenList = appState.komitmenList.filter(k => k.id !== id); saveState(); renderKetuaAllTables(); } }
-        function deleteRekonsiliasi(id) { if (confirm("Hapus rekon?")) { appState.rekonsiliasiList = appState.rekonsiliasiList.filter(r => r.id !== id); saveState(); renderKetuaAllTables(); } }
+        function deleteP2k2(id) {
+            if (confirm("Hapus presensi P2K2 ini?")) {
+                appState.p2k2List = appState.p2k2List.filter(item => item.id !== id);
+                saveState();
+                renderKetuaAllTables();
+            }
+        }
+
+        function deleteKomitmen(id) {
+            if (confirm("Hapus laporan komitmen ini?")) {
+                appState.komitmenList = appState.komitmenList.filter(item => item.id !== id);
+                saveState();
+                renderKetuaAllTables();
+            }
+        }
+
+        function deleteRekonsiliasi(id) {
+            if (confirm("Hapus rekonsiliasi ini?")) {
+                appState.rekonsiliasiList = appState.rekonsiliasiList.filter(item => item.id !== id);
+                saveState();
+                renderKetuaAllTables();
+            }
+        }
+
+        function deleteKpm(id) {
+            if (confirm("Hapus anggota KPM ini?")) {
+                appState.kpmList = appState.kpmList.filter(item => item.id !== id);
+                saveState();
+                renderKetuaAllTables();
+                populateKetuaKpmSelects();
+            }
+        }
+
+        async function saveState() {
+            try {
+                localStorage.setItem('SIP_PKH_STATE_V5', JSON.stringify(appState));
+            } catch (e) {
+                console.error("LocalStorage quota exceeded", e);
+            }
+            try {
+                if (db) {
+                    let optimizedState = JSON.parse(JSON.stringify(appState));
+                    if (optimizedState.komitmenList && optimizedState.komitmenList.length > 20) {
+                        optimizedState.komitmenList = optimizedState.komitmenList.slice(-20);
+                    }
+                    if (optimizedState.rekonsiliasiList && optimizedState.rekonsiliasiList.length > 20) {
+                        optimizedState.rekonsiliasiList = optimizedState.rekonsiliasiList.slice(-20);
+                    }
+                    if (optimizedState.p2k2List && optimizedState.p2k2List.length > 20) {
+                        optimizedState.p2k2List = optimizedState.p2k2List.slice(-20);
+                    }
+
+                    await db.collection("pkh_database").doc("main_state").set(optimizedState);
+                }
+            } catch (e) {
+                console.error("Firebase save error (Ignored to keep app working locally):", e);
+            }
+        }
 
         function openImageViewer(url) {
             document.getElementById('modalImagePreviewTarget').src = url;
