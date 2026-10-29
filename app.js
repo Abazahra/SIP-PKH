@@ -1007,11 +1007,35 @@ function openPrintModal(type) {
     const filterBulan = document.getElementById('printFilterBulan').value;
 
     const currentPendamping = (currentUser && currentUser.role === 'pendamping') ? currentUser : (appState.pendampingProfiles[0] || { nama: "Pendamping PKH", nip: "-" });
+    
+    // Header Tanda Tangan Pendamping
     document.getElementById('printPendampingTtdNama').innerText = currentPendamping.nama;
     document.getElementById('printPendampingTtdNip').innerText = "NIP. " + (currentPendamping.nip || "-");
-    document.getElementById('printTtdTanggal').innerText = "Jakarta, " + new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+    document.getElementById('printTtdTanggal').innerText = (currentPendamping.kecamatan || "Sukamaju") + ", " + new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
 
     tableContainer.innerHTML = '';
+
+    // KOP SURAT RESMI KEMENSOS SESUAI GAMBAR REFERENSI
+    let kopSuratHtml = `
+        <div class="flex items-center border-b-2 border-black pb-3 mb-4">
+            <div class="w-24 flex-shrink-0 flex items-center justify-center pr-2">
+                <!-- Logo Resmi Kemensos -->
+                <svg viewBox="0 0 150 140" class="w-20 h-20">
+                    <circle cx="35" cy="30" r="18" fill="#1e3a8a"/>
+                    <path d="M15 100 Q 35 60 70 80 Q 105 100 135 65" stroke="#15803d" stroke-width="14" fill="none" stroke-linecap="round"/>
+                    <path d="M10 115 Q 75 140 140 100" fill="#eab308"/>
+                </svg>
+            </div>
+            <div class="flex-grow text-center uppercase font-bold text-black tracking-tight leading-snug">
+                <div class="text-sm font-extrabold">Kementerian Sosial Republik Indonesia</div>
+                <div class="text-xs font-bold">Direktorat Jenderal Perlindungan dan Jaminan Sosial</div>
+                <div class="text-xs font-bold">Direktorat Perlindungan Sosial Non Kebencanaan</div>
+                <div class="normal-case text-[10px] font-normal text-slate-700 mt-0.5">
+                    Jl. Salemba Raya No. 28 Jakarta Pusat Tlp (021)22804288 <a href="http://kemensos.go.id/" target="_blank" class="text-blue-600 underline">http://kemensos.go.id/</a>
+                </div>
+            </div>
+        </div>
+    `;
 
     const checkFilter = (itemKelompok, itemTanggal) => {
         if (filterKelompok !== 'ALL' && itemKelompok !== filterKelompok) return false;
@@ -1021,15 +1045,50 @@ function openPrintModal(type) {
         return true;
     };
 
+    // Fungsi bantu mencari NIK KPM berdasarkan Nama & Kelompok
+    const cariNikKpm = (namaKpm, kelompokKpm) => {
+        const found = appState.kpmList.find(k => k.nama.toLowerCase() === (namaKpm || "").toLowerCase() && k.kelompok === kelompokKpm);
+        return found ? found.nik : "-";
+    };
+
     if (type === 'p2k2') {
         titleEl.innerText = "LAPORAN PRESENSI KEHADIRAN P2K2 KPM PKH";
-        let html = `<table class="w-full border-collapse border border-black text-xs text-black"><thead><tr class="bg-gray-100 text-center font-bold"><th class="border border-black p-2">No</th><th class="border border-black p-2">Tanggal</th><th class="border border-black p-2">Kelompok</th><th class="border border-black p-2">Nama KPM</th><th class="border border-black p-2">Modul</th><th class="border border-black p-2">Status</th></tr></thead><tbody>`;
+        let html = kopSuratHtml + `
+            <div class="text-center font-bold text-xs mb-3 uppercase">${titleEl.innerText}</div>
+            <table class="w-full border-collapse border border-black text-xs text-black">
+                <thead>
+                    <tr class="bg-gray-100 text-center font-bold">
+                        <th class="border border-black p-2">No</th>
+                        <th class="border border-black p-2">Tanggal</th>
+                        <th class="border border-black p-2">Kelompok</th>
+                        <th class="border border-black p-2">Nama KPM</th>
+                        <th class="border border-black p-2">NIK KPM</th>
+                        <th class="border border-black p-2">Modul</th>
+                        <th class="border border-black p-2">Status</th>
+                        <th class="border border-black p-2 w-16">TTD</th>
+                    </tr>
+                </thead>
+                <tbody>`;
         
         const data = appState.p2k2List.filter(p => checkFilter(p.kelompok, p.tanggal));
-        if (data.length === 0) { html += `<tr><td colspan="6" class="border border-black p-4 text-center">Tidak ada data sesuai filter.</td></tr>`; }
-        else {
+        if (data.length === 0) { 
+            html += `<tr><td colspan="8" class="border border-black p-4 text-center">Tidak ada data sesuai filter.</td></tr>`; 
+        } else {
             data.forEach((p, idx) => {
-                html += `<tr><td class="border border-black p-2 text-center">${idx+1}</td><td class="border border-black p-2 text-center">${p.tanggal}</td><td class="border border-black p-2 text-center">${p.kelompok}</td><td class="border border-black p-2 font-bold">${p.kpmNama}</td><td class="border border-black p-2">${p.modul}</td><td class="border border-black p-2 text-center">${p.status}</td></tr>`;
+                const nikVal = cariNikKpm(p.kpmNama, p.kelompok);
+                // Nomor urut ganjil/genap untuk tanda tangan interaktif (misal: 1.      2.     dst)
+                const ttdNum = (idx % 2 === 0) ? `${idx+1}. ........` : `     ${idx+1}. ........`;
+                html += `
+                    <tr>
+                        <td class="border border-black p-2 text-center">${idx+1}</td>
+                        <td class="border border-black p-2 text-center">${p.tanggal}</td>
+                        <td class="border border-black p-2 text-center">${p.kelompok}</td>
+                        <td class="border border-black p-2 font-bold">${p.kpmNama}</td>
+                        <td class="border border-black p-2 font-mono text-center">${nikVal}</td>
+                        <td class="border border-black p-2">${p.modul}</td>
+                        <td class="border border-black p-2 text-center">${p.status}</td>
+                        <td class="border border-black p-2 text-center font-mono text-[11px]">${ttdNum}</td>
+                    </tr>`;
             });
         }
         html += `</tbody></table>`;
@@ -1037,13 +1096,40 @@ function openPrintModal(type) {
 
     } else if (type === 'komitmen') {
         titleEl.innerText = "LAPORAN VERIFIKASI KOMITMEN KPM PKH";
-        let html = `<table class="w-full border-collapse border border-black text-xs text-black"><thead><tr class="bg-gray-100 text-center font-bold"><th class="border border-black p-2">No</th><th class="border border-black p-2">Tanggal</th><th class="border border-black p-2">Kelompok</th><th class="border border-black p-2">Nama KPM</th><th class="border border-black p-2">Jenis Layanan</th><th class="border border-black p-2">Status</th><th class="border border-black p-2">Verifikasi</th></tr></thead><tbody>`;
+        let html = kopSuratHtml + `
+            <div class="text-center font-bold text-xs mb-3 uppercase">${titleEl.innerText}</div>
+            <table class="w-full border-collapse border border-black text-xs text-black">
+                <thead>
+                    <tr class="bg-gray-100 text-center font-bold">
+                        <th class="border border-black p-2">No</th>
+                        <th class="border border-black p-2">Tanggal</th>
+                        <th class="border border-black p-2">Kelompok</th>
+                        <th class="border border-black p-2">Nama KPM</th>
+                        <th class="border border-black p-2">NIK KPM</th>
+                        <th class="border border-black p-2">Jenis Layanan</th>
+                        <th class="border border-black p-2">Status</th>
+                        <th class="border border-black p-2">Verifikasi</th>
+                    </tr>
+                </thead>
+                <tbody>`;
         
         const data = appState.komitmenList.filter(k => checkFilter(k.kelompok, k.tanggal));
-        if (data.length === 0) { html += `<tr><td colspan="7" class="border border-black p-4 text-center">Tidak ada data sesuai filter.</td></tr>`; }
-        else {
+        if (data.length === 0) { 
+            html += `<tr><td colspan="8" class="border border-black p-4 text-center">Tidak ada data sesuai filter.</td></tr>`; 
+        } else {
             data.forEach((k, idx) => {
-                html += `<tr><td class="border border-black p-2 text-center">${idx+1}</td><td class="border border-black p-2 text-center">${k.tanggal}</td><td class="border border-black p-2 text-center">${k.kelompok}</td><td class="border border-black p-2 font-bold">${k.kpmNama}</td><td class="border border-black p-2">${k.jenis}</td><td class="border border-black p-2 text-center">${k.status}</td><td class="border border-black p-2 text-center font-bold">${k.statusVerifikasi || 'PENDING'}</td></tr>`;
+                const nikVal = cariNikKpm(k.kpmNama, k.kelompok);
+                html += `
+                    <tr>
+                        <td class="border border-black p-2 text-center">${idx+1}</td>
+                        <td class="border border-black p-2 text-center">${k.tanggal}</td>
+                        <td class="border border-black p-2 text-center">${k.kelompok}</td>
+                        <td class="border border-black p-2 font-bold">${k.kpmNama}</td>
+                        <td class="border border-black p-2 font-mono text-center">${nikVal}</td>
+                        <td class="border border-black p-2">${k.jenis}</td>
+                        <td class="border border-black p-2 text-center">${k.status}</td>
+                        <td class="border border-black p-2 text-center font-bold">${k.statusVerifikasi || 'PENDING'}</td>
+                    </tr>`;
             });
         }
         html += `</tbody></table>`;
@@ -1052,16 +1138,43 @@ function openPrintModal(type) {
     } else if (type === 'rekonsiliasi') {
         titleEl.innerText = "LAPORAN REKONSILIASI PENCAIRAN BANTUAN SOSIAL PKH";
         let total = 0;
-        let html = `<table class="w-full border-collapse border border-black text-xs text-black"><thead><tr class="bg-gray-100 text-center font-bold"><th class="border border-black p-2">No</th><th class="border border-black p-2">Tanggal</th><th class="border border-black p-2">Kelompok</th><th class="border border-black p-2">Nama KPM</th><th class="border border-black p-2">Tahap</th><th class="border border-black p-2 text-right">Nominal (Rp)</th><th class="border border-black p-2">Verifikasi</th></tr></thead><tbody>`;
+        let html = kopSuratHtml + `
+            <div class="text-center font-bold text-xs mb-3 uppercase">${titleEl.innerText}</div>
+            <table class="w-full border-collapse border border-black text-xs text-black">
+                <thead>
+                    <tr class="bg-gray-100 text-center font-bold">
+                        <th class="border border-black p-2">No</th>
+                        <th class="border border-black p-2">Tanggal</th>
+                        <th class="border border-black p-2">Kelompok</th>
+                        <th class="border border-black p-2">Nama KPM</th>
+                        <th class="border border-black p-2">NIK KPM</th>
+                        <th class="border border-black p-2">Tahap</th>
+                        <th class="border border-black p-2 text-right">Nominal (Rp)</th>
+                        <th class="border border-black p-2">Verifikasi</th>
+                    </tr>
+                </thead>
+                <tbody>`;
         
         const data = appState.rekonsiliasiList.filter(r => checkFilter(r.kelompok, r.tanggal));
-        if (data.length === 0) { html += `<tr><td colspan="7" class="border border-black p-4 text-center">Tidak ada data sesuai filter.</td></tr>`; }
-        else {
+        if (data.length === 0) { 
+            html += `<tr><td colspan="8" class="border border-black p-4 text-center">Tidak ada data sesuai filter.</td></tr>`; 
+        } else {
             data.forEach((r, idx) => {
                 total += r.nominal;
-                html += `<tr><td class="border border-black p-2 text-center">${idx+1}</td><td class="border border-black p-2 text-center">${r.tanggal}</td><td class="border border-black p-2 text-center">${r.kelompok}</td><td class="border border-black p-2 font-bold">${r.kpmNama}</td><td class="border border-black p-2 text-center">${r.tahap}</td><td class="border border-black p-2 text-right">Rp ${r.nominal.toLocaleString('id-ID')}</td><td class="border border-black p-2 text-center font-bold">${r.statusVerifikasi || 'PENDING'}</td></tr>`;
+                const nikVal = cariNikKpm(r.kpmNama, r.kelompok);
+                html += `
+                    <tr>
+                        <td class="border border-black p-2 text-center">${idx+1}</td>
+                        <td class="border border-black p-2 text-center">${r.tanggal}</td>
+                        <td class="border border-black p-2 text-center">${r.kelompok}</td>
+                        <td class="border border-black p-2 font-bold">${r.kpmNama}</td>
+                        <td class="border border-black p-2 font-mono text-center">${nikVal}</td>
+                        <td class="border border-black p-2 text-center">${r.tahap}</td>
+                        <td class="border border-black p-2 text-right">Rp ${r.nominal.toLocaleString('id-ID')}</td>
+                        <td class="border border-black p-2 text-center font-bold">${r.statusVerifikasi || 'PENDING'}</td>
+                    </tr>`;
             });
-            html += `<tr class="bg-gray-100 font-bold"><td colspan="5" class="border border-black p-2 text-right">Total:</td><td colspan="2" class="border border-black p-2 text-right">Rp ${total.toLocaleString('id-ID')}</td></tr>`;
+            html += `<tr class="bg-gray-100 font-bold"><td colspan="6" class="border border-black p-2 text-right">Total:</td><td colspan="2" class="border border-black p-2 text-right">Rp ${total.toLocaleString('id-ID')}</td></tr>`;
         }
         html += `</tbody></table>`;
         tableContainer.innerHTML = html;
