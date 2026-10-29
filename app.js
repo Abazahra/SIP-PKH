@@ -1001,13 +1001,85 @@ function openPrintModal(type) {
 function closePrintModal() { document.getElementById('modalPrintViewer').classList.add('hidden'); }
 function executeWindowPrint() { window.print(); }
 
+// FUNGSI TOAST AGAR OTOMATIS MENGHILANG SEMPURNA
 let toastTimer = null;
 function showToast(title, message, type = 'success') {
     const toast = document.getElementById('toast');
     if (!toast) return;
+    
     document.getElementById('toastTitle').innerText = title;
     document.getElementById('toastMessage').innerText = message;
-    toast.className = `fixed top-20 right-5 z-50 transform transition-transform duration-300 ease-in-out translate-x-0 ${type==='success'?'bg-emerald-600':'bg-blue-800'} text-white px-4 py-3 rounded-lg shadow-lg flex items-center space-x-3 max-w-md`;
+    
+    // Sesuaikan warna background
+    const bgClass = type === 'success' ? 'bg-emerald-600' : (type === 'info' ? 'bg-blue-800' : 'bg-red-600');
+    toast.className = `fixed top-20 right-5 z-50 transform transition-all duration-300 ease-in-out translate-x-0 opacity-100 ${bgClass} text-white px-4 py-3 rounded-xl shadow-2xl flex items-center space-x-3 max-w-md pointer-events-auto`;
+    
     if (toastTimer) clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => { toast.classList.add('translate-x-full'); }, 3000);
+    
+    // Otomatis geser keluar layar dan sembunyikan setelah 3.5 detik
+    toastTimer = setTimeout(() => {
+        toast.className = `fixed top-20 right-5 z-50 transform transition-all duration-300 ease-in-out translate-x-full opacity-0 ${bgClass} text-white px-4 py-3 rounded-xl shadow-2xl flex items-center space-x-3 max-w-md pointer-events-none`;
+    }, 3500);
+}
+
+// PENAMBAHAN IDENTITAS PENDAMPING (NAMA, NIP, KECAMATAN) PADA RENDER UI
+function renderUI() {
+    const authView = document.getElementById('authView');
+    const pendampingView = document.getElementById('pendampingDashboardView');
+    const ketuaView = document.getElementById('ketuaDashboardView');
+    const userNavProfile = document.getElementById('userNavProfile');
+
+    if (!currentUser) {
+        authView.classList.remove('hidden');
+        pendampingView.classList.add('hidden');
+        ketuaView.classList.add('hidden');
+        userNavProfile.classList.add('hidden');
+    } else if (currentUser.role === 'pendamping') {
+        authView.classList.add('hidden');
+        pendampingView.classList.remove('hidden');
+        ketuaView.classList.add('hidden');
+        userNavProfile.classList.remove('hidden');
+        userNavProfile.classList.add('flex');
+
+        // Mengatur informasi lengkap Pendamping (Nama, NIP, dan Kecamatan)
+        const pNip = currentUser.nip || "198805122020121001";
+        const pKec = currentUser.kecamatan || "Sukamaju";
+
+        document.getElementById('navUserName').innerText = currentUser.nama;
+        document.getElementById('navUserRole').innerText = "Pendamping PKH";
+        
+        // Menampilkan NIP dan Wilayah Kecamatan di Navbar & Banner
+        const navNipKec = document.getElementById('navUserNipKec');
+        if (navNipKec) navNipKec.innerText = `NIP: ${pNip} | Kec: ${pKec}`;
+
+        document.getElementById('pendampingWelcomeName').innerText = `Selamat Datang, ${currentUser.nama}`;
+        
+        const welcomeDetail = document.getElementById('pendampingWelcomeDetail');
+        if (welcomeDetail) {
+            welcomeDetail.innerText = `NIP: ${pNip} | Wilayah Kerja Kecamatan: ${pKec} — Kelola verifikasi laporan dan kelompok binaan Anda di sini.`;
+        }
+        
+        populatePendampingFilters();
+        renderPendampingVerifikasiTable();
+        renderPendampingKelompokManajemen();
+        renderPendampingKetuaManagement();
+        updateShareInviteUrl();
+    } else if (currentUser.role === 'ketua') {
+        authView.classList.add('hidden');
+        pendampingView.classList.add('hidden');
+        ketuaView.classList.remove('hidden');
+        userNavProfile.classList.remove('hidden');
+        userNavProfile.classList.add('flex');
+
+        document.getElementById('navUserName').innerText = currentUser.nama;
+        document.getElementById('navUserRole').innerText = "Ketua " + currentUser.kelompok;
+        
+        const navNipKec = document.getElementById('navUserNipKec');
+        if (navNipKec) navNipKec.innerText = `Kelompok: ${currentUser.kelompok}`;
+
+        document.getElementById('ketuaWelcomeName').innerText = "Selamat Datang, " + currentUser.nama;
+
+        renderKetuaAllTables();
+        populateKetuaKpmSelects();
+    }
 }
