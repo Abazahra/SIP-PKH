@@ -1660,7 +1660,10 @@
             if (!tbodyPending || !tbodyActive) return;
 
             tbodyPending.innerHTML = '';
-            const pending = appState.ketuaUsers.filter(k => k.status === 'PENDING');
+            
+            // Tampilkan ketua yang berstatus PENDING dan terikat pada pendamping yang sedang login (atau tampilkan semua jika single pendamping)
+            const pending = appState.ketuaUsers.filter(k => k.status === 'PENDING' && (!currentUser || !currentUser.id || k.pendampingId === currentUser.id || !k.pendampingId));
+            
             if (badgePending) {
                 if (pending.length > 0) { badgePending.innerText = pending.length; badgePending.classList.remove('hidden'); }
                 else { badgePending.classList.add('hidden'); }
@@ -1677,7 +1680,7 @@
                             <td class="p-3">${k.kelompok}</td>
                             <td class="p-3">${k.date}</td>
                             <td class="p-3 text-center">
-                                <button onclick="verifyKetua('${k.id}', true)" class="bg-emerald-600 text-white px-3 py-1 rounded text-xs font-bold shadow">Setujui</button>
+                                <button onclick="verifyKetua('${k.id}', true)" class="bg-emerald-600 text-white px-3 py-1 rounded text-xs font-bold shadow cursor-pointer">Setujui</button>
                             </td>
                         </tr>
                     `;
@@ -1685,7 +1688,7 @@
             }
 
             tbodyActive.innerHTML = '';
-            const active = appState.ketuaUsers.filter(k => k.status === 'VERIFIED');
+            const active = appState.ketuaUsers.filter(k => k.status === 'VERIFIED' && (!currentUser || !currentUser.id || k.pendampingId === currentUser.id || !k.pendampingId));
             if (active.length === 0) {
                 tbodyActive.innerHTML = `<tr><td colspan="5" class="text-center p-4 text-slate-400">Belum ada ketua kelompok aktif.</td></tr>`;
             } else {
