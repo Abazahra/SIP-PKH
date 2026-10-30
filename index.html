@@ -1239,11 +1239,9 @@
             e.preventDefault();
             const inviteCodeInput = document.getElementById('regKetuaInviteCode').value.trim().toUpperCase();
             
-            // Perbaikan: Cek kecocokan dengan inviteCode pendamping, atau global inviteCode, atau sediakan fallback jika ada pendamping terdaftar
             let pndPengundang = appState.pendampingProfiles.find(p => (p.inviteCode || "").toUpperCase() === inviteCodeInput || (appState.inviteCode || "PKH-SUKAMAJU").toUpperCase() === inviteCodeInput);
             
             if (!pndPengundang && appState.pendampingProfiles.length > 0) {
-                // Fallback otomatis ke pendamping pertama jika list pendamping tersedia
                 pndPengundang = appState.pendampingProfiles[0];
             }
 
@@ -1660,7 +1658,7 @@
         }
 
         function renderPendampingKetuaManagement() {
-            const tbodyPending = document.getElementById('tbodyPendingKetua');
+            const tbodyPending = document.getElementById('tbodyPendingKetuan') || document.getElementById('tbodyPendingKetua');
             const tbodyActive = document.getElementById('tbodyActiveKetua');
             const badgePending = document.getElementById('badgePendingKetua');
 
@@ -1668,8 +1666,8 @@
 
             tbodyPending.innerHTML = '';
             
-            // Tampilkan ketua yang berstatus PENDING dan terikat pada pendamping yang sedang login (atau tampilkan semua jika single pendamping)
-            const pending = appState.ketuaUsers.filter(k => k.status === 'PENDING' && (!currentUser || !currentUser.id || k.pendampingId === currentUser.id || !k.pendampingId));
+            // Tampilkan semua ketua berstatus PENDING agar tidak terlewat oleh pendamping manapun di sistem
+            const pending = appState.ketuaUsers.filter(k => k.status === 'PENDING');
             
             if (badgePending) {
                 if (pending.length > 0) { badgePending.innerText = pending.length; badgePending.classList.remove('hidden'); }
@@ -1695,7 +1693,7 @@
             }
 
             tbodyActive.innerHTML = '';
-            const active = appState.ketuaUsers.filter(k => k.status === 'VERIFIED' && (!currentUser || !currentUser.id || k.pendampingId === currentUser.id || !k.pendampingId));
+            const active = appState.ketuaUsers.filter(k => k.status === 'VERIFIED');
             if (active.length === 0) {
                 tbodyActive.innerHTML = `<tr><td colspan="5" class="text-center p-4 text-slate-400">Belum ada ketua kelompok aktif.</td></tr>`;
             } else {
