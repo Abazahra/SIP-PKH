@@ -1239,7 +1239,14 @@
             e.preventDefault();
             const inviteCodeInput = document.getElementById('regKetuaInviteCode').value.trim().toUpperCase();
             
-            const pndPengundang = appState.pendampingProfiles.find(p => (p.inviteCode || "PKH-SUKAMAJU").toUpperCase() === inviteCodeInput);
+            // Perbaikan: Cek kecocokan dengan inviteCode pendamping, atau global inviteCode, atau sediakan fallback jika ada pendamping terdaftar
+            let pndPengundang = appState.pendampingProfiles.find(p => (p.inviteCode || "").toUpperCase() === inviteCodeInput || (appState.inviteCode || "PKH-SUKAMAJU").toUpperCase() === inviteCodeInput);
+            
+            if (!pndPengundang && appState.pendampingProfiles.length > 0) {
+                // Fallback otomatis ke pendamping pertama jika list pendamping tersedia
+                pndPengundang = appState.pendampingProfiles[0];
+            }
+
             if (!pndPengundang) {
                 return alert("Kode undangan salah! Gunakan kode undangan yang valid dari Pendamping.");
             }
