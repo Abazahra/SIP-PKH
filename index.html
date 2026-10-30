@@ -991,15 +991,9 @@
                 alamat: "Jl. Salemba Raya No. 28 Jakarta Pusat Tlp (021)22804288 http://kemensos.go.id/",
                 logoBase64: ""
             },
-            pendampingProfiles: [
-                { id: "PND-01", nama: "Budi Santoso, S.Sos", nip: "198805122020121001", pin: "123456", kecamatan: "Sukamaju", inviteCode: "PKH-SUKAMAJU" }
-            ],
-            ketuaUsers: [
-                { id: "KET-01", nama: "Siti Aminah", hp: "081234567890", kelompok: "Mawar 01", pin: "123456", status: "VERIFIED", pendampingId: "PND-01", date: "2026-10-01" }
-            ],
-            kpmList: [
-                { id: "KPM-01", nama: "Ratna Sari", nik: "3201123456780001", jenisBantuan: "PKH dan BPNT", komponen: "Balita / PAUD, Anak Sekolah SD", alamat: "Jl. Melati No. 12", kelompok: "Mawar 01" }
-            ],
+            pendampingProfiles: [],
+            ketuaUsers: [],
+            kpmList: [],
             p2k2List: [],
             komitmenList: [],
             rekonsiliasiList: []
@@ -1239,12 +1233,11 @@
             e.preventDefault();
             const inviteCodeInput = document.getElementById('regKetuaInviteCode').value.trim().toUpperCase();
             
-            // Cari pendamping yang sesuai, atau ambil pendamping pertama / aktif di sistem agar tidak pernah salah
+            // Cari pendamping yang sesuai berdasarkan inviteCode, atau pendamping terakhir yang aktif di sistem
             let pndPengundang = appState.pendampingProfiles.find(p => (p.inviteCode || "").toUpperCase() === inviteCodeInput);
             
             if (!pndPengundang && appState.pendampingProfiles.length > 0) {
-                // Fallback otomatis ke pendamping pertama jika kode tidak ditemukan secara persis
-                pndPengundang = appState.pendampingProfiles[0];
+                pndPengundang = appState.pendampingProfiles[appState.pendampingProfiles.length - 1];
             }
 
             if (!pndPengundang) {
@@ -1343,12 +1336,14 @@
 
                 document.getElementById('ketuaWelcomeName').innerText = "Selamat Datang, " + currentUser.nama;
 
-                let namaPendampingBinaan = "Budi Santoso, S.Sos";
+                let namaPendampingBinaan = "Pendamping PKH";
                 if (currentUser.pendampingId) {
                     const pnd = appState.pendampingProfiles.find(p => p.id === currentUser.pendampingId);
                     if (pnd) {
                         namaPendampingBinaan = pnd.nama;
                     }
+                } else if (appState.pendampingProfiles.length > 0) {
+                    namaPendampingBinaan = appState.pendampingProfiles[0].nama;
                 }
             
                 const elPendamping = document.getElementById('ketuaPendampingNama');
