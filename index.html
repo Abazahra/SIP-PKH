@@ -1239,12 +1239,9 @@
             e.preventDefault();
             const inviteCodeInput = document.getElementById('regKetuaInviteCode').value.trim().toUpperCase();
             
-            let pndPengundang = appState.pendampingProfiles.find(p => (p.inviteCode || "").toUpperCase() === inviteCodeInput || (appState.inviteCode || "PKH-SUKAMAJU").toUpperCase() === inviteCodeInput);
+            // Cari pendamping yang memiliki inviteCode yang sesuai secara persis
+            let pndPengundang = appState.pendampingProfiles.find(p => (p.inviteCode || "").toUpperCase() === inviteCodeInput);
             
-            if (!pndPengundang && appState.pendampingProfiles.length > 0) {
-                pndPengundang = appState.pendampingProfiles[0];
-            }
-
             if (!pndPengundang) {
                 return alert("Kode undangan salah! Gunakan kode undangan yang valid dari Pendamping.");
             }
@@ -1342,17 +1339,17 @@
                 document.getElementById('ketuaWelcomeName').innerText = "Selamat Datang, " + currentUser.nama;
 
                 let namaPendampingBinaan = "Budi Santoso, S.Sos";
-            if (currentUser.pendampingId) {
-                const pnd = appState.pendampingProfiles.find(p => p.id === currentUser.pendampingId);
-                if (pnd) namaPendampingBinaan = pnd.nama;
-            } else if (appState.pendampingProfiles.length > 0) {
-                namaPendampingBinaan = appState.pendampingProfiles[0].nama;
-            }
+                if (currentUser.pendampingId) {
+                    const pnd = appState.pendampingProfiles.find(p => p.id === currentUser.pendampingId);
+                    if (pnd) {
+                        namaPendampingBinaan = pnd.nama;
+                    }
+                }
             
-            const elPendamping = document.getElementById('ketuaPendampingNama');
-            if (elPendamping) elPendamping.innerText = namaPendampingBinaan;
+                const elPendamping = document.getElementById('ketuaPendampingNama');
+                if (elPendamping) elPendamping.innerText = namaPendampingBinaan;
 
-            const myKpmList = appState.kpmList.filter(k => k.kelompok === currentUser.kelompok);
+                const myKpmList = appState.kpmList.filter(k => k.kelompok === currentUser.kelompok);
                 let alamatKelompokStr = `Kelompok ${currentUser.kelompok}`;
                 if (myKpmList.length > 0 && myKpmList[0].alamat) {
                     alamatKelompokStr = `Kelompok ${currentUser.kelompok} (${myKpmList[0].alamat})`;
