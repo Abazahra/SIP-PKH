@@ -68,7 +68,28 @@
             </div>
             
             <div class="flex items-center space-x-3">
-                <button onclick="openAboutModal()" class="bg-blue-800 hover:bg-blue-700 text-amber-300 px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center space-x-1.5 cursor-pointer">
+                <!-- NOTIFICATION BELL DROPDOWN FOR PENDAMPING -->
+                <div id="pendampingNotificationContainer" class="hidden relative">
+                    <button onclick="togglePendampingNotificationDropdown()" class="relative bg-blue-800 hover:bg-blue-700 text-amber-300 p-2 rounded-lg text-xs font-semibold transition flex items-center justify-center shadow" title="Notifikasi Pembaruan Data">
+                        <i class="fas fa-bell text-sm"></i>
+                        <span id="pendampingNotifBadge" class="hidden absolute -top-1 -right-1 bg-red-600 text-white text-[9px] w-4 h-4 rounded-full flex items-center justify-center font-bold">0</span>
+                    </button>
+                    <!-- Dropdown Panel -->
+                    <div id="pendampingNotifDropdown" class="hidden absolute right-0 mt-2 w-80 bg-white rounded-2xl shadow-2xl border border-slate-200 z-50 overflow-hidden text-slate-800">
+                        <div class="bg-blue-900 text-white px-4 py-3 flex justify-between items-center text-xs font-bold">
+                            <span class="flex items-center space-x-1.5"><i class="fas fa-bell text-amber-300"></i><span>Notifikasi Pembaruan Data</span></span>
+                            <span id="pendampingNotifCount" class="bg-blue-800 text-amber-300 px-2 py-0.5 rounded-full text-[10px]">0 baru</span>
+                        </div>
+                        <div id="pendampingNotifList" class="max-h-72 overflow-y-auto divide-y divide-slate-100 text-xs">
+                            <!-- Populated dynamically -->
+                        </div>
+                        <div class="bg-slate-50 p-2 text-center border-t border-slate-100 text-[10px] text-slate-500">
+                            Klik item untuk langsung menuju menu verifikasi
+                        </div>
+                    </div>
+                </div>
+
+                <button onclick="openAboutModal()" class="bg-blue-800 hover:bg-blue-700 text-amber-300 px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center space-x-1.5">
                     <i class="fas fa-info-circle"></i>
                     <span class="hidden sm:inline">Tentang Aplikasi</span>
                 </button>
@@ -79,7 +100,7 @@
                         <div id="navUserRole" class="text-[10px] text-blue-300">Pendamping PKH</div>
                         <div id="navUserNipKec" class="text-[9px] text-amber-300 font-mono">NIP: - | Kec: -</div>
                     </div>
-                    <button onclick="handleLogout()" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold transition shadow flex items-center space-x-1 cursor-pointer">
+                    <button onclick="handleLogout()" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold transition shadow flex items-center space-x-1">
                         <i class="fas fa-sign-out-alt"></i>
                         <span>Keluar</span>
                     </button>
@@ -99,8 +120,8 @@
             </div>
 
             <div class="grid grid-cols-2 bg-slate-100 p-1.5 m-4 rounded-xl text-xs font-bold gap-1">
-                <button id="mainTabLogin" type="button" onclick="switchMainTab('login')" class="py-2 px-3 rounded-lg bg-blue-900 text-white shadow text-center transition-all cursor-pointer">Masuk Aplikasi</button>
-                <button id="mainTabRegister" type="button" onclick="switchMainTab('register')" class="py-2 px-3 rounded-lg text-slate-600 hover:text-slate-900 text-center transition-all cursor-pointer">Daftar Akun Baru</button>
+                <button id="mainTabLogin" type="button" onclick="switchMainTab('login')" class="py-2 px-3 rounded-lg bg-blue-900 text-white shadow text-center transition-all">Masuk Aplikasi</button>
+                <button id="mainTabRegister" type="button" onclick="switchMainTab('register')" class="py-2 px-3 rounded-lg text-slate-600 hover:text-slate-900 text-center transition-all">Daftar Akun Baru</button>
             </div>
 
             <!-- FORM LOGIN -->
@@ -120,7 +141,7 @@
                     <label class="block text-xs font-bold text-slate-700 mb-1">PIN Keamanan</label>
                     <input type="password" id="loginPin" required placeholder="••••••" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs font-semibold text-slate-800">
                 </div>
-                <button type="submit" class="w-full bg-blue-900 hover:bg-blue-800 text-white py-3 rounded-xl font-bold text-xs shadow-lg shadow-blue-900/20 transition cursor-pointer">
+                <button type="submit" class="w-full bg-blue-900 hover:bg-blue-800 text-white py-3 rounded-xl font-bold text-xs shadow-lg shadow-blue-900/20 transition">
                     Masuk ke Sistem
                 </button>
             </form>
@@ -156,7 +177,7 @@
                         <label class="block text-xs font-bold text-slate-700 mb-1">Buat PIN Akses (6 Angka)</label>
                         <input type="password" id="regKetuaPin" required maxlength="6" placeholder="••••••" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs font-semibold text-slate-800">
                     </div>
-                    <button type="submit" class="w-full bg-emerald-700 hover:bg-emerald-800 text-white py-3 rounded-xl font-bold text-xs shadow-lg transition cursor-pointer">
+                    <button type="submit" class="w-full bg-emerald-700 hover:bg-emerald-800 text-white py-3 rounded-xl font-bold text-xs shadow-lg transition">
                         Daftar Sebagai Ketua Kelompok
                     </button>
                 </form>
@@ -178,7 +199,7 @@
                         <label class="block text-xs font-bold text-slate-700 mb-1">PIN Keamanan</label>
                         <input type="password" id="regPndPin" required maxlength="6" placeholder="••••••" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs font-semibold text-slate-800">
                     </div>
-                    <button type="submit" class="w-full bg-blue-900 hover:bg-blue-800 text-white py-3 rounded-xl font-bold text-xs shadow-lg transition cursor-pointer">
+                    <button type="submit" class="w-full bg-blue-900 hover:bg-blue-800 text-white py-3 rounded-xl font-bold text-xs shadow-lg transition">
                         Daftar Akun Pendamping
                     </button>
                 </form>
@@ -192,7 +213,7 @@
                     <span class="bg-blue-800 text-blue-200 text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider">Akses Pendamping PKH</span>
                     <h2 id="pendampingWelcomeName" class="text-xl font-bold mt-2">Selamat Datang, Pendamping</h2>
                     <p id="pendampingWelcomeDetail" class="text-xs text-blue-200 mt-0.5">NIP: - | Wilayah Kerja Kecamatan: -</p>
-                    <button onclick="openEditPendampingProfileModal()" class="mt-3 bg-amber-500 hover:bg-amber-600 text-slate-900 px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center space-x-1.5 shadow cursor-pointer">
+                    <button onclick="openEditPendampingProfileModal()" class="mt-3 bg-amber-500 hover:bg-amber-600 text-slate-900 px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center space-x-1.5 shadow">
                         <i class="fas fa-user-edit"></i> <span>Edit Profil & Kecamatan</span>
                     </button>
                 </div>
@@ -202,10 +223,10 @@
                         <strong id="displayInviteCode" class="text-sm font-mono text-amber-300">PKH-SUKAMAJU</strong>
                     </div>
                     <div class="flex items-center space-x-2 pt-1 border-t border-white/20">
-                        <button onclick="shareInviteWhatsApp()" class="bg-emerald-600 hover:bg-emerald-500 text-white py-1.5 px-3 rounded-lg font-bold flex items-center space-x-1.5 transition text-[11px] cursor-pointer">
+                        <button onclick="shareInviteWhatsApp()" class="bg-emerald-600 hover:bg-emerald-500 text-white py-1.5 px-3 rounded-lg font-bold flex items-center space-x-1.5 transition text-[11px]">
                             <i class="fab fa-whatsapp"></i> <span>Bagikan WA</span>
                         </button>
-                        <button onclick="openCustomInviteModal()" class="bg-amber-500 hover:bg-amber-600 text-slate-900 py-1.5 px-3 rounded-lg font-bold flex items-center space-x-1.5 transition text-[11px] cursor-pointer">
+                        <button onclick="openCustomInviteModal()" class="bg-amber-500 hover:bg-amber-600 text-slate-900 py-1.5 px-3 rounded-lg font-bold flex items-center space-x-1.5 transition text-[11px]">
                             <i class="fas fa-edit"></i> <span>Ubah Kode</span>
                         </button>
                     </div>
@@ -213,25 +234,31 @@
             </div>
 
             <div class="flex flex-wrap gap-2 bg-white p-2 rounded-2xl shadow-sm border border-slate-200">
-                <button id="pTabVerifikasi" onclick="switchPendampingTab('verifikasi')" class="py-3 px-4 rounded-xl bg-blue-900 text-white text-xs font-bold flex items-center space-x-2 shadow cursor-pointer">
+                <button id="pTabVerifikasi" onclick="switchPendampingTab('verifikasi')" class="py-3 px-4 rounded-xl bg-blue-900 text-white text-xs font-bold flex items-center space-x-2 shadow">
                     <i class="fas fa-clipboard-check"></i><span>Verifikasi Laporan</span>
                 </button>
-                <button id="pTabKelompok" onclick="switchPendampingTab('kelompok')" class="py-3 px-4 rounded-xl text-slate-600 hover:bg-slate-100 text-xs font-bold flex items-center space-x-2 cursor-pointer">
+                <button id="pTabPpse" onclick="switchPendampingTab('ppse')" class="py-3 px-4 rounded-xl text-slate-600 hover:bg-slate-100 text-xs font-bold flex items-center space-x-2">
+                    <i class="fas fa-hand-holding-usd"></i><span>Verifikasi PPSE</span>
+                </button>
+                <button id="pTabGraduasi" onclick="switchPendampingTab('graduasi')" class="py-3 px-4 rounded-xl text-slate-600 hover:bg-slate-100 text-xs font-bold flex items-center space-x-2">
+                    <i class="fas fa-award"></i><span>Verifikasi Graduasi</span>
+                </button>
+                <button id="pTabKelompok" onclick="switchPendampingTab('kelompok')" class="py-3 px-4 rounded-xl text-slate-600 hover:bg-slate-100 text-xs font-bold flex items-center space-x-2">
                     <i class="fas fa-users"></i><span>Kelola Kelompok & Anggota</span>
                 </button>
-                <button id="pTabUndangan" onclick="switchPendampingTab('undangan')" class="py-3 px-4 rounded-xl text-slate-600 hover:bg-slate-100 text-xs font-bold flex items-center space-x-2 relative cursor-pointer">
+                <button id="pTabUndangan" onclick="switchPendampingTab('undangan')" class="py-3 px-4 rounded-xl text-slate-600 hover:bg-slate-100 text-xs font-bold flex items-center space-x-2 relative">
                     <i class="fas fa-user-plus"></i><span>Undang & Verifikasi Ketua</span>
                     <span id="badgePendingKetua" class="hidden absolute -top-1 -right-1 bg-red-600 text-white text-[10px] w-5 h-5 rounded-full flex items-center justify-center font-bold">0</span>
                 </button>
-                <button id="pTabRekap" onclick="switchPendampingTab('rekap')" class="py-3 px-4 rounded-xl text-slate-600 hover:bg-slate-100 text-xs font-bold flex items-center space-x-2 cursor-pointer">
+                <button id="pTabRekap" onclick="switchPendampingTab('rekap')" class="py-3 px-4 rounded-xl text-slate-600 hover:bg-slate-100 text-xs font-bold flex items-center space-x-2">
                     <i class="fas fa-print"></i><span>Cetak PDF & Rekapitulasi</span>
                 </button>
             </div>
 
-            <!-- Tab Verifikasi -->
+            <!-- Tab Verifikasi Laporan Rutin -->
             <div id="pContentVerifikasi" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-4">
                 <div class="flex flex-wrap items-center justify-between gap-3">
-                    <h3 class="font-bold text-slate-800 text-sm">Daftar Laporan Masuk dari Ketua Kelompok</h3>
+                    <h3 class="font-bold text-slate-800 text-sm">Daftar Laporan Rutin Masuk dari Ketua Kelompok</h3>
                     <div class="flex flex-wrap items-center gap-2">
                         <select id="pFilterKelompokVerifikasi" onchange="renderPendampingVerifikasiTable()" class="p-2 bg-white border border-slate-300 rounded-xl text-xs font-semibold text-slate-700">
                             <option value="ALL">-- Semua Kelompok --</option>
@@ -263,6 +290,67 @@
                 </div>
             </div>
 
+            <!-- Tab Verifikasi Usulan PPSE -->
+            <div id="pContentPpse" class="hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-4">
+                <div class="flex flex-wrap items-center justify-between gap-3">
+                    <h3 class="font-bold text-slate-800 text-sm">Verifikasi Usulan Pemberdayaan Ekonomi (PPSE)</h3>
+                    <div class="flex flex-wrap items-center gap-2">
+                        <select id="pFilterKelompokPpse" onchange="renderPendampingPpseTable()" class="p-2 bg-white border border-slate-300 rounded-xl text-xs font-semibold text-slate-700">
+                            <option value="ALL">-- Semua Kelompok --</option>
+                        </select>
+                        <input type="month" id="pFilterBulanPpse" onchange="renderPendampingPpseTable()" class="p-2 bg-white border border-slate-300 rounded-xl text-xs font-semibold text-slate-700">
+                    </div>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs text-slate-700 border-collapse">
+                        <thead>
+                            <tr class="bg-slate-100 text-slate-800 uppercase font-bold text-[10px]">
+                                <th class="p-3 rounded-l-xl">Tanggal</th>
+                                <th class="p-3">Kelompok</th>
+                                <th class="p-3">Nama KPM, NIK & Kontak</th>
+                                <th class="p-3">IDPEL & Kohor</th>
+                                <th class="p-3">Usaha Ada / Ajuan</th>
+                                <th class="p-3">Keuangan & Sisa</th>
+                                <th class="p-3">Foto</th>
+                                <th class="p-3">Status</th>
+                                <th class="p-3 text-center rounded-r-xl">Aksi Verifikasi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbodyPendampingPpse" class="divide-y divide-slate-100"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Tab Verifikasi Graduasi Mandiri -->
+            <div id="pContentGraduasi" class="hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-4">
+                <div class="flex flex-wrap items-center justify-between gap-3">
+                    <h3 class="font-bold text-slate-800 text-sm">Verifikasi Usulan Graduasi Mandiri KPM PKH</h3>
+                    <div class="flex flex-wrap items-center gap-2">
+                        <select id="pFilterKelompokGraduasi" onchange="renderPendampingGraduasiTable()" class="p-2 bg-white border border-slate-300 rounded-xl text-xs font-semibold text-slate-700">
+                            <option value="ALL">-- Semua Kelompok --</option>
+                        </select>
+                        <input type="month" id="pFilterBulanGraduasi" onchange="renderPendampingGraduasiTable()" class="p-2 bg-white border border-slate-300 rounded-xl text-xs font-semibold text-slate-700">
+                    </div>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs text-slate-700 border-collapse">
+                        <thead>
+                            <tr class="bg-slate-100 text-slate-800 uppercase font-bold text-[10px]">
+                                <th class="p-3 rounded-l-xl">Tanggal</th>
+                                <th class="p-3">Kelompok</th>
+                                <th class="p-3">Nama KPM & NIK</th>
+                                <th class="p-3">Kohor</th>
+                                <th class="p-3">Alasan Graduasi</th>
+                                <th class="p-3">Foto (KPM/Rumah/Surat)</th>
+                                <th class="p-3">Status</th>
+                                <th class="p-3 text-center rounded-r-xl">Aksi Verifikasi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbodyPendampingGraduasi" class="divide-y divide-slate-100"></tbody>
+                    </table>
+                </div>
+            </div>
+
             <!-- Tab Kelompok -->
             <div id="pContentKelompok" class="hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-4">
                 <div class="flex flex-wrap justify-between items-center gap-3">
@@ -271,7 +359,7 @@
                         <select id="pFilterKelompokManajemen" onchange="renderPendampingKelompokManajemen()" class="p-2 bg-white border border-slate-300 rounded-xl text-xs font-semibold text-slate-700">
                             <option value="ALL">-- Semua Kelompok --</option>
                         </select>
-                        <button onclick="openTambahKetuaManualModal()" class="bg-blue-900 text-white px-3 py-2 rounded-xl text-xs font-bold flex items-center space-x-1 shadow cursor-pointer">
+                        <button onclick="openTambahKetuaManualModal()" class="bg-blue-900 text-white px-3 py-2 rounded-xl text-xs font-bold flex items-center space-x-1 shadow">
                             <i class="fas fa-plus"></i><span>Tambah Kelompok</span>
                         </button>
                     </div>
@@ -301,7 +389,7 @@
                     </div>
                     <div class="flex items-center space-x-2 w-full md:w-auto">
                         <input type="text" id="shareInviteUrl" readonly class="p-2 bg-white border border-slate-300 rounded-xl text-xs font-mono text-slate-600 w-full md:w-80">
-                        <button onclick="copyInviteUrl()" class="bg-slate-800 hover:bg-slate-900 text-white px-3 py-2 rounded-xl text-xs font-bold whitespace-nowrap shadow cursor-pointer">Salin</button>
+                        <button onclick="copyInviteUrl()" class="bg-slate-800 hover:bg-slate-900 text-white px-3 py-2 rounded-xl text-xs font-bold whitespace-nowrap shadow">Salin</button>
                     </div>
                 </div>
 
@@ -346,25 +434,35 @@
             <div id="pContentRekap" class="hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-6">
                 <div class="flex justify-between items-center">
                     <h3 class="font-bold text-slate-800 text-sm">Cetak Laporan & Rekapitulasi Resmi</h3>
-                    <button onclick="openEditKopModal()" class="bg-amber-500 hover:bg-amber-600 text-slate-900 px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center space-x-1.5 shadow cursor-pointer">
+                    <button onclick="openEditKopModal()" class="bg-amber-500 hover:bg-amber-600 text-slate-900 px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center space-x-1.5 shadow">
                         <i class="fas fa-heading"></i><span>Edit Kop/Header Laporan</span>
                     </button>
                 </div>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
                     <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3">
                         <h4 class="font-bold text-blue-900 text-xs uppercase">Presensi P2K2</h4>
-                        <p class="text-xs text-slate-500">Cetak laporan kehadiran pertemuan peningkatan kemampuan keluarga.</p>
-                        <button onclick="openPrintModal('p2k2')" class="w-full bg-blue-900 text-white py-2 rounded-xl text-xs font-bold shadow cursor-pointer">Pratinjau & Cetak P2K2</button>
+                        <p class="text-xs text-slate-500">Cetak laporan kehadiran pertemuan P2K2.</p>
+                        <button onclick="openPrintModal('p2k2')" class="w-full bg-blue-900 text-white py-2 rounded-xl text-xs font-bold shadow">Cetak P2K2</button>
                     </div>
                     <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3">
-                        <h4 class="font-bold text-emerald-800 text-xs uppercase">Verifikasi Komitmen</h4>
-                        <p class="text-xs text-slate-500">Cetak laporan pemenuhan komitmen layanan kesehatan & pendidikan.</p>
-                        <button onclick="openPrintModal('komitmen')" class="w-full bg-emerald-700 text-white py-2 rounded-xl text-xs font-bold shadow cursor-pointer">Pratinjau & Cetak Komitmen</button>
+                        <h4 class="font-bold text-emerald-800 text-xs uppercase">Komitmen</h4>
+                        <p class="text-xs text-slate-500">Cetak laporan pemenuhan komitmen.</p>
+                        <button onclick="openPrintModal('komitmen')" class="w-full bg-emerald-700 text-white py-2 rounded-xl text-xs font-bold shadow">Cetak Komitmen</button>
                     </div>
                     <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3">
-                        <h4 class="font-bold text-indigo-900 text-xs uppercase">Rekonsiliasi Pencairan</h4>
-                        <p class="text-xs text-slate-500">Cetak rekapitulasi pencairan dana bantuan sosial KPM PKH.</p>
-                        <button onclick="openPrintModal('rekonsiliasi')" class="w-full bg-indigo-900 text-white py-2 rounded-xl text-xs font-bold shadow cursor-pointer">Pratinjau & Cetak Rekonsiliasi</button>
+                        <h4 class="font-bold text-indigo-900 text-xs uppercase">Rekonsiliasi</h4>
+                        <p class="text-xs text-slate-500">Cetak rekapitulasi pencairan dana.</p>
+                        <button onclick="openPrintModal('rekonsiliasi')" class="w-full bg-indigo-900 text-white py-2 rounded-xl text-xs font-bold shadow">Cetak Rekonsiliasi</button>
+                    </div>
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3">
+                        <h4 class="font-bold text-amber-800 text-xs uppercase">Usulan PPSE</h4>
+                        <p class="text-xs text-slate-500">Cetak usulan pemberdayaan ekonomi.</p>
+                        <button onclick="openPrintModal('ppse')" class="w-full bg-amber-700 text-white py-2 rounded-xl text-xs font-bold shadow">Cetak PPSE</button>
+                    </div>
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3">
+                        <h4 class="font-bold text-teal-800 text-xs uppercase">Graduasi Mandiri</h4>
+                        <p class="text-xs text-slate-500">Cetak usulan graduasi mandiri KPM.</p>
+                        <button onclick="openPrintModal('graduasi')" class="w-full bg-teal-700 text-white py-2 rounded-xl text-xs font-bold shadow">Cetak Graduasi</button>
                     </div>
                 </div>
             </div>
@@ -391,17 +489,23 @@
             </div>
 
             <div class="flex flex-wrap gap-2 bg-white p-2 rounded-2xl shadow-sm border border-slate-200">
-                <button id="kTabKpm" onclick="switchKetuaTab('kpm')" class="py-3 px-4 rounded-xl bg-emerald-700 text-white text-xs font-bold flex items-center space-x-2 shadow cursor-pointer">
+                <button id="kTabKpm" onclick="switchKetuaTab('kpm')" class="py-3 px-4 rounded-xl bg-emerald-700 text-white text-xs font-bold flex items-center space-x-2 shadow">
                     <i class="fas fa-user-friends"></i><span>Data Anggota KPM</span>
                 </button>
-                <button id="kTabP2k2" onclick="switchKetuaTab('p2k2')" class="py-3 px-4 rounded-xl text-slate-600 hover:bg-slate-100 text-xs font-bold flex items-center space-x-2 cursor-pointer">
+                <button id="kTabP2k2" onclick="switchKetuaTab('p2k2')" class="py-3 px-4 rounded-xl text-slate-600 hover:bg-slate-100 text-xs font-bold flex items-center space-x-2">
                     <i class="fas fa-calendar-check"></i><span>Presensi P2K2</span>
                 </button>
-                <button id="kTabKomitmen" onclick="switchKetuaTab('komitmen')" class="py-3 px-4 rounded-xl text-slate-600 hover:bg-slate-100 text-xs font-bold flex items-center space-x-2 cursor-pointer">
+                <button id="kTabKomitmen" onclick="switchKetuaTab('komitmen')" class="py-3 px-4 rounded-xl text-slate-600 hover:bg-slate-100 text-xs font-bold flex items-center space-x-2">
                     <i class="fas fa-file-invoice-dollar"></i><span>Laporan Komitmen</span>
                 </button>
-                <button id="kTabRekonsiliasi" onclick="switchKetuaTab('rekonsiliasi')" class="py-3 px-4 rounded-xl text-slate-600 hover:bg-slate-100 text-xs font-bold flex items-center space-x-2 cursor-pointer">
+                <button id="kTabRekonsiliasi" onclick="switchKetuaTab('rekonsiliasi')" class="py-3 px-4 rounded-xl text-slate-600 hover:bg-slate-100 text-xs font-bold flex items-center space-x-2">
                     <i class="fas fa-wallet"></i><span>Rekonsiliasi Pencairan</span>
+                </button>
+                <button id="kTabPpse" onclick="switchKetuaTab('ppse')" class="py-3 px-4 rounded-xl text-slate-600 hover:bg-slate-100 text-xs font-bold flex items-center space-x-2">
+                    <i class="fas fa-chart-line"></i><span>Usulan PPSE</span>
+                </button>
+                <button id="kTabGraduasi" onclick="switchKetuaTab('graduasi')" class="py-3 px-4 rounded-xl text-slate-600 hover:bg-slate-100 text-xs font-bold flex items-center space-x-2">
+                    <i class="fas fa-medal"></i><span>Usulan Graduasi Mandiri</span>
                 </button>
             </div>
 
@@ -422,20 +526,27 @@
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-slate-700 mb-1">Kohor / Tahun Kepesertaan</label>
-                                <select id="kpmKohor" required class="w-full p-2.5 bg-white border border-slate-300 rounded-xl text-xs font-semibold text-slate-800">
-                                    <option value="">-- Pilih Tahun Kohor --</option>
-                                    <option value="2007 / Perintis">2007 / Perintis</option>
-                                    <option value="2016 / Perluasan">2016 / Perluasan</option>
-                                    <option value="2017 / Perluasan">2017 / Perluasan</option>
-                                    <option value="2018 / Perluasan">2018 / Perluasan</option>
-                                    <option value="2019 / Perluasan">2019 / Perluasan</option>
-                                    <option value="2020 / Perluasan">2020 / Perluasan</option>
-                                    <option value="2021 / Reguler">2021 / Reguler</option>
-                                    <option value="2022 / Reguler">2022 / Reguler</option>
-                                    <option value="2023 / Reguler">2023 / Reguler</option>
-                                    <option value="2024 / Reguler">2024 / Reguler</option>
-                                    <option value="2025 / Reguler">2025 / Reguler</option>
-                                    <option value="2026 / Reguler">2026 / Reguler</option>
+                                <select id="kpmKohor" class="w-full p-2.5 bg-white border border-slate-300 rounded-xl text-xs font-semibold text-slate-800">
+                                    <option value="2007">2007 (Perintis)</option>
+                                    <option value="2008">2008</option>
+                                    <option value="2009">2009</option>
+                                    <option value="2010">2010</option>
+                                    <option value="2011">2011</option>
+                                    <option value="2012">2012</option>
+                                    <option value="2013">2013</option>
+                                    <option value="2014">2014</option>
+                                    <option value="2015">2015</option>
+                                    <option value="2016">2016</option>
+                                    <option value="2017">2017</option>
+                                    <option value="2018">2018</option>
+                                    <option value="2019">2019</option>
+                                    <option value="2020">2020</option>
+                                    <option value="2021">2021</option>
+                                    <option value="2022">2022</option>
+                                    <option value="2023">2023</option>
+                                    <option value="2024">2024</option>
+                                    <option value="2025">2025</option>
+                                    <option value="2026" selected>2026</option>
                                 </select>
                             </div>
                             <div>
@@ -486,10 +597,10 @@
                                     </div>
                                     <div class="flex items-center justify-between bg-slate-50 p-2 rounded-xl border border-slate-200">
                                         <label class="flex items-center space-x-2 cursor-pointer">
-                                            <input type="checkbox" name="kpmKomponen" value="Lansia" onchange="toggleCompQty(this)" class="rounded text-emerald-700">
+                                            <input type="checkbox" name="kpmKomponen" value="Lansia (60+)" onchange="toggleCompQty(this)" class="rounded text-emerald-700">
                                             <span>Lansia</span>
                                         </label>
-                                        <input type="number" min="1" max="10" value="1" disabled id="qty_Lansia" class="w-14 p-1 bg-white border border-slate-300 rounded text-center text-xs font-bold disabled:opacity-40">
+                                        <input type="number" min="1" max="10" value="1" disabled id="qty_Lansia__60___" class="w-14 p-1 bg-white border border-slate-300 rounded text-center text-xs font-bold disabled:opacity-40">
                                     </div>
                                     <div class="flex items-center justify-between bg-slate-50 p-2 rounded-xl border border-slate-200 col-span-1 sm:col-span-2">
                                         <label class="flex items-center space-x-2 cursor-pointer">
@@ -505,8 +616,8 @@
                                 <input type="text" id="kpmAlamat" required placeholder="Contoh: Kp. Jampang Rt 01/02" class="w-full p-2.5 bg-white border border-slate-300 rounded-xl text-xs font-semibold text-slate-800">
                             </div>
                             <div class="flex space-x-2 pt-2">
-                                <button type="submit" id="btnSubmitKpm" class="flex-1 bg-emerald-700 hover:bg-emerald-800 text-white py-2.5 rounded-xl font-bold text-xs shadow transition cursor-pointer">Simpan Anggota KPM</button>
-                                <button type="button" id="btnCancelKpmEdit" onclick="cancelKpmEdit()" class="hidden bg-slate-400 hover:bg-slate-500 text-white px-3 py-2.5 rounded-xl font-bold text-xs cursor-pointer">Batal</button>
+                                <button type="submit" id="btnSubmitKpm" class="flex-1 bg-emerald-700 hover:bg-emerald-800 text-white py-2.5 rounded-xl font-bold text-xs shadow transition">Simpan Anggota KPM</button>
+                                <button type="button" id="btnCancelKpmEdit" onclick="cancelKpmEdit()" class="hidden bg-slate-400 hover:bg-slate-500 text-white px-3 py-2.5 rounded-xl font-bold text-xs">Batal</button>
                             </div>
                         </form>
                     </div>
@@ -567,7 +678,7 @@
                                 <input type="file" id="p2k2Foto" accept="image/*,.pdf" class="w-full text-xs p-1 bg-white border border-slate-300 rounded-xl file:mr-2 file:py-1 file:px-2 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-blue-50 file:text-blue-900 hover:file:bg-blue-100">
                                 <span class="text-[10px] text-slate-500 mt-0.5 block">Bisa ambil foto langsung via kamera atau pilih file/gambar dari memori HP.</span>
                             </div>
-                            <button type="submit" class="w-full bg-emerald-700 hover:bg-emerald-800 text-white py-2.5 rounded-xl font-bold text-xs shadow transition cursor-pointer">Simpan Presensi P2K2</button>
+                            <button type="submit" class="w-full bg-emerald-700 hover:bg-emerald-800 text-white py-2.5 rounded-xl font-bold text-xs shadow transition">Simpan Presensi P2K2</button>
                         </form>
                     </div>
 
@@ -617,7 +728,7 @@
                                     <option value="Tidak Terpenuhi">Tidak Terpenuhi</option>
                                 </select>
                             </div>
-                            <button type="submit" class="w-full bg-emerald-700 hover:bg-emerald-800 text-white py-2.5 rounded-xl font-bold text-xs shadow transition cursor-pointer">Kirim ke Pendamping</button>
+                            <button type="submit" class="w-full bg-emerald-700 hover:bg-emerald-800 text-white py-2.5 rounded-xl font-bold text-xs shadow transition">Kirim ke Pendamping</button>
                         </form>
                     </div>
 
@@ -670,7 +781,7 @@
                                 <input type="file" id="rekonFoto" accept="image/*,.pdf" required class="w-full text-xs p-1 bg-white border border-slate-300 rounded-xl file:mr-2 file:py-1 file:px-2 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-blue-50 file:text-blue-900 hover:file:bg-blue-100">
                                 <span class="text-[10px] text-slate-500 mt-0.5 block">Ambil foto langsung atau pilih file dari memori perangkat.</span>
                             </div>
-                            <button type="submit" class="w-full bg-emerald-700 hover:bg-emerald-800 text-white py-2.5 rounded-xl font-bold text-xs shadow transition cursor-pointer">Simpan Rekonsiliasi</button>
+                            <button type="submit" class="w-full bg-emerald-700 hover:bg-emerald-800 text-white py-2.5 rounded-xl font-bold text-xs shadow transition">Simpan Rekonsiliasi</button>
                         </form>
                     </div>
 
@@ -695,6 +806,182 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Tab Usulan PPSE -->
+            <div id="kContentPpse" class="hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-6">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div class="bg-slate-50 p-5 rounded-xl border border-slate-200 space-y-4">
+                        <h3 id="formPpseTitle" class="font-bold text-slate-800 text-sm">Usulan Pemberdayaan Ekonomi (PPSE)</h3>
+                        <form id="formPpse" onsubmit="handleSavePpse(event)" class="space-y-3">
+                            <input type="hidden" id="editPpseId">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">Pilih Anggota KPM</label>
+                                <select id="ppseKpmSelect" onchange="autoFillPpseKpmData()" required class="w-full p-2.5 bg-white border border-slate-300 rounded-xl text-xs font-semibold text-slate-800"></select>
+                            </div>
+                            <div class="grid grid-cols-2 gap-2">
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 mb-1">NIK</label>
+                                    <input type="text" id="ppseNik" readonly class="w-full p-2 bg-slate-200 border border-slate-300 rounded-xl text-xs font-mono text-slate-600">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 mb-1">Kohor</label>
+                                    <input type="text" id="ppseKohor" readonly class="w-full p-2 bg-slate-200 border border-slate-300 rounded-xl text-xs font-semibold text-slate-600">
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-2">
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 mb-1">Usia KPM (Tahun)</label>
+                                    <input type="number" id="ppseUsia" required min="18" max="59" placeholder="Contoh: 35" class="w-full p-2 bg-white border border-slate-300 rounded-xl text-xs font-semibold text-slate-800">
+                                    <span class="text-[9px] text-slate-500 block mt-0.5">Usia 18 s.d. 59 Thn</span>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 mb-1">IDPEL Listrik</label>
+                                    <input type="text" id="ppseIdpel" required placeholder="No. Meter / IDPEL" class="w-full p-2 bg-white border border-slate-300 rounded-xl text-xs font-semibold text-slate-800">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">Nomor WhatsApp (HP)</label>
+                                <input type="tel" id="ppseHp" required placeholder="08123456789" class="w-full p-2.5 bg-white border border-slate-300 rounded-xl text-xs font-semibold text-slate-800">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">Jenis Usaha Yang Ada (Jika Ada)</label>
+                                <input type="text" id="ppseUsahaAda" placeholder="Contoh: Warung Kelontong / Peternakan" class="w-full p-2.5 bg-white border border-slate-300 rounded-xl text-xs font-semibold text-slate-800">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">Jenis Usaha Yang Diajukan (Program PPSE)</label>
+                                <select id="ppseUsahaAjuan" class="w-full p-2.5 bg-white border border-slate-300 rounded-xl text-xs font-semibold text-slate-800">
+                                    <option value="Kuliner / Makanan & Minuman">Kuliner / Makanan & Minuman</option>
+                                    <option value="Pertanian / Hortikultura">Pertanian / Hortikultura</option>
+                                    <option value="Peternakan Unggas / Ruminansia">Peternakan Unggas / Ruminansia</option>
+                                    <option value="Perdagangan / Kelontong">Perdagangan / Kelontong</option>
+                                    <option value="Kerajinan Tangan / Konveksi">Kerajinan Tangan / Konveksi</option>
+                                    <option value="Jasa / Perbengkelan / Salon">Jasa / Perbengkelan / Salon</option>
+                                </select>
+                            </div>
+                            <div class="grid grid-cols-2 gap-2">
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 mb-1">Pendapatan Bersih KPM / Bln</label>
+                                    <input type="number" id="ppseBersih" oninput="calculatePpseNetIncome()" required placeholder="Rp 0" class="w-full p-2 bg-white border border-slate-300 rounded-xl text-xs font-semibold text-slate-800">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 mb-1">Penghasilan Keluarga Lainnya</label>
+                                    <input type="number" id="ppseKeluarga" oninput="calculatePpseNetIncome()" required placeholder="Rp 0" class="w-full p-2 bg-white border border-slate-300 rounded-xl text-xs font-semibold text-slate-800">
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-2">
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 mb-1">Biaya Makan & Minum / Bln</label>
+                                    <input type="number" id="ppseMakan" oninput="calculatePpseNetIncome()" required placeholder="Rp 0" class="w-full p-2 bg-white border border-slate-300 rounded-xl text-xs font-semibold text-slate-800">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 mb-1">Sisa / Defisit Bersih</label>
+                                    <input type="text" id="ppseSisaDisplay" readonly value="Rp 0" class="w-full p-2 bg-slate-100 border border-slate-300 rounded-xl text-xs font-bold text-blue-900">
+                                    <input type="hidden" id="ppseSisaVal" value="0">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">Foto KPM / Usaha / Rumah</label>
+                                <input type="file" id="ppseFoto" accept="image/*,.pdf" class="w-full text-xs p-1 bg-white border border-slate-300 rounded-xl file:mr-2 file:py-1 file:px-2 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-blue-50 file:text-blue-900 hover:file:bg-blue-100">
+                                <span class="text-[10px] text-slate-500 mt-0.5 block">Kamera HP atau Galeri.</span>
+                            </div>
+                            <div class="flex space-x-2 pt-2">
+                                <button type="submit" id="btnSubmitPpse" class="flex-1 bg-emerald-700 hover:bg-emerald-800 text-white py-2.5 rounded-xl font-bold text-xs shadow transition">Simpan Usulan PPSE</button>
+                                <button type="button" id="btnCancelPpseEdit" onclick="cancelPpseEdit()" class="hidden bg-slate-400 hover:bg-slate-500 text-white px-3 py-2.5 rounded-xl font-bold text-xs">Batal</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="lg:col-span-2 space-y-3">
+                        <h3 class="font-bold text-slate-800 text-sm">Riwayat Usulan PPSE Kelompok</h3>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs text-slate-700 border-collapse">
+                                <thead>
+                                    <tr class="bg-slate-100 text-slate-800 uppercase font-bold text-[10px]">
+                                        <th class="p-3 rounded-l-xl">Tanggal</th>
+                                        <th class="p-3">Nama KPM & NIK</th>
+                                        <th class="p-3">Kohor & Usia</th>
+                                        <th class="p-3">Usaha & Keuangan</th>
+                                        <th class="p-3">Status</th>
+                                        <th class="p-3 text-center rounded-r-xl">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tbodyKetuaPpse" class="divide-y divide-slate-100"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab Usulan Graduasi Mandiri -->
+            <div id="kContentGraduasi" class="hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-6">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div class="bg-slate-50 p-5 rounded-xl border border-slate-200 space-y-4">
+                        <h3 id="formGraduasiTitle" class="font-bold text-slate-800 text-sm">Usulan Graduasi Mandiri</h3>
+                        <form id="formGraduasi" onsubmit="handleSaveGraduasi(event)" class="space-y-3">
+                            <input type="hidden" id="editGraduasiId">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">Pilih Anggota KPM</label>
+                                <select id="graduasiKpmSelect" onchange="autoFillGraduasiKpmData()" required class="w-full p-2.5 bg-white border border-slate-300 rounded-xl text-xs font-semibold text-slate-800"></select>
+                            </div>
+                            <div class="grid grid-cols-2 gap-2">
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 mb-1">NIK</label>
+                                    <input type="text" id="graduasiNik" readonly class="w-full p-2 bg-slate-200 border border-slate-300 rounded-xl text-xs font-mono text-slate-600">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 mb-1">Kohor</label>
+                                    <input type="text" id="graduasiKohor" readonly class="w-full p-2 bg-slate-200 border border-slate-300 rounded-xl text-xs font-semibold text-slate-600">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">Alasan Graduasi Mandiri</label>
+                                <select id="graduasiAlasan" class="w-full p-2.5 bg-white border border-slate-300 rounded-xl text-xs font-semibold text-slate-800">
+                                    <option value="Ekonomi Keluarga Sudah Mapan / Sejahtera">Ekonomi Keluarga Sudah Mapan / Sejahtera</option>
+                                    <option value="Memiliki Usaha Tetap & Berkembang">Memiliki Usaha Tetap & Berkembang</option>
+                                    <option value="Anggota Keluarga Sudah Bekerja Berpenghasilan Tetap">Anggota Keluarga Sudah Bekerja Berpenghasilan Tetap</option>
+                                    <option value="Kesadaran Mandiri / Mengundurkan Diri Baik-Baik">Kesadaran Mandiri / Mengundurkan Diri Baik-Baik</option>
+                                    <option value="Pindah Domisili / Mampu Secara Sosial Ekonomi">Pindah Domisili / Mampu Secara Sosial Ekonomi</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">Foto KPM</label>
+                                <input type="file" id="graduasiFotoKpm" accept="image/*" class="w-full text-xs p-1 bg-white border border-slate-300 rounded-xl file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:font-bold file:bg-blue-50 file:text-blue-900">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">Foto Rumah Tampak Depan</label>
+                                <input type="file" id="graduasiFotoRumah" accept="image/*" class="w-full text-xs p-1 bg-white border border-slate-300 rounded-xl file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:font-bold file:bg-blue-50 file:text-blue-900">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">Foto Bukti Dukung / Surat Pernyataan Graduasi</label>
+                                <input type="file" id="graduasiFotoSurat" accept="image/*,.pdf" class="w-full text-xs p-1 bg-white border border-slate-300 rounded-xl file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:font-bold file:bg-blue-50 file:text-blue-900">
+                            </div>
+                            <div class="flex space-x-2 pt-2">
+                                <button type="submit" id="btnSubmitGraduasi" class="flex-1 bg-emerald-700 hover:bg-emerald-800 text-white py-2.5 rounded-xl font-bold text-xs shadow transition">Simpan Usulan Graduasi</button>
+                                <button type="button" id="btnCancelGraduasiEdit" onclick="cancelGraduasiEdit()" class="hidden bg-slate-400 hover:bg-slate-500 text-white px-3 py-2.5 rounded-xl font-bold text-xs">Batal</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="lg:col-span-2 space-y-3">
+                        <h3 class="font-bold text-slate-800 text-sm">Riwayat Usulan Graduasi Mandiri Kelompok</h3>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs text-slate-700 border-collapse">
+                                <thead>
+                                    <tr class="bg-slate-100 text-slate-800 uppercase font-bold text-[10px]">
+                                        <th class="p-3 rounded-l-xl">Tanggal</th>
+                                        <th class="p-3">Nama KPM & NIK</th>
+                                        <th class="p-3">Kohor</th>
+                                        <th class="p-3">Alasan</th>
+                                        <th class="p-3">Status</th>
+                                        <th class="p-3 text-center rounded-r-xl">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tbodyKetuaGraduasi" class="divide-y divide-slate-100"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
     </main>
@@ -712,11 +999,11 @@
                     <i class="fas fa-info-circle text-blue-900"></i>
                     <span>Tentang SIP-PKH</span>
                 </h3>
-                <button onclick="closeAboutModal()" class="text-slate-400 hover:text-slate-700 text-lg font-bold cursor-pointer"><i class="fas fa-times"></i></button>
+                <button onclick="closeAboutModal()" class="text-slate-400 hover:text-slate-700 text-lg font-bold"><i class="fas fa-times"></i></button>
             </div>
             <div class="space-y-3 text-xs text-slate-600 leading-relaxed">
                 <p>
-                    <strong>SIP-PKH (Sistem Informasi Pelaksanaan Program Keluarga Harapan)</strong> adalah aplikasi berbasis digital yang dirancang khusus untuk mempermudah Pendamping sosial dan Ketua Kelompok dalam mengelola data anggota, presensi P2K2, pelaporan pemenuhan komitmen layanan, serta rekonsiliasi pencairan bantuan sosial secara transparan dan akurat.
+                    <strong>SIP-PKH (Sistem Informasi Pelaksanaan Program Keluarga Harapan)</strong> adalah aplikasi berbasis digital yang dirancang khusus untuk mempermudah Pendamping sosial dan Ketua Kelompok dalam mengelola data anggota, presensi P2K2, pelaporan pemenuhan komitmen layanan, usulan PPSE, usulan graduasi mandiri, serta rekonsiliasi pencairan bantuan sosial secara transparan dan akurat.
                 </p>
                 <div class="bg-blue-50 border border-blue-100 p-4 rounded-xl space-y-2">
                     <h4 class="font-bold text-blue-900 text-sm">Informasi Pengembang & Rekening Donasi / Operasional</h4>
@@ -728,7 +1015,7 @@
                             <span id="rekeningText" class="font-mono font-bold text-blue-900 text-sm">7211585298</span>
                             <div class="flex items-center space-x-2">
                                 <span class="text-[10px] text-slate-500 font-medium">a.n. Encep Yuyus</span>
-                                <button onclick="copyRekeningNumber()" class="bg-blue-900 hover:bg-blue-800 text-white px-2.5 py-1 rounded-md text-[10px] font-bold transition flex items-center space-x-1 shadow cursor-pointer">
+                                <button onclick="copyRekeningNumber()" class="bg-blue-900 hover:bg-blue-800 text-white px-2.5 py-1 rounded-md text-[10px] font-bold transition flex items-center space-x-1 shadow">
                                     <i class="fas fa-copy"></i>
                                     <span>Salin</span>
                                 </button>
@@ -738,7 +1025,7 @@
                 </div>
             </div>
             <div class="pt-2 flex justify-end">
-                <button onclick="closeAboutModal()" class="bg-blue-900 hover:bg-blue-800 text-white px-4 py-2 rounded-xl text-xs font-bold shadow transition cursor-pointer">Tutup</button>
+                <button onclick="closeAboutModal()" class="bg-blue-900 hover:bg-blue-800 text-white px-4 py-2 rounded-xl text-xs font-bold shadow transition">Tutup</button>
             </div>
         </div>
     </div>
@@ -748,14 +1035,14 @@
         <div class="bg-white w-full max-w-sm rounded-2xl shadow-xl overflow-hidden p-6 space-y-4">
             <div class="flex justify-between items-center pb-3 border-b border-slate-100">
                 <h3 class="font-bold text-slate-800 text-sm">Ubah Kode Undangan Pendamping</h3>
-                <button onclick="closeCustomInviteModal()" class="text-slate-400 hover:text-slate-700 cursor-pointer"><i class="fas fa-times"></i></button>
+                <button onclick="closeCustomInviteModal()" class="text-slate-400 hover:text-slate-700"><i class="fas fa-times"></i></button>
             </div>
             <div class="space-y-3">
                 <div>
                     <label class="block text-xs font-bold text-slate-700 mb-1">Kode Undangan Baru</label>
                     <input type="text" id="inputCustomInviteCode" placeholder="Contoh: PKH-GARUT01" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs font-mono font-bold uppercase text-blue-900">
                 </div>
-                <button onclick="updateInviteCode()" class="w-full bg-blue-900 text-white py-2.5 rounded-xl font-bold text-xs shadow cursor-pointer">Simpan Kode Undangan</button>
+                <button onclick="updateInviteCode()" class="w-full bg-blue-900 text-white py-2.5 rounded-xl font-bold text-xs shadow">Simpan Kode Undangan</button>
             </div>
         </div>
     </div>
@@ -765,7 +1052,7 @@
         <div class="bg-white w-full max-w-md rounded-2xl shadow-xl overflow-hidden p-6 space-y-4">
             <div class="flex justify-between items-center pb-3 border-b border-slate-100">
                 <h3 class="font-bold text-slate-800 text-sm">Edit Profil & Wilayah Kerja Pendamping</h3>
-                <button onclick="closeEditPendampingProfileModal()" class="text-slate-400 hover:text-slate-700 cursor-pointer"><i class="fas fa-times"></i></button>
+                <button onclick="closeEditPendampingProfileModal()" class="text-slate-400 hover:text-slate-700"><i class="fas fa-times"></i></button>
             </div>
             <form onsubmit="handleSavePendampingProfile(event)" class="space-y-3">
                 <div>
@@ -780,7 +1067,7 @@
                     <label class="block text-xs font-bold text-slate-700 mb-1">Nama Wilayah Kecamatan Kerja</label>
                     <input type="text" id="editPndKecamatan" required placeholder="Contoh: Sukamaju" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs font-semibold text-slate-800">
                 </div>
-                <button type="submit" class="w-full bg-blue-900 hover:bg-blue-800 text-white py-2.5 rounded-xl font-bold text-xs shadow transition cursor-pointer">Simpan Perubahan Profil</button>
+                <button type="submit" class="w-full bg-blue-900 hover:bg-blue-800 text-white py-2.5 rounded-xl font-bold text-xs shadow transition">Simpan Perubahan Profil</button>
             </form>
         </div>
     </div>
@@ -793,7 +1080,7 @@
                     <h3 id="modalKelompokTitle" class="font-bold text-slate-800 text-sm">Informasi Kelompok</h3>
                     <p class="text-[11px] text-slate-500">Ketua: <strong id="infoKetuaNama">-</strong> | WhatsApp: <strong id="infoKetuaHp">-</strong></p>
                 </div>
-                <button onclick="closePendampingKelompokModal()" class="text-slate-400 hover:text-slate-700 cursor-pointer"><i class="fas fa-times"></i></button>
+                <button onclick="closePendampingKelompokModal()" class="text-slate-400 hover:text-slate-700"><i class="fas fa-times"></i></button>
             </div>
             <div class="overflow-x-auto max-h-96">
                 <table class="w-full text-left text-xs text-slate-700 border-collapse">
@@ -801,6 +1088,7 @@
                         <tr class="bg-slate-100 font-bold uppercase text-[10px]">
                             <th class="p-2">Nama KPM</th>
                             <th class="p-2">NIK</th>
+                            <th class="p-2">Kohor</th>
                             <th class="p-2">Bantuan</th>
                             <th class="p-2">Komponen</th>
                             <th class="p-2">Alamat</th>
@@ -817,7 +1105,7 @@
         <div class="bg-white w-full max-w-md rounded-2xl shadow-xl overflow-hidden p-6 space-y-4">
             <div class="flex justify-between items-center pb-3 border-b border-slate-100">
                 <h3 class="font-bold text-slate-800 text-sm">Tambah Kelompok & Ketua Manual</h3>
-                <button onclick="closeTambahKetuaManualModal()" class="text-slate-400 hover:text-slate-700 cursor-pointer"><i class="fas fa-times"></i></button>
+                <button onclick="closeTambahKetuaManualModal()" class="text-slate-400 hover:text-slate-700"><i class="fas fa-times"></i></button>
             </div>
             <form onsubmit="handleTambahKetuaManual(event)" class="space-y-3">
                 <div>
@@ -836,7 +1124,7 @@
                     <label class="block text-xs font-bold text-slate-700 mb-1">PIN Akses (6 Angka)</label>
                     <input type="password" id="mKetuaPin" required maxlength="6" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs font-semibold">
                 </div>
-                <button type="submit" class="w-full bg-blue-900 text-white py-2.5 rounded-xl font-bold text-xs shadow cursor-pointer">Simpan Kelompok</button>
+                <button type="submit" class="w-full bg-blue-900 text-white py-2.5 rounded-xl font-bold text-xs shadow">Simpan Kelompok</button>
             </form>
         </div>
     </div>
@@ -846,7 +1134,7 @@
         <div class="bg-white w-full max-w-md rounded-2xl shadow-xl overflow-hidden p-6 space-y-4">
             <div class="flex justify-between items-center pb-3 border-b border-slate-100">
                 <h3 class="font-bold text-slate-800 text-sm">Edit Data Kelompok & Ketua</h3>
-                <button onclick="closeEditKelompokModal()" class="text-slate-400 hover:text-slate-700 cursor-pointer"><i class="fas fa-times"></i></button>
+                <button onclick="closeEditKelompokModal()" class="text-slate-400 hover:text-slate-700"><i class="fas fa-times"></i></button>
             </div>
             <form onsubmit="handleSaveEditKelompok(event)" class="space-y-3">
                 <input type="hidden" id="editKelompokId">
@@ -862,7 +1150,7 @@
                     <label class="block text-xs font-bold text-slate-700 mb-1">No. WhatsApp (HP)</label>
                     <input type="tel" id="editKelompokHp" required class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs font-semibold">
                 </div>
-                <button type="submit" class="w-full bg-blue-900 text-white py-2.5 rounded-xl font-bold text-xs shadow cursor-pointer">Simpan Perubahan Kelompok</button>
+                <button type="submit" class="w-full bg-blue-900 text-white py-2.5 rounded-xl font-bold text-xs shadow">Simpan Perubahan Kelompok</button>
             </form>
         </div>
     </div>
@@ -872,7 +1160,7 @@
         <div class="bg-white w-full max-w-lg rounded-2xl shadow-xl overflow-hidden p-6 space-y-4 max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center pb-3 border-b border-slate-100">
                 <h3 class="font-bold text-slate-800 text-sm">Pengaturan Kop / Header Dokumen Cetak</h3>
-                <button onclick="closeEditKopModal()" class="text-slate-400 hover:text-slate-700 cursor-pointer"><i class="fas fa-times"></i></button>
+                <button onclick="closeEditKopModal()" class="text-slate-400 hover:text-slate-700"><i class="fas fa-times"></i></button>
             </div>
             <form onsubmit="handleSaveKopConfig(event)" class="space-y-3 text-xs">
                 <div>
@@ -907,8 +1195,8 @@
                     </div>
                 </div>
                 <div class="flex space-x-2 pt-2">
-                    <button type="submit" class="flex-1 bg-blue-900 text-white py-2.5 rounded-xl font-bold shadow cursor-pointer">Simpan Kop Surat</button>
-                    <button type="button" onclick="resetKopConfig()" class="bg-slate-300 text-slate-800 px-3 py-2.5 rounded-xl font-bold cursor-pointer">Reset Default</button>
+                    <button type="submit" class="flex-1 bg-blue-900 text-white py-2.5 rounded-xl font-bold shadow">Simpan Kop Surat</button>
+                    <button type="button" onclick="resetKopConfig()" class="bg-slate-300 text-slate-800 px-3 py-2.5 rounded-xl font-bold">Reset Default</button>
                 </div>
             </form>
         </div>
@@ -959,16 +1247,16 @@
         <div class="bg-white w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden flex flex-col p-6 space-y-4">
             <div class="flex justify-between items-center pb-2 border-b border-slate-100">
                 <h3 class="font-bold text-slate-800 text-sm">Pratinjau Bukti Foto / Struk</h3>
-                <button onclick="closeImageViewerModal()" class="text-slate-400 hover:text-slate-700 text-base font-bold cursor-pointer"><i class="fas fa-times"></i></button>
+                <button onclick="closeImageViewerModal()" class="text-slate-400 hover:text-slate-700 text-base font-bold"><i class="fas fa-times"></i></button>
             </div>
             <div class="flex justify-center items-center bg-slate-100 rounded-xl p-4 max-h-[70vh] overflow-auto">
                 <img id="modalImagePreviewTarget" src="https://placehold.co/600x400/png" alt="Bukti Foto" class="max-h-[60vh] object-contain rounded-lg shadow">
             </div>
             <div class="flex justify-end space-x-2 pt-2">
-                <a id="modalImageDownloadBtn" href="#" download="bukti_pkh.jpg" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-xl text-xs font-bold shadow flex items-center space-x-1.5 cursor-pointer">
+                <a id="modalImageDownloadBtn" href="#" download="bukti_pkh.jpg" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-xl text-xs font-bold shadow flex items-center space-x-1.5">
                     <i class="fas fa-download"></i><span>Unduh Foto</span>
                 </a>
-                <button onclick="closeImageViewerModal()" class="bg-slate-700 hover:bg-slate-600 text-white px-4 py-2 rounded-xl text-xs font-bold cursor-pointer">Tutup</button>
+                <button onclick="closeImageViewerModal()" class="bg-slate-700 hover:bg-slate-600 text-white px-4 py-2 rounded-xl text-xs font-bold">Tutup</button>
             </div>
         </div>
     </div>
@@ -1016,7 +1304,9 @@
             kpmList: [],
             p2k2List: [],
             komitmenList: [],
-            rekonsiliasiList: []
+            rekonsiliasiList: [],
+            ppseList: [],
+            graduasiList: []
         };
 
         let tempLogoBase64 = "";
@@ -1039,9 +1329,11 @@
                                 pendampingProfiles: remoteState.pendampingProfiles.length > 0 ? remoteState.pendampingProfiles : appState.pendampingProfiles,
                                 ketuaUsers: remoteState.ketuaUsers.length > 0 ? remoteState.ketuaUsers : appState.ketuaUsers,
                                 kpmList: remoteState.kpmList.length > 0 ? remoteState.kpmList : appState.kpmList,
-                                p2k2List: remoteState.p2k2List.length > 0 ? remoteState.p2k2List : appState.p2k2List,
-                                komitmenList: remoteState.komitmenList.length > 0 ? remoteState.komitmenList : appState.komitmenList,
-                                rekonsiliasiList: remoteState.rekonsiliasiList.length > 0 ? remoteState.rekonsiliasiList : appState.rekonsiliasiList
+                                p2k2List: remoteState.p2k2List || [],
+                                komitmenList: remoteState.komitmenList || [],
+                                rekonsiliasiList: remoteState.rekonsiliasiList || [],
+                                ppseList: remoteState.ppseList || [],
+                                graduasiList: remoteState.graduasiList || []
                             };
                             localStorage.setItem('SIP_PKH_STATE_V6', JSON.stringify(appState));
                             renderUI();
@@ -1195,13 +1487,13 @@
             if (tab === 'login') {
                 formLogin.classList.remove('hidden');
                 regContainer.classList.add('hidden');
-                btnLogin.className = "py-2 px-3 rounded-lg bg-blue-900 text-white shadow text-center transition-all font-bold cursor-pointer";
-                btnReg.className = "py-2 px-3 rounded-lg text-slate-600 hover:text-slate-900 text-center transition-all font-bold cursor-pointer";
+                btnLogin.className = "py-2 px-3 rounded-lg bg-blue-900 text-white shadow text-center transition-all font-bold";
+                btnReg.className = "py-2 px-3 rounded-lg text-slate-600 hover:text-slate-900 text-center transition-all font-bold";
             } else {
                 formLogin.classList.add('hidden');
                 regContainer.classList.remove('hidden');
-                btnReg.className = "py-2 px-3 rounded-lg bg-blue-900 text-white shadow text-center transition-all font-bold cursor-pointer";
-                btnLogin.className = "py-2 px-3 rounded-lg text-slate-600 hover:text-slate-900 text-center transition-all font-bold cursor-pointer";
+                btnReg.className = "py-2 px-3 rounded-lg bg-blue-900 text-white shadow text-center transition-all font-bold";
+                btnLogin.className = "py-2 px-3 rounded-lg text-slate-600 hover:text-slate-900 text-center transition-all font-bold";
             }
         }
 
@@ -1316,62 +1608,87 @@
             const pendampingView = document.getElementById('pendampingDashboardView');
             const ketuaView = document.getElementById('ketuaDashboardView');
             const userNavProfile = document.getElementById('userNavProfile');
+            const pendampingNotificationContainer = document.getElementById('pendampingNotificationContainer');
 
             if (!currentUser) {
-                authView.classList.remove('hidden');
-                pendampingView.classList.add('hidden');
-                ketuaView.classList.add('hidden');
-                userNavProfile.classList.add('hidden');
+                if (authView) authView.classList.remove('hidden');
+                if (pendampingView) pendampingView.classList.add('hidden');
+                if (ketuaView) ketuaView.classList.add('hidden');
+                if (userNavProfile) userNavProfile.classList.add('hidden');
+                if (pendampingNotificationContainer) pendampingNotificationContainer.classList.add('hidden');
             } else if (currentUser.role === 'pendamping') {
-                authView.classList.add('hidden');
-                pendampingView.classList.remove('hidden');
-                ketuaView.classList.add('hidden');
-                userNavProfile.classList.remove('hidden');
-                userNavProfile.classList.add('flex');
+                if (authView) authView.classList.add('hidden');
+                if (pendampingView) pendampingView.classList.remove('hidden');
+                if (ketuaView) ketuaView.classList.add('hidden');
+                if (userNavProfile) {
+                    userNavProfile.classList.remove('hidden');
+                    userNavProfile.classList.add('flex');
+                }
+                if (pendampingNotificationContainer) {
+                    pendampingNotificationContainer.classList.remove('hidden');
+                    pendampingNotificationContainer.classList.add('flex');
+                }
 
                 const pNip = currentUser.nip || "198310102025211098";
                 const pKec = currentUser.kecamatan || "Pameungpeuk";
 
-                document.getElementById('navUserName').innerText = currentUser.nama;
-                document.getElementById('navUserRole').innerText = "Pendamping PKH";
-                document.getElementById('navUserNipKec').innerText = `NIP: ${pNip} | Kec: ${pKec}`;
-                document.getElementById('pendampingWelcomeName').innerText = `Selamat Datang, ${currentUser.nama}`;
-                document.getElementById('pendampingWelcomeDetail').innerText = `NIP: ${pNip} | Wilayah Kerja Kecamatan: ${pKec}`;
+                const navUserName = document.getElementById('navUserName');
+                const navUserRole = document.getElementById('navUserRole');
+                const navUserNipKec = document.getElementById('navUserNipKec');
+                const pWelcomeName = document.getElementById('pendampingWelcomeName');
+                const pWelcomeDetail = document.getElementById('pendampingWelcomeDetail');
+
+                if (navUserName) navUserName.innerText = currentUser.nama;
+                if (navUserRole) navUserRole.innerText = "Pendamping PKH";
+                if (navUserNipKec) navUserNipKec.innerText = `NIP: ${pNip} | Kec: ${pKec}`;
+                if (pWelcomeName) pWelcomeName.innerText = `Selamat Datang, ${currentUser.nama}`;
+                if (pWelcomeDetail) pWelcomeDetail.innerText = `NIP: ${pNip} | Wilayah Kerja Kecamatan: ${pKec}`;
 
                 populatePendampingFilters();
                 renderPendampingVerifikasiTable();
+                renderPendampingPpseTable();
+                renderPendampingGraduasiTable();
                 renderPendampingKelompokManajemen();
                 renderPendampingKetuaManagement();
                 updateShareInviteUrl();
+                updatePendampingNotifications();
             } else if (currentUser.role === 'ketua') {
-                authView.classList.add('hidden');
-                pendampingView.classList.add('hidden');
-                ketuaView.classList.remove('hidden');
-                userNavProfile.classList.remove('hidden');
-                userNavProfile.classList.add('flex');
+                if (authView) authView.classList.add('hidden');
+                if (pendampingView) pendampingView.classList.add('hidden');
+                if (ketuaView) ketuaView.classList.remove('hidden');
+                if (userNavProfile) {
+                    userNavProfile.classList.remove('hidden');
+                    userNavProfile.classList.add('flex');
+                }
+                if (pendampingNotificationContainer) pendampingNotificationContainer.classList.add('hidden');
 
-                document.getElementById('navUserName').innerText = currentUser.nama;
-                document.getElementById('navUserRole').innerText = "Ketua " + currentUser.kelompok;
-                document.getElementById('navUserNipKec').innerText = `Kelompok: ${currentUser.kelompok}`;
-                document.getElementById('ketuaWelcomeName').innerText = "Selamat Datang, " + currentUser.nama;
+                const navUserName = document.getElementById('navUserName');
+                const navUserRole = document.getElementById('navUserRole');
+                const navUserNipKec = document.getElementById('navUserNipKec');
+                const kWelcomeName = document.getElementById('ketuaWelcomeName');
+
+                if (navUserName) navUserName.innerText = currentUser.nama;
+                if (navUserRole) navUserRole.innerText = "Ketua " + currentUser.kelompok;
+                if (navUserNipKec) navUserNipKec.innerText = `Kelompok: ${currentUser.kelompok}`;
+                if (kWelcomeName) kWelcomeName.innerText = "Selamat Datang, " + currentUser.nama;
 
                 let namaPendampingBinaan = "Encep Yuyus Syamsul Firdaus, S.Sos.I";
                 if (currentUser.pendampingId) {
                     const pnd = appState.pendampingProfiles.find(p => p.id === currentUser.pendampingId);
-                    if (pnd) {
-                        namaPendampingBinaan = pnd.nama;
-                    }
+                    if (pnd) namaPendampingBinaan = pnd.nama;
                 } else if (appState.pendampingProfiles.length > 0) {
                     namaPendampingBinaan = appState.pendampingProfiles[0].nama;
                 }
-                document.getElementById('ketuaPendampingNama').innerText = namaPendampingBinaan;
+                const ketuaPendampingNama = document.getElementById('ketuaPendampingNama');
+                if (ketuaPendampingNama) ketuaPendampingNama.innerText = namaPendampingBinaan;
 
                 const myKpmList = appState.kpmList.filter(k => k.kelompok === currentUser.kelompok);
                 let alamatKelompokStr = `Kelompok ${currentUser.kelompok}`;
                 if (myKpmList.length > 0 && myKpmList[0].alamat) {
                     alamatKelompokStr = `Kelompok ${currentUser.kelompok} (${myKpmList[0].alamat})`;
                 }
-                document.getElementById('ketuaAlamatKelompokText').innerText = alamatKelompokStr;
+                const ketuaAlamatKelompokText = document.getElementById('ketuaAlamatKelompokText');
+                if (ketuaAlamatKelompokText) ketuaAlamatKelompokText.innerText = alamatKelompokStr;
 
                 renderKetuaAllTables();
                 populateKetuaKpmSelects();
@@ -1379,29 +1696,55 @@
         }
 
         function switchPendampingTab(tab) {
-            ['pContentVerifikasi', 'pContentKelompok', 'pContentUndangan', 'pContentRekap'].forEach(id => document.getElementById(id).classList.add('hidden'));
-            ['pTabVerifikasi', 'pTabKelompok', 'pTabUndangan', 'pTabRekap'].forEach(id => document.getElementById(id).className = "py-3 px-4 rounded-xl text-slate-600 hover:bg-slate-100 text-xs font-bold flex items-center space-x-2 cursor-pointer");
+            ['pContentVerifikasi', 'pContentPpse', 'pContentGraduasi', 'pContentKelompok', 'pContentUndangan', 'pContentRekap'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.classList.add('hidden');
+            });
+            ['pTabVerifikasi', 'pTabPpse', 'pTabGraduasi', 'pTabKelompok', 'pTabUndangan', 'pTabRekap'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.className = "py-3 px-4 rounded-xl text-slate-600 hover:bg-slate-100 text-xs font-bold flex items-center space-x-2";
+            });
 
             if (tab === 'verifikasi') {
-                document.getElementById('pContentVerifikasi').classList.remove('hidden');
-                document.getElementById('pTabVerifikasi').className = "py-3 px-4 rounded-xl bg-blue-900 text-white text-xs font-bold flex items-center space-x-2 shadow cursor-pointer";
+                const el = document.getElementById('pContentVerifikasi');
+                if (el) el.classList.remove('hidden');
+                const btn = document.getElementById('pTabVerifikasi');
+                if (btn) btn.className = "py-3 px-4 rounded-xl bg-blue-900 text-white text-xs font-bold flex items-center space-x-2 shadow";
+            } else if (tab === 'ppse') {
+                const el = document.getElementById('pContentPpse');
+                if (el) el.classList.remove('hidden');
+                const btn = document.getElementById('pTabPpse');
+                if (btn) btn.className = "py-3 px-4 rounded-xl bg-blue-900 text-white text-xs font-bold flex items-center space-x-2 shadow";
+                renderPendampingPpseTable();
+            } else if (tab === 'graduasi') {
+                const el = document.getElementById('pContentGraduasi');
+                if (el) el.classList.remove('hidden');
+                const btn = document.getElementById('pTabGraduasi');
+                if (btn) btn.className = "py-3 px-4 rounded-xl bg-blue-900 text-white text-xs font-bold flex items-center space-x-2 shadow";
+                renderPendampingGraduasiTable();
             } else if (tab === 'kelompok') {
-                document.getElementById('pContentKelompok').classList.remove('hidden');
-                document.getElementById('pTabKelompok').className = "py-3 px-4 rounded-xl bg-blue-900 text-white text-xs font-bold flex items-center space-x-2 shadow cursor-pointer";
+                const el = document.getElementById('pContentKelompok');
+                if (el) el.classList.remove('hidden');
+                const btn = document.getElementById('pTabKelompok');
+                if (btn) btn.className = "py-3 px-4 rounded-xl bg-blue-900 text-white text-xs font-bold flex items-center space-x-2 shadow";
                 renderPendampingKelompokManajemen();
             } else if (tab === 'undangan') {
-                document.getElementById('pContentUndangan').classList.remove('hidden');
-                document.getElementById('pTabUndangan').className = "py-3 px-4 rounded-xl bg-blue-900 text-white text-xs font-bold flex items-center space-x-2 shadow cursor-pointer";
+                const el = document.getElementById('pContentUndangan');
+                if (el) el.classList.remove('hidden');
+                const btn = document.getElementById('pTabUndangan');
+                if (btn) btn.className = "py-3 px-4 rounded-xl bg-blue-900 text-white text-xs font-bold flex items-center space-x-2 shadow";
                 renderPendampingKetuaManagement();
             } else if (tab === 'rekap') {
-                document.getElementById('pContentRekap').classList.remove('hidden');
-                document.getElementById('pTabRekap').className = "py-3 px-4 rounded-xl bg-blue-900 text-white text-xs font-bold flex items-center space-x-2 shadow cursor-pointer";
+                const el = document.getElementById('pContentRekap');
+                if (el) el.classList.remove('hidden');
+                const btn = document.getElementById('pTabRekap');
+                if (btn) btn.className = "py-3 px-4 rounded-xl bg-blue-900 text-white text-xs font-bold flex items-center space-x-2 shadow";
             }
         }
 
         function populatePendampingFilters() {
             const kelompokList = [...new Set(appState.ketuaUsers.map(k => k.kelompok))];
-            ['pFilterKelompokVerifikasi', 'pFilterKelompokManajemen', 'printFilterKelompok'].forEach(sId => {
+            ['pFilterKelompokVerifikasi', 'pFilterKelompokPpse', 'pFilterKelompokGraduasi', 'pFilterKelompokManajemen', 'printFilterKelompok'].forEach(sId => {
                 const select = document.getElementById(sId);
                 if (select) {
                     select.innerHTML = '<option value="ALL">-- Semua Kelompok --</option>';
@@ -1471,6 +1814,8 @@
                 appState.p2k2List.forEach(m => { if (m.kelompok === oldName) m.kelompok = newKelompok; });
                 appState.komitmenList.forEach(m => { if (m.kelompok === oldName) m.kelompok = newKelompok; });
                 appState.rekonsiliasiList.forEach(m => { if (m.kelompok === oldName) m.kelompok = newKelompok; });
+                appState.ppseList.forEach(m => { if (m.kelompok === oldName) m.kelompok = newKelompok; });
+                appState.graduasiList.forEach(m => { if (m.kelompok === oldName) m.kelompok = newKelompok; });
                 saveState();
                 closeEditKelompokModal();
                 renderPendampingKelompokManajemen();
@@ -1481,7 +1826,7 @@
 
         function openPendampingKelompokModal(kelompokName) {
             const modal = document.getElementById('modalPendampingKelompokDetail');
-            document.getElementById('modalKelompokTitle',).innerText = `Informasi Kelompok ${kelompokName}`;
+            document.getElementById('modalKelompokTitle').innerText = `Informasi Kelompok ${kelompokName}`;
             const ketua = appState.ketuaUsers.find(k => k.kelompok === kelompokName);
             if (ketua) {
                 document.getElementById('infoKetuaNama').innerText = ketua.nama;
@@ -1498,7 +1843,7 @@
                         <tr>
                             <td class="p-2 font-bold">${m.nama}</td>
                             <td class="p-2 font-mono">${m.nik}</td>
-                            <td class="p-2 font-semibold text-blue-900">${m.kohor || '-'}</td>
+                            <td class="p-2 text-center">${m.kohor || '2026'}</td>
                             <td class="p-2">${m.jenisBantuan || 'PKH'}</td>
                             <td class="p-2">${m.komponen}</td>
                             <td class="p-2">${m.alamat}</td>
@@ -1563,7 +1908,7 @@
             }
 
             if (allReports.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" class="text-center p-6 text-slate-400 font-semibold">Belum ada laporan masuk sesuai filter.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="7" class="text-center p-6 text-slate-400 font-semibold">Belum ada laporan rutin masuk sesuai filter.</td></tr>`;
                 return;
             }
 
@@ -1596,8 +1941,125 @@
                         <td class="p-3">${fotoHtml}</td>
                         <td class="p-3"><span class="px-2.5 py-1 rounded-full font-bold text-[10px] ${badgeStatus}">${r.statusVerifikasi || 'PENDING'}</span></td>
                         <td class="p-3 text-center space-x-1 whitespace-nowrap">
-                            <button onclick="approveReport('${r.id}', '${r.reportType}')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-2.5 py-1 rounded text-xs font-bold shadow cursor-pointer">Setuju</button>
-                            <button onclick="rejectReport('${r.id}', '${r.reportType}')" class="bg-red-600 hover:bg-red-700 text-white px-2.5 py-1 rounded text-xs font-bold shadow cursor-pointer">Tolak</button>
+                            <button onclick="approveReport('${r.id}', '${r.reportType}')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-2.5 py-1 rounded text-xs font-bold shadow">Setuju</button>
+                            <button onclick="rejectReport('${r.id}', '${r.reportType}')" class="bg-red-600 hover:bg-red-700 text-white px-2.5 py-1 rounded text-xs font-bold shadow">Tolak</button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        function renderPendampingPpseTable() {
+            const filterKelompok = document.getElementById('pFilterKelompokPpse').value;
+            const filterBulan = document.getElementById('pFilterBulanPpse').value;
+            const tbody = document.getElementById('tbodyPendampingPpse');
+            if (!tbody) return;
+            tbody.innerHTML = '';
+
+            let list = (appState.ppseList || []).filter(item => {
+                if (!appState.ketuaUsers.some(k => k.kelompok.trim().toLowerCase() === (item.kelompok || "").trim().toLowerCase() && k.status === 'VERIFIED')) return false;
+                const itemKlp = item.kelompok ? item.kelompok.trim().toLowerCase() : "";
+                const fKlp = filterKelompok ? filterKelompok.trim().toLowerCase() : "all";
+                if (fKlp !== 'all' && itemKlp !== fKlp) return false;
+                if (filterBulan && item.tanggal && !item.tanggal.startsWith(filterBulan)) return false;
+                return true;
+            });
+
+            if (list.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="9" class="text-center p-6 text-slate-400 font-semibold">Belum ada usulan PPSE masuk.</td></tr>`;
+                return;
+            }
+
+            list.sort((a, b) => new Date(b.tanggal) - new Date(a.tanggal));
+            list.forEach(p => {
+                let badgeStatus = 'bg-amber-100 text-amber-800';
+                if (p.statusVerifikasi === 'DISETUJUI') badgeStatus = 'bg-emerald-100 text-emerald-800';
+                if (p.statusVerifikasi === 'DITOLAK') badgeStatus = 'bg-red-100 text-red-800';
+                let fotoHtml = p.foto ? `<img src="${p.foto}" alt="Foto" onclick="openImageViewer('${p.foto}')" class="w-12 h-12 object-cover rounded-lg border border-slate-300 cursor-pointer hover:opacity-80 shadow-sm" title="Klik untuk memperbesar">` : '-';
+                let sisaClass = (p.sisaVal || 0) < 0 ? 'text-red-600 font-bold' : 'text-blue-900 font-bold';
+
+                tbody.innerHTML += `
+                    <tr>
+                        <td class="p-3">${p.tanggal}</td>
+                        <td class="p-3 font-semibold text-blue-900">${p.kelompok}</td>
+                        <td class="p-3">
+                            <div class="font-bold text-slate-900">${p.kpmNama}</div>
+                            <div class="text-[11px] text-slate-500 font-mono">NIK: ${p.nik}</div>
+                            <div class="text-[10px] text-slate-500">Usia: ${p.usia} Thn | WA: ${p.hp}</div>
+                        </td>
+                        <td class="p-3">
+                            <div class="font-mono text-slate-800">IDPEL: ${p.idpel}</div>
+                            <div class="text-[10px] text-slate-500">Kohor: ${p.kohor}</div>
+                        </td>
+                        <td class="p-3">
+                            <div class="text-slate-600">Ada: ${p.usahaAda || '-'}</div>
+                            <div class="font-bold text-emerald-800">Ajuan: ${p.usahaAjuan}</div>
+                        </td>
+                        <td class="p-3 text-[11px]">
+                            <div>Makan/Minum: Rp ${(p.makan || 0).toLocaleString('id-ID')}</div>
+                            <div>Bersih: Rp ${(p.bersih || 0).toLocaleString('id-ID')}</div>
+                            <div>Keluarga: Rp ${(p.keluarga || 0).toLocaleString('id-ID')}</div>
+                            <div class="${sisaClass}">Sisa: Rp ${(p.sisaVal || 0).toLocaleString('id-ID')}</div>
+                        </td>
+                        <td class="p-3">${fotoHtml}</td>
+                        <td class="p-3"><span class="px-2.5 py-1 rounded-full font-bold text-[10px] ${badgeStatus}">${p.statusVerifikasi || 'PENDING'}</span></td>
+                        <td class="p-3 text-center space-x-1 whitespace-nowrap">
+                            <button onclick="approvePpse('${p.id}')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-2.5 py-1 rounded text-xs font-bold shadow">Setuju</button>
+                            <button onclick="rejectPpse('${p.id}')" class="bg-red-600 hover:bg-red-700 text-white px-2.5 py-1 rounded text-xs font-bold shadow">Tolak</button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        function renderPendampingGraduasiTable() {
+            const filterKelompok = document.getElementById('pFilterKelompokGraduasi').value;
+            const filterBulan = document.getElementById('pFilterBulanGraduasi').value;
+            const tbody = document.getElementById('tbodyPendampingGraduasi');
+            if (!tbody) return;
+            tbody.innerHTML = '';
+
+            let list = (appState.graduasiList || []).filter(item => {
+                if (!appState.ketuaUsers.some(k => k.kelompok.trim().toLowerCase() === (item.kelompok || "").trim().toLowerCase() && k.status === 'VERIFIED')) return false;
+                const itemKlp = item.kelompok ? item.kelompok.trim().toLowerCase() : "";
+                const fKlp = filterKelompok ? filterKelompok.trim().toLowerCase() : "all";
+                if (fKlp !== 'all' && itemKlp !== fKlp) return false;
+                if (filterBulan && item.tanggal && !item.tanggal.startsWith(filterBulan)) return false;
+                return true;
+            });
+
+            if (list.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="8" class="text-center p-6 text-slate-400 font-semibold">Belum ada usulan graduasi mandiri masuk.</td></tr>`;
+                return;
+            }
+
+            list.sort((a, b) => new Date(b.tanggal) - new Date(a.tanggal));
+            list.forEach(g => {
+                let badgeStatus = 'bg-amber-100 text-amber-800';
+                if (g.statusVerifikasi === 'DISETUJUI') badgeStatus = 'bg-emerald-100 text-emerald-800';
+                if (g.statusVerifikasi === 'DITOLAK') badgeStatus = 'bg-red-100 text-red-800';
+
+                let fotoThumbs = '';
+                if (g.fotoKpm) fotoThumbs += `<img src="${g.fotoKpm}" alt="KPM" onclick="openImageViewer('${g.fotoKpm}')" class="w-10 h-10 object-cover rounded border inline-block mr-1 cursor-pointer" title="Foto KPM">`;
+                if (g.fotoRumah) fotoThumbs += `<img src="${g.fotoRumah}" alt="Rumah" onclick="openImageViewer('${g.fotoRumah}')" class="w-10 h-10 object-cover rounded border inline-block mr-1 cursor-pointer" title="Foto Rumah">`;
+                if (g.fotoSurat) fotoThumbs += `<img src="${g.fotoSurat}" alt="Surat" onclick="openImageViewer('${g.fotoSurat}')" class="w-10 h-10 object-cover rounded border inline-block mr-1 cursor-pointer" title="Foto Surat">`;
+                if (!fotoThumbs) fotoThumbs = '-';
+
+                tbody.innerHTML += `
+                    <tr>
+                        <td class="p-3">${g.tanggal}</td>
+                        <td class="p-3 font-semibold text-blue-900">${g.kelompok}</td>
+                        <td class="p-3">
+                            <div class="font-bold text-slate-900">${g.kpmNama}</div>
+                            <div class="text-[11px] text-slate-500 font-mono">NIK: ${g.nik}</div>
+                        </td>
+                        <td class="p-3 text-center font-mono">${g.kohor}</td>
+                        <td class="p-3 font-medium text-slate-700">${g.alasan}</td>
+                        <td class="p-3">${fotoThumbs}</td>
+                        <td class="p-3"><span class="px-2.5 py-1 rounded-full font-bold text-[10px] ${badgeStatus}">${g.statusVerifikasi || 'PENDING'}</span></td>
+                        <td class="p-3 text-center space-x-1 whitespace-nowrap">
+                            <button onclick="approveGraduasi('${g.id}')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-2.5 py-1 rounded text-xs font-bold shadow">Setuju</button>
+                            <button onclick="rejectGraduasi('${g.id}')" class="bg-red-600 hover:bg-red-700 text-white px-2.5 py-1 rounded text-xs font-bold shadow">Tolak</button>
                         </td>
                     </tr>
                 `;
@@ -1612,6 +2074,7 @@
             if (item) item.statusVerifikasi = 'DISETUJUI';
             saveState();
             renderPendampingVerifikasiTable();
+            updatePendampingNotifications();
             showToast("Disetujui", "Laporan diverifikasi.", "success");
         }
 
@@ -1623,7 +2086,44 @@
             if (item) item.statusVerifikasi = 'DITOLAK';
             saveState();
             renderPendampingVerifikasiTable();
+            updatePendampingNotifications();
             showToast("Ditolak", "Laporan ditolak.", "info");
+        }
+
+        function approvePpse(id) {
+            const item = (appState.ppseList || []).find(i => i.id === id);
+            if (item) item.statusVerifikasi = 'DISETUJUI';
+            saveState();
+            renderPendampingPpseTable();
+            updatePendampingNotifications();
+            showToast("Disetujui", "Usulan PPSE diverifikasi.", "success");
+        }
+
+        function rejectPpse(id) {
+            const item = (appState.ppseList || []).find(i => i.id === id);
+            if (item) item.statusVerifikasi = 'DITOLAK';
+            saveState();
+            renderPendampingPpseTable();
+            updatePendampingNotifications();
+            showToast("Ditolak", "Usulan PPSE ditolak.", "info");
+        }
+
+        function approveGraduasi(id) {
+            const item = (appState.graduasiList || []).find(i => i.id === id);
+            if (item) item.statusVerifikasi = 'DISETUJUI';
+            saveState();
+            renderPendampingGraduasiTable();
+            updatePendampingNotifications();
+            showToast("Disetujui", "Usulan Graduasi diverifikasi.", "success");
+        }
+
+        function rejectGraduasi(id) {
+            const item = (appState.graduasiList || []).find(i => i.id === id);
+            if (item) item.statusVerifikasi = 'DITOLAK';
+            saveState();
+            renderPendampingGraduasiTable();
+            updatePendampingNotifications();
+            showToast("Ditolak", "Usulan Graduasi ditolak.", "info");
         }
 
         function renderPendampingKetuaManagement() {
@@ -1687,6 +2187,7 @@
                 saveState();
                 renderPendampingKetuaManagement();
                 populatePendampingFilters();
+                updatePendampingNotifications();
                 showToast("Berhasil", "Akun ketua berhasil diaktifkan.", "success");
             }
         }
@@ -1740,34 +2241,102 @@
         }
 
         function switchKetuaTab(tab) {
-            ['kContentKpm', 'kContentP2k2', 'kContentKomitmen', 'kContentRekonsiliasi'].forEach(id => document.getElementById(id).classList.add('hidden'));
-            ['kTabKpm', 'kTabP2k2', 'kTabKomitmen', 'kTabRekonsiliasi'].forEach(id => document.getElementById(id).className = "py-3 px-4 rounded-xl text-slate-600 hover:bg-slate-100 text-xs font-bold flex items-center space-x-2 cursor-pointer");
+            ['kContentKpm', 'kContentP2k2', 'kContentKomitmen', 'kContentRekonsiliasi', 'kContentPpse', 'kContentGraduasi'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.classList.add('hidden');
+            });
+            ['kTabKpm', 'kTabP2k2', 'kTabKomitmen', 'kTabRekonsiliasi', 'kTabPpse', 'kTabGraduasi'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.className = "py-3 px-4 rounded-xl text-slate-600 hover:bg-slate-100 text-xs font-bold flex items-center space-x-2";
+            });
 
             if (tab === 'kpm') {
-                document.getElementById('kContentKpm').classList.remove('hidden');
-                document.getElementById('kTabKpm').className = "py-3 px-4 rounded-xl bg-emerald-700 text-white text-xs font-bold flex items-center space-x-2 shadow cursor-pointer";
+                const el = document.getElementById('kContentKpm');
+                if (el) el.classList.remove('hidden');
+                const btn = document.getElementById('kTabKpm');
+                if (btn) btn.className = "py-3 px-4 rounded-xl bg-emerald-700 text-white text-xs font-bold flex items-center space-x-2 shadow";
             } else if (tab === 'p2k2') {
-                document.getElementById('kContentP2k2').classList.remove('hidden');
-                document.getElementById('kTabP2k2').className = "py-3 px-4 rounded-xl bg-emerald-700 text-white text-xs font-bold flex items-center space-x-2 shadow cursor-pointer";
+                const el = document.getElementById('kContentP2k2');
+                if (el) el.classList.remove('hidden');
+                const btn = document.getElementById('kTabP2k2');
+                if (btn) btn.className = "py-3 px-4 rounded-xl bg-emerald-700 text-white text-xs font-bold flex items-center space-x-2 shadow";
             } else if (tab === 'komitmen') {
-                document.getElementById('kContentKomitmen').classList.remove('hidden');
-                document.getElementById('kTabKomitmen').className = "py-3 px-4 rounded-xl bg-emerald-700 text-white text-xs font-bold flex items-center space-x-2 shadow cursor-pointer";
+                const el = document.getElementById('kContentKomitmen');
+                if (el) el.classList.remove('hidden');
+                const btn = document.getElementById('kTabKomitmen');
+                if (btn) btn.className = "py-3 px-4 rounded-xl bg-emerald-700 text-white text-xs font-bold flex items-center space-x-2 shadow";
             } else if (tab === 'rekonsiliasi') {
-                document.getElementById('kContentRekonsiliasi').classList.remove('hidden');
-                document.getElementById('kTabRekonsiliasi').className = "py-3 px-4 rounded-xl bg-emerald-700 text-white text-xs font-bold flex items-center space-x-2 shadow cursor-pointer";
+                const el = document.getElementById('kContentRekonsiliasi');
+                if (el) el.classList.remove('hidden');
+                const btn = document.getElementById('kTabRekonsiliasi');
+                if (btn) btn.className = "py-3 px-4 rounded-xl bg-emerald-700 text-white text-xs font-bold flex items-center space-x-2 shadow";
+            } else if (tab === 'ppse') {
+                const el = document.getElementById('kContentPpse');
+                if (el) el.classList.remove('hidden');
+                const btn = document.getElementById('kTabPpse');
+                if (btn) btn.className = "py-3 px-4 rounded-xl bg-emerald-700 text-white text-xs font-bold flex items-center space-x-2 shadow";
+            } else if (tab === 'graduasi') {
+                const el = document.getElementById('kContentGraduasi');
+                if (el) el.classList.remove('hidden');
+                const btn = document.getElementById('kTabGraduasi');
+                if (btn) btn.className = "py-3 px-4 rounded-xl bg-emerald-700 text-white text-xs font-bold flex items-center space-x-2 shadow";
             }
         }
 
         function populateKetuaKpmSelects() {
             if (!currentUser) return;
             const myKpm = appState.kpmList.filter(k => k.kelompok === currentUser.kelompok);
-            ['p2k2KpmSelect', 'komitmenKpmSelect', 'rekonKpmSelect'].forEach(sId => {
+            ['p2k2KpmSelect', 'komitmenKpmSelect', 'rekonKpmSelect', 'ppseKpmSelect', 'graduasiKpmSelect'].forEach(sId => {
                 const select = document.getElementById(sId);
                 if (select) {
                     select.innerHTML = '<option value="">-- Pilih KPM --</option>';
                     myKpm.forEach(k => { select.innerHTML += `<option value="${k.nama}">${k.nama} (NIK: ${k.nik})</option>`; });
                 }
             });
+        }
+
+        function autoFillPpseKpmData() {
+            const name = document.getElementById('ppseKpmSelect').value;
+            if (!name) {
+                document.getElementById('ppseNik').value = '';
+                document.getElementById('ppseKohor').value = '';
+                return;
+            }
+            const found = appState.kpmList.find(k => k.nama === name && k.kelompok === currentUser.kelompok);
+            if (found) {
+                document.getElementById('ppseNik').value = found.nik || '';
+                document.getElementById('ppseKohor').value = found.kohor || '2026';
+            }
+        }
+
+        function calculatePpseNetIncome() {
+            const bersih = parseFloat(document.getElementById('ppseBersih').value) || 0;
+            const keluarga = parseFloat(document.getElementById('ppseKeluarga').value) || 0;
+            const makan = parseFloat(document.getElementById('ppseMakan').value) || 0;
+            const sisa = bersih + keluarga - makan;
+            document.getElementById('ppseSisaVal').value = sisa;
+            const disp = document.getElementById('ppseSisaDisplay');
+            if (sisa < 0) {
+                disp.value = `- Rp ${Math.abs(sisa).toLocaleString('id-ID')} (Defisit)`;
+                disp.className = "w-full p-2 bg-red-50 border border-red-300 rounded-xl text-xs font-bold text-red-700";
+            } else {
+                disp.value = `Rp ${sisa.toLocaleString('id-ID')} (Surplus)`;
+                disp.className = "w-full p-2 bg-blue-50 border border-blue-300 rounded-xl text-xs font-bold text-blue-900";
+            }
+        }
+
+        function autoFillGraduasiKpmData() {
+            const name = document.getElementById('graduasiKpmSelect').value;
+            if (!name) {
+                document.getElementById('graduasiNik').value = '';
+                document.getElementById('graduasiKohor').value = '';
+                return;
+            }
+            const found = appState.kpmList.find(k => k.nama === name && k.kelompok === currentUser.kelompok);
+            if (found) {
+                document.getElementById('graduasiNik').value = found.nik || '';
+                document.getElementById('graduasiKohor').value = found.kohor || '2026';
+            }
         }
 
         function updateDynamicKomitmenCheckboxes() {
@@ -1798,7 +2367,7 @@
 
                 html += `
                     <div class="space-y-1 pb-3 border-b border-slate-100 last:border-0" data-komponen-block="${idx}">
-                        <label class="flex items-center space-x-2 font-bold text-slate-700 cursor-pointer">
+                        <label class="flex items-center space-x-2 font-bold text-slate-700">
                             <input type="checkbox" name="komitmenJenisCheckbox" value="${labelName}" data-index="${idx}" onchange="toggleKomitmenFotoInputCustom(this, ${idx})" class="rounded text-emerald-700">
                             <span>${labelName} (${comp})</span>
                         </label>
@@ -1836,13 +2405,13 @@
                         <tr>
                             <td class="p-3 font-bold">${k.nama}</td>
                             <td class="p-3 font-mono">${k.nik}</td>
-                            <td class="p-3 font-semibold text-blue-900">${k.kohor || '-'}</td>
+                            <td class="p-3 text-center font-mono">${k.kohor || '2026'}</td>
                             <td class="p-3 font-semibold text-emerald-800">${k.jenisBantuan || 'PKH'}</td>
                             <td class="p-3">${k.komponen}</td>
                             <td class="p-3">${k.alamat}</td>
                             <td class="p-3 text-center space-x-1">
-                                <button onclick="editKpm('${k.id}')" class="bg-amber-500 text-white px-2 py-1 rounded text-xs font-bold cursor-pointer">Edit</button>
-                                <button onclick="deleteKpm('${k.id}')" class="bg-red-600 text-white px-2 py-1 rounded text-xs font-bold cursor-pointer">Hapus</button>
+                                <button onclick="editKpm('${k.id}')" class="bg-amber-500 text-white px-2 py-1 rounded text-xs font-bold">Edit</button>
+                                <button onclick="deleteKpm('${k.id}')" class="bg-red-600 text-white px-2 py-1 rounded text-xs font-bold">Hapus</button>
                             </td>
                         </tr>
                     `;
@@ -1866,7 +2435,7 @@
                             <td class="p-3">${p.status}</td>
                             <td class="p-3"><span class="px-2.5 py-1 rounded-full font-bold text-[10px] ${badgeStatus}">${p.statusVerifikasi || 'PENDING'}</span></td>
                             <td class="p-3">${p2k2Thumb}</td>
-                            <td class="p-3 text-center"><button onclick="deleteP2k2('${p.id}')" class="bg-red-600 text-white px-2 py-1 rounded text-xs cursor-pointer">Hapus</button></td>
+                            <td class="p-3 text-center"><button onclick="deleteP2k2('${p.id}')" class="bg-red-600 text-white px-2 py-1 rounded text-xs">Hapus</button></td>
                         </tr>
                     `;
                 });
@@ -1896,7 +2465,7 @@
                             </td>
                             <td class="p-3">${k.status}</td>
                             <td class="p-3"><span class="px-2.5 py-1 rounded-full font-bold text-[10px] ${badgeStatus}">${k.statusVerifikasi || 'PENDING'}</span></td>
-                            <td class="p-3 text-center"><button onclick="deleteKomitmen('${k.id}')" class="bg-red-600 text-white px-2 py-1 rounded text-xs cursor-pointer">Hapus</button></td>
+                            <td class="p-3 text-center"><button onclick="deleteKomitmen('${k.id}')" class="bg-red-600 text-white px-2 py-1 rounded text-xs">Hapus</button></td>
                         </tr>
                     `;
                 });
@@ -1919,7 +2488,68 @@
                             <td class="p-3 font-semibold text-blue-900">Rp ${(r.nominal || 0).toLocaleString('id-ID')}</td>
                             <td class="p-3"><span class="px-2.5 py-1 rounded-full font-bold text-[10px] ${badgeStatus}">${r.statusVerifikasi || 'PENDING'}</span></td>
                             <td class="p-3">${rekonThumb}</td>
-                            <td class="p-3 text-center"><button onclick="deleteRekonsiliasi('${r.id}')" class="bg-red-600 text-white px-2 py-1 rounded text-xs cursor-pointer">Hapus</button></td>
+                            <td class="p-3 text-center"><button onclick="deleteRekonsiliasi('${r.id}')" class="bg-red-600 text-white px-2 py-1 rounded text-xs">Hapus</button></td>
+                        </tr>
+                    `;
+                });
+            }
+
+            const tbodyPpse = document.getElementById('tbodyKetuaPpse');
+            if (tbodyPpse) {
+                tbodyPpse.innerHTML = '';
+                (appState.ppseList || []).filter(p => p.kelompok === myKelompok).forEach(p => {
+                    let badgeStatus = 'bg-amber-100 text-amber-800';
+                    if (p.statusVerifikasi === 'DISETUJUI') badgeStatus = 'bg-emerald-100 text-emerald-800';
+                    if (p.statusVerifikasi === 'DITOLAK') badgeStatus = 'bg-red-100 text-red-800';
+                    let fotoThumb = p.foto ? `<img src="${p.foto}" alt="Foto" onclick="openImageViewer('${p.foto}')" class="w-10 h-10 object-cover rounded border cursor-pointer">` : '-';
+
+                    tbodyPpse.innerHTML += `
+                        <tr>
+                            <td class="p-3">${p.tanggal}</td>
+                            <td class="p-3">
+                                <div class="font-bold">${p.kpmNama}</div>
+                                <div class="text-[10px] font-mono text-slate-500">${p.nik}</div>
+                            </td>
+                            <td class="p-3">
+                                <div>Kohor: ${p.kohor}</div>
+                                <div class="text-[10px] text-slate-500">Usia: ${p.usia} Thn</div>
+                            </td>
+                            <td class="p-3">
+                                <div class="font-bold text-emerald-800">${p.usahaAjuan}</div>
+                                <div class="text-[10px] text-slate-500">Sisa: Rp ${(p.sisaVal || 0).toLocaleString('id-ID')}</div>
+                            </td>
+                            <td class="p-3"><span class="px-2 py-0.5 rounded-full font-bold text-[10px] ${badgeStatus}">${p.statusVerifikasi || 'PENDING'}</span></td>
+                            <td class="p-3 text-center space-x-1 whitespace-nowrap">
+                                <button onclick="editPpse('${p.id}')" class="bg-amber-500 text-white px-2 py-1 rounded text-xs font-bold">Edit</button>
+                                <button onclick="deletePpse('${p.id}')" class="bg-red-600 text-white px-2 py-1 rounded text-xs font-bold">Hapus</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+            }
+
+            const tbodyGraduasi = document.getElementById('tbodyKetuaGraduasi');
+            if (tbodyGraduasi) {
+                tbodyGraduasi.innerHTML = '';
+                (appState.graduasiList || []).filter(g => g.kelompok === myKelompok).forEach(g => {
+                    let badgeStatus = 'bg-amber-100 text-amber-800';
+                    if (g.statusVerifikasi === 'DISETUJUI') badgeStatus = 'bg-emerald-100 text-emerald-800';
+                    if (g.statusVerifikasi === 'DITOLAK') badgeStatus = 'bg-red-100 text-red-800';
+
+                    tbodyGraduasi.innerHTML += `
+                        <tr>
+                            <td class="p-3">${g.tanggal}</td>
+                            <td class="p-3">
+                                <div class="font-bold">${g.kpmNama}</div>
+                                <div class="text-[10px] font-mono text-slate-500">${g.nik}</div>
+                            </td>
+                            <td class="p-3 text-center font-mono">${g.kohor}</td>
+                            <td class="p-3">${g.alasan}</td>
+                            <td class="p-3"><span class="px-2 py-0.5 rounded-full font-bold text-[10px] ${badgeStatus}">${g.statusVerifikasi || 'PENDING'}</span></td>
+                            <td class="p-3 text-center space-x-1 whitespace-nowrap">
+                                <button onclick="editGraduasi('${g.id}')" class="bg-amber-500 text-white px-2 py-1 rounded text-xs font-bold">Edit</button>
+                                <button onclick="deleteGraduasi('${g.id}')" class="bg-red-600 text-white px-2 py-1 rounded text-xs font-bold">Hapus</button>
+                            </td>
                         </tr>
                     `;
                 });
@@ -1945,7 +2575,6 @@
             const alamat = document.getElementById('kpmAlamat').value.trim();
 
             if (nik.length !== 16 || !/^\d+$/.test(nik)) return alert("NIK harus tepat 16 digit angka.");
-            if (!kohor) return alert("Pilih Kohor / Tahun Kepesertaan terlebih dahulu.");
 
             const checkboxes = document.querySelectorAll('input[name="kpmKomponen"]:checked');
             let sel = [];
@@ -1984,14 +2613,14 @@
             document.getElementById('editKpmId').value = k.id;
             document.getElementById('kpmNama').value = k.nama;
             document.getElementById('kpmNik').value = k.nik;
-            document.getElementById('kpmKohor').value = k.kohor || '';
+            document.getElementById('kpmKohor').value = k.kohor || '2026';
             document.getElementById('kpmJenisBantuan').value = k.jenisBantuan || 'PKH';
             document.getElementById('kpmAlamat').value = k.alamat;
 
             document.querySelectorAll('input[name="kpmKomponen"]').forEach(cb => {
                 const valId = "qty_" + cb.value.replace(/[^a-zA-Z0-9]/g, "_");
                 const inputEl = document.getElementById(valId);
-                const matched = k.komponen.split(',').find(part => part.trim().startsWith(cb.value) || (cb.value === 'Lansia' && part.trim().startsWith('Lansia')));
+                const matched = k.komponen.split(',').find(part => part.trim().startsWith(cb.value));
                 if (matched) {
                     cb.checked = true;
                     if (inputEl) {
@@ -2016,6 +2645,193 @@
             document.getElementById('formKpmTitle').innerText = "Tambah Anggota KPM Baru";
             document.getElementById('btnSubmitKpm').innerText = "Simpan Anggota KPM";
             document.getElementById('btnCancelKpmEdit').classList.add('hidden');
+        }
+
+        function handleSavePpse(e) {
+            e.preventDefault();
+            const editId = document.getElementById('editPpseId').value;
+            const kpmNama = document.getElementById('ppseKpmSelect').value;
+            const nik = document.getElementById('ppseNik').value;
+            const kohor = document.getElementById('ppseKohor').value;
+            const usia = parseInt(document.getElementById('ppseUsia').value);
+            const idpel = document.getElementById('ppseIdpel').value.trim();
+            const hp = document.getElementById('ppseHp').value.trim();
+            const usahaAda = document.getElementById('ppseUsahaAda').value.trim();
+            const usahaAjuan = document.getElementById('ppseUsahaAjuan').value;
+            const bersih = parseFloat(document.getElementById('ppseBersih').value) || 0;
+            const keluarga = parseFloat(document.getElementById('ppseKeluarga').value) || 0;
+            const makan = parseFloat(document.getElementById('ppseMakan').value) || 0;
+            const sisaVal = parseFloat(document.getElementById('ppseSisaVal').value) || 0;
+            const fileInput = document.getElementById('ppseFoto');
+
+            if (usia < 18 || usia > 59) return alert("Ketentuan PPSE: Usia KPM harus antara 18 hingga 59 Tahun (tidak boleh anak dan tidak boleh lansia).");
+
+            const saveRecord = (fotoUrl = "") => {
+                if (editId) {
+                    const found = (appState.ppseList || []).find(i => i.id === editId);
+                    if (found) {
+                        found.kpmNama = kpmNama; found.nik = nik; found.kohor = kohor; found.usia = usia;
+                        found.idpel = idpel; found.hp = hp; found.usahaAda = usahaAda; found.usahaAjuan = usahaAjuan;
+                        found.bersih = bersih; found.keluarga = keluarga; found.makan = makan; found.sisaVal = sisaVal;
+                        if (fotoUrl) found.foto = fotoUrl;
+                    }
+                    document.getElementById('editPpseId').value = '';
+                    document.getElementById('formPpseTitle').innerText = "Usulan Pemberdayaan Ekonomi (PPSE)";
+                    document.getElementById('btnSubmitPpse').innerText = "Simpan Usulan PPSE";
+                    document.getElementById('btnCancelPpseEdit').classList.add('hidden');
+                    showToast("Berhasil", "Usulan PPSE diperbarui.", "success");
+                } else {
+                    const newRecord = {
+                        id: "PPSE-" + Date.now(),
+                        tanggal: new Date().toISOString().split('T')[0],
+                        kelompok: currentUser.kelompok,
+                        kpmNama, nik, kohor, usia, idpel, hp, usahaAda, usahaAjuan,
+                        bersih, keluarga, makan, sisaVal,
+                        foto: fotoUrl,
+                        statusVerifikasi: "PENDING"
+                    };
+                    if (!appState.ppseList) appState.ppseList = [];
+                    appState.ppseList.push(newRecord);
+                    showToast("Berhasil", "Usulan PPSE berhasil disimpan.", "success");
+                }
+                saveState();
+                document.getElementById('formPpse').reset();
+                document.getElementById('ppseSisaDisplay').value = "Rp 0";
+                renderKetuaAllTables();
+            };
+
+            if (fileInput.files && fileInput.files[0]) {
+                compressImage(fileInput.files[0], (base64) => { saveRecord(base64); }, 800, 0.7);
+            } else {
+                const existing = editId ? (appState.ppseList || []).find(i => i.id === editId) : null;
+                saveRecord(existing ? existing.foto : "");
+            }
+        }
+
+        function editPpse(id) {
+            const item = (appState.ppseList || []).find(i => i.id === id);
+            if (!item) return;
+            document.getElementById('editPpseId').value = item.id;
+            document.getElementById('ppseKpmSelect').value = item.kpmNama;
+            document.getElementById('ppseNik').value = item.nik;
+            document.getElementById('ppseKohor').value = item.kohor;
+            document.getElementById('ppseUsia').value = item.usia;
+            document.getElementById('ppseIdpel').value = item.idpel;
+            document.getElementById('ppseHp').value = item.hp;
+            document.getElementById('ppseUsahaAda').value = item.usahaAda || '';
+            document.getElementById('ppseUsahaAjuan').value = item.usahaAjuan;
+            document.getElementById('ppseBersih').value = item.bersih;
+            document.getElementById('ppseKeluarga').value = item.keluarga;
+            document.getElementById('ppseMakan').value = item.makan;
+            calculatePpseNetIncome();
+            document.getElementById('formPpseTitle').innerText = "Edit Usulan PPSE";
+            document.getElementById('btnSubmitPpse').innerText = "Perbarui Usulan PPSE";
+            document.getElementById('btnCancelPpseEdit').classList.remove('hidden');
+        }
+
+        function cancelPpseEdit() {
+            document.getElementById('editPpseId').value = '';
+            document.getElementById('formPpse').reset();
+            document.getElementById('ppseSisaDisplay').value = "Rp 0";
+            document.getElementById('formPpseTitle').innerText = "Usulan Pemberdayaan Ekonomi (PPSE)";
+            document.getElementById('btnSubmitPpse').innerText = "Simpan Usulan PPSE";
+            document.getElementById('btnCancelPpseEdit').classList.add('hidden');
+        }
+
+        function deletePpse(id) {
+            if (confirm("Hapus usulan PPSE ini?")) {
+                appState.ppseList = (appState.ppseList || []).filter(i => i.id !== id);
+                saveState();
+                renderKetuaAllTables();
+                showToast("Dihapus", "Usulan PPSE dihapus.", "info");
+            }
+        }
+
+        function handleSaveGraduasi(e) {
+            e.preventDefault();
+            const editId = document.getElementById('editGraduasiId').value;
+            const kpmNama = document.getElementById('graduasiKpmSelect').value;
+            const nik = document.getElementById('graduasiNik').value;
+            const kohor = document.getElementById('graduasiKohor').value;
+            const alasan = document.getElementById('graduasiAlasan').value;
+            const fileKpm = document.getElementById('graduasiFotoKpm');
+            const fileRumah = document.getElementById('graduasiFotoRumah');
+            const fileSurat = document.getElementById('graduasiFotoSurat');
+
+            let filesToProcess = [];
+            const processFile = (inputEl) => {
+                return new Promise(resolve => {
+                    if (inputEl.files && inputEl.files[0]) {
+                        compressImage(inputEl.files[0], base64 => resolve(base64), 600, 0.6);
+                    } else {
+                        resolve(null);
+                    }
+                });
+            };
+
+            Promise.all([processFile(fileKpm), processFile(fileRumah), processFile(fileSurat)]).then(([fk, fr, fs]) => {
+                const existing = editId ? (appState.graduasiList || []).find(i => i.id === editId) : null;
+                const fotoKpm = fk || (existing ? existing.fotoKpm : "");
+                const fotoRumah = fr || (existing ? existing.fotoRumah : "");
+                const fotoSurat = fs || (existing ? existing.fotoSurat : "");
+
+                if (editId) {
+                    if (existing) {
+                        existing.kpmNama = kpmNama; existing.nik = nik; existing.kohor = kohor; existing.alasan = alasan;
+                        existing.fotoKpm = fotoKpm; existing.fotoRumah = fotoRumah; existing.fotoSurat = fotoSurat;
+                    }
+                    document.getElementById('editGraduasiId').value = '';
+                    document.getElementById('formGraduasiTitle').innerText = "Usulan Graduasi Mandiri";
+                    document.getElementById('btnSubmitGraduasi').innerText = "Simpan Usulan Graduasi";
+                    document.getElementById('btnCancelGraduasiEdit').classList.add('hidden');
+                    showToast("Berhasil", "Usulan Graduasi Mandiri diperbarui.", "success");
+                } else {
+                    const newG = {
+                        id: "GRAD-" + Date.now(),
+                        tanggal: new Date().toISOString().split('T')[0],
+                        kelompok: currentUser.kelompok,
+                        kpmNama, nik, kohor, alasan,
+                        fotoKpm, fotoRumah, fotoSurat,
+                        statusVerifikasi: "PENDING"
+                    };
+                    if (!appState.graduasiList) appState.graduasiList = [];
+                    appState.graduasiList.push(newG);
+                    showToast("Berhasil", "Usulan Graduasi Mandiri berhasil disimpan.", "success");
+                }
+                saveState();
+                document.getElementById('formGraduasi').reset();
+                renderKetuaAllTables();
+            });
+        }
+
+        function editGraduasi(id) {
+            const item = (appState.graduasiList || []).find(i => i.id === id);
+            if (!item) return;
+            document.getElementById('editGraduasiId').value = item.id;
+            document.getElementById('graduasiKpmSelect').value = item.kpmNama;
+            document.getElementById('graduasiNik').value = item.nik;
+            document.getElementById('graduasiKohor').value = item.kohor;
+            document.getElementById('graduasiAlasan').value = item.alasan;
+            document.getElementById('formGraduasiTitle').innerText = "Edit Usulan Graduasi Mandiri";
+            document.getElementById('btnSubmitGraduasi').innerText = "Perbarui Usulan Graduasi";
+            document.getElementById('btnCancelGraduasiEdit').classList.remove('hidden');
+        }
+
+        function cancelGraduasiEdit() {
+            document.getElementById('editGraduasiId').value = '';
+            document.getElementById('formGraduasi').reset();
+            document.getElementById('formGraduasiTitle').innerText = "Usulan Graduasi Mandiri";
+            document.getElementById('btnSubmitGraduasi').innerText = "Simpan Usulan Graduasi";
+            document.getElementById('btnCancelGraduasiEdit').classList.add('hidden');
+        }
+
+        function deleteGraduasi(id) {
+            if (confirm("Hapus usulan graduasi mandiri ini?")) {
+                appState.graduasiList = (appState.graduasiList || []).filter(i => i.id !== id);
+                saveState();
+                renderKetuaAllTables();
+                showToast("Dihapus", "Usulan graduasi dihapus.", "info");
+            }
         }
 
         function handleSaveP2k2(e) {
@@ -2286,9 +3102,9 @@
                 return true;
             };
 
-            const cariDetailKpm = (namaKpm, kelompokKpm) => {
+            const cariNikKpm = (namaKpm, kelompokKpm) => {
                 const found = appState.kpmList.find(k => k.nama.toLowerCase() === (namaKpm || "").toLowerCase() && k.kelompok === kelompokKpm);
-                return found ? { nik: found.nik, kohor: found.kohor || '-' } : { nik: "-", kohor: "-" };
+                return found ? found.nik : "-";
             };
 
             if (type === 'p2k2') {
@@ -2302,8 +3118,7 @@
                                 <th class="border border-black p-2">Tanggal</th>
                                 <th class="border border-black p-2">Kelompok</th>
                                 <th class="border border-black p-2">Nama KPM</th>
-                                <th class="border border-black p-2">NIK</th>
-                                <th class="border border-black p-2">Kohor</th>
+                                <th class="border border-black p-2">NIK KPM</th>
                                 <th class="border border-black p-2">Modul</th>
                                 <th class="border border-black p-2">Status</th>
                                 <th class="border border-black p-2 w-16">TTD</th>
@@ -2312,10 +3127,10 @@
                         <tbody>`;
                 const data = appState.p2k2List.filter(p => checkFilter(p.kelompok, p.tanggal));
                 if (data.length === 0) {
-                    html += `<tr><td colspan="9" class="border border-black p-4 text-center">Tidak ada data sesuai filter.</td></tr>`;
+                    html += `<tr><td colspan="8" class="border border-black p-4 text-center">Tidak ada data sesuai filter.</td></tr>`;
                 } else {
                     data.forEach((p, idx) => {
-                        const detailKpm = cariDetailKpm(p.kpmNama, p.kelompok);
+                        const nikVal = cariNikKpm(p.kpmNama, p.kelompok);
                         const ttdNum = (idx % 2 === 0) ? `${idx+1}. ........` : `     ${idx+1}. ........`;
                         html += `
                             <tr>
@@ -2323,8 +3138,7 @@
                                 <td class="border border-black p-2 text-center">${p.tanggal}</td>
                                 <td class="border border-black p-2 text-center">${p.kelompok}</td>
                                 <td class="border border-black p-2 font-bold">${p.kpmNama}</td>
-                                <td class="border border-black p-2 font-mono text-center">${detailKpm.nik}</td>
-                                <td class="border border-black p-2 text-center">${detailKpm.kohor}</td>
+                                <td class="border border-black p-2 font-mono text-center">${nikVal}</td>
                                 <td class="border border-black p-2">${p.modul}</td>
                                 <td class="border border-black p-2 text-center">${p.status}</td>
                                 <td class="border border-black p-2 text-center font-mono text-[11px]">${ttdNum}</td>
@@ -2344,8 +3158,7 @@
                                 <th class="border border-black p-2">Tanggal</th>
                                 <th class="border border-black p-2">Kelompok</th>
                                 <th class="border border-black p-2">Nama KPM</th>
-                                <th class="border border-black p-2">NIK</th>
-                                <th class="border border-black p-2">Kohor</th>
+                                <th class="border border-black p-2">NIK KPM</th>
                                 <th class="border border-black p-2">Jenis Layanan</th>
                                 <th class="border border-black p-2">Status</th>
                                 <th class="border border-black p-2">Verifikasi</th>
@@ -2354,18 +3167,17 @@
                         <tbody>`;
                 const data = appState.komitmenList.filter(k => checkFilter(k.kelompok, k.tanggal));
                 if (data.length === 0) {
-                    html += `<tr><td colspan="9" class="border border-black p-4 text-center">Tidak ada data sesuai filter.</td></tr>`;
+                    html += `<tr><td colspan="8" class="border border-black p-4 text-center">Tidak ada data sesuai filter.</td></tr>`;
                 } else {
                     data.forEach((k, idx) => {
-                        const detailKpm = cariDetailKpm(k.kpmNama, k.kelompok);
+                        const nikVal = cariNikKpm(k.kpmNama, k.kelompok);
                         html += `
                             <tr>
                                 <td class="border border-black p-2 text-center">${idx+1}</td>
                                 <td class="border border-black p-2 text-center">${k.tanggal}</td>
                                 <td class="border border-black p-2 text-center">${k.kelompok}</td>
                                 <td class="border border-black p-2 font-bold">${k.kpmNama}</td>
-                                <td class="border border-black p-2 font-mono text-center">${detailKpm.nik}</td>
-                                <td class="border border-black p-2 text-center">${detailKpm.kohor}</td>
+                                <td class="border border-black p-2 font-mono text-center">${nikVal}</td>
                                 <td class="border border-black p-2">${k.jenis}</td>
                                 <td class="border border-black p-2 text-center">${k.status}</td>
                                 <td class="border border-black p-2 text-center font-bold">${k.statusVerifikasi || 'PENDING'}</td>
@@ -2386,8 +3198,7 @@
                                 <th class="border border-black p-2">Tanggal</th>
                                 <th class="border border-black p-2">Kelompok</th>
                                 <th class="border border-black p-2">Nama KPM</th>
-                                <th class="border border-black p-2">NIK</th>
-                                <th class="border border-black p-2">Kohor</th>
+                                <th class="border border-black p-2">NIK KPM</th>
                                 <th class="border border-black p-2">Tahap</th>
                                 <th class="border border-black p-2 text-right">Nominal (Rp)</th>
                                 <th class="border border-black p-2">Verifikasi</th>
@@ -2396,25 +3207,98 @@
                         <tbody>`;
                 const data = appState.rekonsiliasiList.filter(r => checkFilter(r.kelompok, r.tanggal));
                 if (data.length === 0) {
-                    html += `<tr><td colspan="9" class="border border-black p-4 text-center">Tidak ada data sesuai filter.</td></tr>`;
+                    html += `<tr><td colspan="8" class="border border-black p-4 text-center">Tidak ada data sesuai filter.</td></tr>`;
                 } else {
                     data.forEach((r, idx) => {
                         total += r.nominal;
-                        const detailKpm = cariDetailKpm(r.kpmNama, r.kelompok);
+                        const nikVal = cariNikKpm(r.kpmNama, r.kelompok);
                         html += `
                             <tr>
                                 <td class="border border-black p-2 text-center">${idx+1}</td>
                                 <td class="border border-black p-2 text-center">${r.tanggal}</td>
                                 <td class="border border-black p-2 text-center">${r.kelompok}</td>
                                 <td class="border border-black p-2 font-bold">${r.kpmNama}</td>
-                                <td class="border border-black p-2 font-mono text-center">${detailKpm.nik}</td>
-                                <td class="border border-black p-2 text-center">${detailKpm.kohor}</td>
+                                <td class="border border-black p-2 font-mono text-center">${nikVal}</td>
                                 <td class="border border-black p-2 text-center">${r.tahap}</td>
                                 <td class="border border-black p-2 text-right">Rp ${r.nominal.toLocaleString('id-ID')}</td>
                                 <td class="border border-black p-2 text-center font-bold">${r.statusVerifikasi || 'PENDING'}</td>
                             </tr>`;
                     });
-                    html += `<tr class="bg-gray-100 font-bold"><td colspan="7" class="border border-black p-2 text-right">Total:</td><td colspan="2" class="border border-black p-2 text-right">Rp ${total.toLocaleString('id-ID')}</td></tr>`;
+                    html += `<tr class="bg-gray-100 font-bold"><td colspan="6" class="border border-black p-2 text-right">Total:</td><td colspan="2" class="border border-black p-2 text-right">Rp ${total.toLocaleString('id-ID')}</td></tr>`;
+                }
+                html += `</tbody></table>`;
+                tableContainer.innerHTML = html;
+            } else if (type === 'ppse') {
+                titleEl.innerText = "LAPORAN USULAN PEMBERDAYAAN EKONOMI (PPSE) KPM PKH";
+                let html = kopSuratHtml + `
+                    <div class="text-center font-bold text-xs mb-3 uppercase">${titleEl.innerText}</div>
+                    <table class="w-full border-collapse border border-black text-xs text-black">
+                        <thead>
+                            <tr class="bg-gray-100 text-center font-bold">
+                                <th class="border border-black p-2">No</th>
+                                <th class="border border-black p-2">Tanggal</th>
+                                <th class="border border-black p-2">Kelompok</th>
+                                <th class="border border-black p-2">Nama KPM & NIK</th>
+                                <th class="border border-black p-2">Kohor & Usia</th>
+                                <th class="border border-black p-2">Usaha Ajuan</th>
+                                <th class="border border-black p-2 text-right">Sisa / Defisit (Rp)</th>
+                                <th class="border border-black p-2">Verifikasi</th>
+                            </tr>
+                        </thead>
+                        <tbody>`;
+                const data = (appState.ppseList || []).filter(p => checkFilter(p.kelompok, p.tanggal));
+                if (data.length === 0) {
+                    html += `<tr><td colspan="8" class="border border-black p-4 text-center">Tidak ada data sesuai filter.</td></tr>`;
+                } else {
+                    data.forEach((p, idx) => {
+                        html += `
+                            <tr>
+                                <td class="border border-black p-2 text-center">${idx+1}</td>
+                                <td class="border border-black p-2 text-center">${p.tanggal}</td>
+                                <td class="border border-black p-2 text-center">${p.kelompok}</td>
+                                <td class="border border-black p-2"><div class="font-bold">${p.kpmNama}</div><div class="font-mono text-[10px]">${p.nik}</div></td>
+                                <td class="border border-black p-2 text-center">Kohor ${p.kohor}<br>${p.usia} Thn</td>
+                                <td class="border border-black p-2">${p.usahaAjuan}</td>
+                                <td class="border border-black p-2 text-right font-mono">Rp ${(p.sisaVal || 0).toLocaleString('id-ID')}</td>
+                                <td class="border border-black p-2 text-center font-bold">${p.statusVerifikasi || 'PENDING'}</td>
+                            </tr>`;
+                    });
+                }
+                html += `</tbody></table>`;
+                tableContainer.innerHTML = html;
+            } else if (type === 'graduasi') {
+                titleEl.innerText = "LAPORAN USULAN GRADUASI MANDIRI KPM PKH";
+                let html = kopSuratHtml + `
+                    <div class="text-center font-bold text-xs mb-3 uppercase">${titleEl.innerText}</div>
+                    <table class="w-full border-collapse border border-black text-xs text-black">
+                        <thead>
+                            <tr class="bg-gray-100 text-center font-bold">
+                                <th class="border border-black p-2">No</th>
+                                <th class="border border-black p-2">Tanggal</th>
+                                <th class="border border-black p-2">Kelompok</th>
+                                <th class="border border-black p-2">Nama KPM & NIK</th>
+                                <th class="border border-black p-2">Kohor</th>
+                                <th class="border border-black p-2">Alasan Graduasi Mandiri</th>
+                                <th class="border border-black p-2">Verifikasi</th>
+                            </tr>
+                        </thead>
+                        <tbody>`;
+                const data = (appState.graduasiList || []).filter(g => checkFilter(g.kelompok, g.tanggal));
+                if (data.length === 0) {
+                    html += `<tr><td colspan="7" class="border border-black p-4 text-center">Tidak ada data sesuai filter.</td></tr>`;
+                } else {
+                    data.forEach((g, idx) => {
+                        html += `
+                            <tr>
+                                <td class="border border-black p-2 text-center">${idx+1}</td>
+                                <td class="border border-black p-2 text-center">${g.tanggal}</td>
+                                <td class="border border-black p-2 text-center">${g.kelompok}</td>
+                                <td class="border border-black p-2"><div class="font-bold">${g.kpmNama}</div><div class="font-mono text-[10px]">${g.nik}</div></td>
+                                <td class="border border-black p-2 text-center font-mono">${g.kohor}</td>
+                                <td class="border border-black p-2">${g.alasan}</td>
+                                <td class="border border-black p-2 text-center font-bold">${g.statusVerifikasi || 'PENDING'}</td>
+                            </tr>`;
+                    });
                 }
                 html += `</tbody></table>`;
                 tableContainer.innerHTML = html;
@@ -2476,5 +3360,136 @@
             renderUI();
             showToast("Berhasil", "Profil dan wilayah kerja pendamping diperbarui.", "success");
         }
+
+        // --- NEW NOTIFICATION FUNCTIONS FOR PENDAMPING ---
+        function togglePendampingNotificationDropdown() {
+            const dropdown = document.getElementById('pendampingNotifDropdown');
+            if (dropdown) dropdown.classList.toggle('hidden');
+        }
+
+        function updatePendampingNotifications() {
+            const badge = document.getElementById('pendampingNotifBadge');
+            const countLabel = document.getElementById('pendampingNotifCount');
+            const listContainer = document.getElementById('pendampingNotifList');
+            if (!badge || !countLabel || !listContainer) return;
+
+            let pendingItems = [];
+
+            // 1. Pending Ketua Registrations
+            const pendingKetua = (appState.ketuaUsers || []).filter(k => k.status === 'PENDING');
+            pendingKetua.forEach(k => {
+                pendingItems.push({
+                    id: k.id,
+                    title: "Pendaftaran Ketua Baru",
+                    desc: `${k.nama} (${k.kelompok})`,
+                    date: k.date || '',
+                    tabTarget: 'undangan'
+                });
+            });
+
+            // 2. Pending P2K2 Reports
+            const pendingP2k2 = (appState.p2k2List || []).filter(p => !p.statusVerifikasi || p.statusVerifikasi === 'PENDING');
+            pendingP2k2.forEach(p => {
+                pendingItems.push({
+                    id: p.id,
+                    title: "Presensi P2K2 Baru",
+                    desc: `${p.kelompok} - ${p.kpmNama}`,
+                    date: p.tanggal || '',
+                    tabTarget: 'verifikasi'
+                });
+            });
+
+            // 3. Pending Komitmen Reports
+            const pendingKomitmen = (appState.komitmenList || []).filter(k => !k.statusVerifikasi || k.statusVerifikasi === 'PENDING');
+            pendingKomitmen.forEach(k => {
+                pendingItems.push({
+                    id: k.id,
+                    title: "Laporan Komitmen Baru",
+                    desc: `${k.kelompok} - ${k.kpmNama}`,
+                    date: k.tanggal || '',
+                    tabTarget: 'verifikasi'
+                });
+            });
+
+            // 4. Pending Rekonsiliasi Reports
+            const pendingRekon = (appState.rekonsiliasiList || []).filter(r => !r.statusVerifikasi || r.statusVerifikasi === 'PENDING');
+            pendingRekon.forEach(r => {
+                pendingItems.push({
+                    id: r.id,
+                    title: "Rekonsiliasi Pencairan Baru",
+                    desc: `${r.kelompok} - ${r.kpmNama} (Rp ${(r.nominal || 0).toLocaleString('id-ID')})`,
+                    date: r.tanggal || '',
+                    tabTarget: 'verifikasi'
+                });
+            });
+
+            // 5. Pending PPSE Usulan
+            const pendingPpse = (appState.ppseList || []).filter(p => !p.statusVerifikasi || p.statusVerifikasi === 'PENDING');
+            pendingPpse.forEach(p => {
+                pendingItems.push({
+                    id: p.id,
+                    title: "Usulan PPSE Baru",
+                    desc: `${p.kelompok} - ${p.kpmNama} (${p.usahaAjuan})`,
+                    date: p.tanggal || '',
+                    tabTarget: 'ppse'
+                });
+            });
+
+            // 6. Pending Graduasi Usulan
+            const pendingGraduasi = (appState.graduasiList || []).filter(g => !g.statusVerifikasi || g.statusVerifikasi === 'PENDING');
+            pendingGraduasi.forEach(g => {
+                pendingItems.push({
+                    id: g.id,
+                    title: "Usulan Graduasi Baru",
+                    desc: `${g.kelompok} - ${g.kpmNama}`,
+                    date: g.tanggal || '',
+                    tabTarget: 'graduasi'
+                });
+            });
+
+            const totalCount = pendingItems.length;
+            if (totalCount > 0) {
+                badge.innerText = totalCount;
+                badge.classList.remove('hidden');
+                countLabel.innerText = `${totalCount} baru`;
+            } else {
+                badge.classList.add('hidden');
+                countLabel.innerText = `0 baru`;
+            }
+
+            listContainer.innerHTML = '';
+            if (totalCount === 0) {
+                listContainer.innerHTML = `<div class="p-4 text-center text-slate-400 font-medium">Tidak ada pembaruan data baru.</div>`;
+                return;
+            }
+
+            pendingItems.forEach(item => {
+                listContainer.innerHTML += `
+                    <div onclick="handleNotificationClick('${item.tabTarget}')" class="p-3 hover:bg-slate-50 transition cursor-pointer flex items-start space-x-2.5">
+                        <div class="bg-blue-100 text-blue-900 p-2 rounded-lg flex-shrink-0 mt-0.5"><i class="fas fa-file-alt text-xs"></i></div>
+                        <div>
+                            <div class="font-bold text-slate-900">${item.title}</div>
+                            <div class="text-[11px] text-slate-600">${item.desc}</div>
+                            <div class="text-[9px] text-slate-400 mt-0.5">${item.date}</div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function handleNotificationClick(tabTarget) {
+            const dropdown = document.getElementById('pendampingNotifDropdown');
+            if (dropdown) dropdown.classList.add('hidden');
+            switchPendampingTab(tabTarget);
+        }
+
+        window.addEventListener('click', function(e) {
+            const container = document.getElementById('pendampingNotificationContainer');
+            const dropdown = document.getElementById('pendampingNotifDropdown');
+            if (container && dropdown && !container.contains(e.target)) {
+                dropdown.classList.add('hidden');
+            }
+        });
     </script>
-</body></html>
+</body>
+</html>
