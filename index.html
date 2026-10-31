@@ -600,7 +600,7 @@
                                             <input type="checkbox" name="kpmKomponen" value="Lansia (60+)" onchange="toggleCompQty(this)" class="rounded text-emerald-700">
                                             <span>Lansia</span>
                                         </label>
-                                        <input type="number" min="1" max="10" value="1" disabled id="qty_Lansia__60___" class="w-14 p-1 bg-white border border-slate-300 rounded text-center text-xs font-bold disabled:opacity-40">
+                                        <input type="number" min="1" max="10" value="1" disabled id="qty_Lansia__60___" class="w-14 p-1 bg-white border border-slate-300 rounded text-center text-xs font-bold disabled:opacity-40" data-alt-id="qty_Lansia">
                                     </div>
                                     <div class="flex items-center justify-between bg-slate-50 p-2 rounded-xl border border-slate-200 col-span-1 sm:col-span-2">
                                         <label class="flex items-center space-x-2 cursor-pointer">
@@ -2558,7 +2558,12 @@
 
         function toggleCompQty(cb) {
             const valId = "qty_" + cb.value.replace(/[^a-zA-Z0-9]/g, "_");
-            const inputEl = document.getElementById(valId);
+            let inputEl = document.getElementById(valId);
+            if (!inputEl) {
+                if (cb.value.includes("Lansia")) {
+                    inputEl = document.getElementById("qty_Lansia__60___") || document.getElementById("qty_Lansia");
+                }
+            }
             if (inputEl) {
                 inputEl.disabled = !cb.checked;
                 if (!cb.checked) inputEl.value = "1";
@@ -2619,8 +2624,12 @@
 
             document.querySelectorAll('input[name="kpmKomponen"]').forEach(cb => {
                 const valId = "qty_" + cb.value.replace(/[^a-zA-Z0-9]/g, "_");
-                const inputEl = document.getElementById(valId);
-                const matched = k.komponen.split(',').find(part => part.trim().startsWith(cb.value));
+                let inputEl = document.getElementById(valId);
+                if (!inputEl && cb.value.includes("Lansia")) {
+                    inputEl = document.getElementById("qty_Lansia__60___") || document.getElementById("qty_Lansia");
+                }
+
+                const matched = k.komponen.split(',').find(part => part.trim().startsWith(cb.value) || (cb.value.includes("Lansia") && part.includes("Lansia")));
                 if (matched) {
                     cb.checked = true;
                     if (inputEl) {
