@@ -72,7 +72,7 @@
             <div class="flex items-center space-x-3">
                 <!-- NOTIFICATION BELL DROPDOWN FOR PENDAMPING -->
                 <div id="pendampingNotificationContainer" class="hidden relative">
-                    <button onclick="togglePendampingNotificationDropdown()" class="relative bg-blue-800 hover:bg-blue-700 text-amber-300 p-2 rounded-lg text-xs font-semibold transition flex items-center justify-center shadow" title="Notifikasi Pembaruan Data">
+                    <button onclick="togglePendampingNotificationDropdown()" class="relative bg-blue-800 hover:bg-blue-700 text-amber-300 p-2 rounded-lg text-xs font-semibold transition flex items-center justify-center shadow cursor-pointer" title="Notifikasi Pembaruan Data">
                         <i class="fas fa-bell text-sm"></i>
                         <span id="pendampingNotifBadge" class="hidden absolute -top-1 -right-1 bg-red-600 text-white text-[9px] w-4 h-4 rounded-full flex items-center justify-center font-bold">0</span>
                     </button>
@@ -91,7 +91,7 @@
                     </div>
                 </div>
 
-                <button onclick="openAboutModal()" class="bg-blue-800 hover:bg-blue-700 text-amber-300 px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center space-x-1.5">
+                <button type="button" onclick="openAboutModal()" class="bg-blue-800 hover:bg-blue-700 text-amber-300 px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center space-x-1.5 cursor-pointer">
                     <i class="fas fa-info-circle"></i>
                     <span class="hidden sm:inline">Tentang Aplikasi</span>
                 </button>
@@ -140,7 +140,10 @@
                     <input type="text" id="loginIdentifier" placeholder="Masukkan Nama atau NIP/HP..." class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs font-semibold text-slate-800">
                 </div>
                 <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1">PIN Keamanan / Password</label>
+                    <div class="flex justify-between items-center mb-1">
+                        <label class="block text-xs font-bold text-slate-700">PIN Keamanan / Password</label>
+                        <button type="button" onclick="openLupaPinModal()" class="text-[11px] text-blue-700 hover:underline font-semibold cursor-pointer">Lupa PIN / Password?</button>
+                    </div>
                     <div class="relative">
                         <input type="password" id="loginPin" required placeholder="••••••" class="w-full p-2.5 pr-10 bg-slate-50 border border-slate-300 rounded-xl text-xs font-semibold text-slate-800">
                         <button type="button" onclick="togglePasswordVisibility('loginPin', 'iconLoginPin')" class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-700 text-xs">
@@ -235,11 +238,16 @@
                         <span class="bg-amber-400 text-purple-950 px-2.5 py-0.5 rounded-full text-xs font-extrabold uppercase">Super Admin Pusat</span>
                     </div>
                     <h2 class="text-2xl font-bold">Dashboard Pengelolaan Sistem Nasional</h2>
-                    <p class="text-xs text-purple-200">Kelola seluruh Pendamping Wilayah, reset PIN, dan monitor aktivitas sistem PKH</p>
+                    <p class="text-xs text-purple-200">Kelola seluruh Pendamping Wilayah, reset & lihat PIN, dan monitor aktivitas sistem PKH</p>
                 </div>
-                <button onclick="openSuperAdminAddPendampingModal()" class="bg-amber-400 hover:bg-amber-300 text-purple-950 px-4 py-2.5 rounded-xl font-bold text-xs shadow-lg flex items-center space-x-2 transition cursor-pointer">
-                    <i class="fas fa-user-plus"></i><span>Tambah Pendamping Baru</span>
-                </button>
+                <div class="flex items-center space-x-2">
+                    <button onclick="openSuperAdminAddPendampingModal()" class="bg-amber-400 hover:bg-amber-300 text-purple-950 px-4 py-2.5 rounded-xl font-bold text-xs shadow-lg flex items-center space-x-2 transition cursor-pointer">
+                        <i class="fas fa-user-plus"></i><span>Tambah Pendamping Baru</span>
+                    </button>
+                    <a href="https://wa.me/6281321312304?text=Halo%20Admin%20Pusat,%20saya%20ingin%20mengirimkan%20saran%20atau%20meminta%20bantuan%20sistem%20SIP-PKH." target="_blank" class="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2.5 rounded-xl font-bold text-xs shadow-lg flex items-center space-x-2 transition cursor-pointer">
+                        <i class="fab fa-whatsapp"></i><span>WhatsApp Admin Pusat</span>
+                    </a>
+                </div>
             </div>
 
             <!-- STATS CARDS -->
@@ -263,7 +271,7 @@
             <!-- TABEL DAFTAR PENDAMPING -->
             <div class="bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden">
                 <div class="bg-slate-900 text-white p-4 font-bold text-xs flex justify-between items-center">
-                    <span>Daftar Pendamping Wilayah Terdaftar</span>
+                    <span>Daftar Pendamping Wilayah Terdaftar &amp; Kontrol PIN</span>
                     <span class="text-xs text-slate-400 font-normal">Akses Kontrol Super Admin</span>
                 </div>
                 <div class="overflow-x-auto">
@@ -274,11 +282,36 @@
                                 <th class="p-3">NIP</th>
                                 <th class="p-3">Kecamatan</th>
                                 <th class="p-3">Kode Undangan</th>
+                                <th class="p-3">PIN Keamanan</th>
                                 <th class="p-3">Kelompok Binaan</th>
                                 <th class="p-3 text-center">Aksi / Kontrol</th>
                             </tr>
                         </thead>
                         <tbody id="tbodySuperAdminPendamping" class="divide-y divide-slate-100">
+                            <!-- Populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- TABEL KETUA KELOMPOK SE-SISTEM UNTUK ADMIN PUSAT -->
+            <div class="bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden">
+                <div class="bg-slate-900 text-white p-4 font-bold text-xs flex justify-between items-center">
+                    <span>Daftar Seluruh Ketua Kelompok Se-Sistem (Kontrol PIN &amp; Akun)</span>
+                    <span class="text-xs text-slate-400 font-normal">Admin Pusat</span>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-xs">
+                        <thead>
+                            <tr class="bg-slate-100 text-slate-700 font-bold border-b border-slate-200">
+                                <th class="p-3">Nama Ketua</th>
+                                <th class="p-3">No. WhatsApp</th>
+                                <th class="p-3">Kelompok</th>
+                                <th class="p-3">PIN Keamanan</th>
+                                <th class="p-3 text-center">Kontrol PIN / Hapus</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbodySuperAdminKetua" class="divide-y divide-slate-100">
                             <!-- Populated dynamically -->
                         </tbody>
                     </table>
@@ -603,6 +636,14 @@
                     </div>
                     <h2 id="ketuaWelcomeName" class="text-2xl font-bold">Selamat Datang, Ketua</h2>
                     <p class="text-xs text-emerald-100">Pendamping Wilayah Binaan: <span id="ketuaPendampingNama" class="font-bold text-white">Pendamping Sosial</span></p>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <button onclick="openEditKetuaProfileModal()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3.5 py-2 rounded-xl font-bold text-xs shadow flex items-center space-x-1.5 cursor-pointer">
+                        <i class="fas fa-user-edit"></i><span>Edit Profil &amp; PIN</span>
+                    </button>
+                    <button onclick="openLupaPinModal()" class="bg-amber-300 hover:bg-amber-400 text-emerald-950 px-3.5 py-2 rounded-xl font-bold text-xs shadow flex items-center space-x-1.5 cursor-pointer">
+                        <i class="fab fa-whatsapp"></i><span>Bantuan / Lupa PIN</span>
+                    </button>
                 </div>
             </div>
 
@@ -1078,9 +1119,10 @@
     </main>
 
     <!-- FOOTER -->
-    <footer class="bg-white border-t border-slate-200 py-4 mt-8 text-center text-xs text-slate-500">
+    <footer class="bg-white border-t border-slate-200 py-4 mt-8 text-center text-xs text-slate-500 space-y-1">
         <p>SIP-PKH © 2026 | Sistem Informasi Pelaksanaan Program Keluarga Harapan</p>
-        <p class="text-[10px] text-slate-400 mt-1">Pengembang: Encep Yuyus Syamsul Firdaus, S.Sos.I (ASN PPPK KEMENSOS)</p>
+        <p class="text-[11px] text-slate-600 font-semibold">Butuh Saran atau Lupa PIN? Hubungi Admin Pusat WhatsApp: <a href="https://wa.me/6281321312304?text=Halo%20Admin%20Pusat,%20saya%20ingin%20mengirimkan%20saran%20atau%20meminta%20bantuan%20PIN%20SIP-PKH." target="_blank" class="text-blue-700 underline font-bold">081321312304</a></p>
+        <p class="text-[10px] text-slate-400">Pengembang: Encep Yuyus Syamsul Firdaus, S.Sos.I (ASN PPPK KEMENSOS)</p>
     </footer>
 
     <!-- MODAL EDIT KOP SURAT -->
@@ -1134,7 +1176,7 @@
     <div id="modalEditPendampingProfile" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <div class="bg-white w-full max-w-md rounded-2xl shadow-xl overflow-hidden p-6 space-y-4">
             <div class="flex justify-between items-center pb-3 border-b border-slate-100">
-                <h3 class="font-bold text-slate-800 text-sm">Edit Profil Pendamping</h3>
+                <h3 class="font-bold text-slate-800 text-sm">Edit Profil &amp; PIN Pendamping</h3>
                 <button onclick="closeEditPendampingProfileModal()" class="text-slate-400 hover:text-slate-700"><i class="fas fa-times"></i></button>
             </div>
             <form onsubmit="handleSavePendampingProfile(event)" class="space-y-3">
@@ -1150,8 +1192,116 @@
                     <label class="block text-xs font-bold text-slate-700 mb-1">Wilayah Kecamatan Binaan</label>
                     <input type="text" id="editPndKecamatan" required class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs font-semibold">
                 </div>
-                <button type="submit" class="w-full bg-blue-900 text-white py-2.5 rounded-xl font-bold text-xs shadow">Simpan Perubahan Profil</button>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">PIN Keamanan / Password Baru</label>
+                    <div class="relative">
+                        <input type="password" id="editPndPin" required maxlength="12" placeholder="••••••" class="w-full p-2.5 pr-10 bg-slate-50 border border-slate-300 rounded-xl text-xs font-semibold">
+                        <button type="button" onclick="togglePasswordVisibility('editPndPin', 'iconEditPndPin')" class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-700 text-xs">
+                            <i id="iconEditPndPin" class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+                <button type="submit" class="w-full bg-blue-900 text-white py-2.5 rounded-xl font-bold text-xs shadow">Simpan Perubahan Profil &amp; PIN</button>
             </form>
+        </div>
+    </div>
+
+    <!-- MODAL EDIT KETUA PROFILE -->
+    <div id="modalEditKetuaProfile" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-md rounded-2xl shadow-xl overflow-hidden p-6 space-y-4">
+            <div class="flex justify-between items-center pb-3 border-b border-slate-100">
+                <h3 class="font-bold text-slate-800 text-sm">Edit Profil &amp; PIN Ketua Kelompok</h3>
+                <button onclick="closeEditKetuaProfileModal()" class="text-slate-400 hover:text-slate-700"><i class="fas fa-times"></i></button>
+            </div>
+            <form onsubmit="handleSaveKetuaProfile(event)" class="space-y-3">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Nama Lengkap Ketua</label>
+                    <input type="text" id="editKetuaNamaInput" required class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs font-semibold">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Nomor WhatsApp (HP)</label>
+                    <input type="tel" id="editKetuaHpInput" required class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs font-semibold">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Nama Kelompok</label>
+                    <input type="text" id="editKetuaKelompokInput" required class="w-full p-2.5 bg-slate-200 border border-slate-300 rounded-xl text-xs font-semibold text-slate-600" readonly>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">PIN Akses Baru (6 Angka)</label>
+                    <div class="relative">
+                        <input type="password" id="editKetuaPinInput" required maxlength="6" placeholder="••••••" class="w-full p-2.5 pr-10 bg-slate-50 border border-slate-300 rounded-xl text-xs font-semibold">
+                        <button type="button" onclick="togglePasswordVisibility('editKetuaPinInput', 'iconEditKetuaPin')" class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-700 text-xs">
+                            <i id="iconEditKetuaPin" class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+                <button type="submit" class="w-full bg-emerald-700 text-white py-2.5 rounded-xl font-bold text-xs shadow">Simpan Perubahan Profil &amp; PIN</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL LUPA PIN / BANTUAN ADMIN PUSAT -->
+    <div id="modalLupaPin" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl overflow-hidden p-6 space-y-4">
+            <div class="flex justify-between items-center pb-3 border-b border-slate-100">
+                <h3 class="font-bold text-slate-800 text-sm flex items-center space-x-2">
+                    <i class="fab fa-whatsapp text-emerald-600 text-lg"></i><span>Bantuan &amp; Kirim Saran ke Admin Pusat</span>
+                </h3>
+                <button type="button" onclick="closeLupaPinModal()" class="text-slate-400 hover:text-slate-700 cursor-pointer"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="space-y-3 text-xs">
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1">Nama Lengkap / Akun</label>
+                    <input type="text" id="lupaNama" placeholder="Nama Anda..." class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl font-semibold">
+                </div>
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1">No. WhatsApp / NIP Terdaftar</label>
+                    <input type="text" id="lupaHp" placeholder="08123456789..." class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl font-semibold">
+                </div>
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1">Pesan Saran atau Permintaan Lupa PIN</label>
+                    <textarea id="lupaPesan" rows="3" placeholder="Tuliskan saran atau kendala lupa PIN Anda di sini..." class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl font-semibold"></textarea>
+                </div>
+                <div class="bg-blue-50 p-3 rounded-xl border border-blue-200 text-blue-900 text-[11px]">
+                    <p class="font-bold mb-0.5">Kontak Resmi Admin Pusat (081321312304):</p>
+                    <p>Tombol di bawah akan mengarahkan langsung ke WhatsApp Admin Pusat dengan menyertakan detail nama dan pesan Anda secara otomatis.</p>
+                </div>
+            </div>
+            <div class="flex space-x-2 pt-2">
+                <button type="button" onclick="sendWhatsAppAdminPusat()" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white py-2.5 rounded-xl font-bold shadow flex items-center justify-center space-x-2 cursor-pointer">
+                    <i class="fab fa-whatsapp text-base"></i><span>Kirim ke WA Admin Pusat</span>
+                </button>
+                <button type="button" onclick="closeLupaPinModal()" class="bg-slate-300 hover:bg-slate-400 text-slate-800 px-4 py-2.5 rounded-xl font-bold cursor-pointer">Tutup</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL ABOUT APLIKASI -->
+    <div id="modalAbout" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl overflow-hidden p-6 space-y-4">
+            <div class="flex justify-between items-center pb-3 border-b border-slate-100">
+                <h3 class="font-bold text-slate-800 text-sm flex items-center space-x-2">
+                    <i class="fas fa-hands-holding-child text-amber-500 text-lg"></i><span>Tentang SIP-PKH</span>
+                </h3>
+                <button type="button" onclick="closeAboutModal()" class="text-slate-400 hover:text-slate-700 cursor-pointer"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="space-y-3 text-xs text-slate-700 leading-relaxed">
+                <p><strong>SIP-PKH</strong> (Sistem Informasi Pelaksanaan Program Keluarga Harapan) adalah platform digital terpadu yang dirancang khusus untuk mendampingi dan meringankan beban kerja Pendamping Sosial dalam mengelola warga atau KPM (Keluarga Penerima Manfaat) binaan secara efisien, transparan, dan akurat di lapangan.</p>
+                <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-1">
+                    <p class="font-bold text-blue-900">Pengembang &amp; Inovator:</p>
+                    <p class="font-semibold">Encep Yuyus Syamsul Firdaus, S.Sos.I</p>
+                    <p class="text-[11px] text-slate-500">ASN PPPK KEMENSOS (Penata Layanan Operasional / Pendamping Sosial PKH)</p>
+                </div>
+                <div class="bg-emerald-50 p-3 rounded-xl border border-emerald-200 space-y-1">
+                    <p class="font-bold text-emerald-900">Dukungan &amp; Pengembangan Aplikasi:</p>
+                    <p class="font-mono font-bold text-emerald-800">BSI: 7211585298 (a.n. Encep Yuyus)</p>
+                    <p class="text-[10px] text-emerald-700 mt-1">Mari bantu dukung pengembangan fitur lanjutan aplikasi ini agar terus optimal dalam mempermudah pendataan dan pelayanan kesejahteraan sosial bagi masyarakat.</p>
+                </div>
+                <p class="text-[11px] text-slate-500">Butuh bantuan PIN atau saran? Hubungi Admin Pusat via WhatsApp di <a href="https://wa.me/6281321312304?text=Halo%20Admin%20Pusat,%20saya%20ingin%20memberikan%20saran%20atau%20meminta%20bantuan%20PIN%20SIP-PKH." target="_blank" class="text-blue-700 font-bold underline">081321312304</a>.</p>
+            </div>
+            <div class="pt-2">
+                <button type="button" onclick="closeAboutModal()" class="w-full bg-blue-900 hover:bg-blue-800 text-white py-2.5 rounded-xl font-bold shadow cursor-pointer">Tutup</button>
+            </div>
         </div>
     </div>
 
@@ -1602,6 +1752,16 @@
             document.getElementById('modalCustomInvite').classList.add('hidden');
         }
 
+        function openAboutModal() {
+            const modal = document.getElementById('modalAbout');
+            if (modal) modal.classList.remove('hidden');
+        }
+
+        function closeAboutModal() {
+            const modal = document.getElementById('modalAbout');
+            if (modal) modal.classList.add('hidden');
+        }
+
         function updateInviteCode() {
             const customCode = document.getElementById('inputCustomInviteCode').value.trim().toUpperCase();
             if (!customCode) return alert("Masukkan kode undangan.");
@@ -1832,6 +1992,7 @@
 
         function renderSuperAdminDashboard() {
             const tbody = document.getElementById('tbodySuperAdminPendamping');
+            const tbodyKetua = document.getElementById('tbodySuperAdminKetua');
             const totalPnd = document.getElementById('superAdminTotalPnd');
             const totalKlp = document.getElementById('superAdminTotalKlp');
             if (!tbody) return;
@@ -1848,14 +2009,70 @@
                         <td class="p-3 font-mono">${p.nip || '-'}</td>
                         <td class="p-3">${p.kecamatan || '-'}</td>
                         <td class="p-3 font-mono font-bold text-purple-900">${p.inviteCode || '-'}</td>
+                        <td class="p-3 font-mono font-bold text-emerald-800">${p.pin || '-'}</td>
                         <td class="p-3 font-semibold text-blue-900">${klpCount} Kelompok</td>
-                        <td class="p-3 text-center space-x-1">
-                            <button onclick="superAdminResetPndPin('${p.id}')" class="bg-amber-500 text-white px-2.5 py-1 rounded text-xs font-bold cursor-pointer">Reset PIN</button>
+                        <td class="p-3 text-center space-x-1 whitespace-nowrap">
+                            <button onclick="superAdminResetPndPin('${p.id}')" class="bg-amber-500 text-white px-2.5 py-1 rounded text-xs font-bold cursor-pointer">Ubah PIN</button>
                             <button onclick="superAdminDeletePnd('${p.id}')" class="bg-red-600 text-white px-2.5 py-1 rounded text-xs font-bold cursor-pointer">Hapus</button>
                         </td>
                     </tr>
                 `;
             });
+
+            if (tbodyKetua) {
+                tbodyKetua.innerHTML = '';
+                if (appState.ketuaUsers.length === 0) {
+                    tbodyKetua.innerHTML = `<tr><td colspan="5" class="text-center p-4 text-slate-400">Belum ada ketua kelompok terdaftar.</td></tr>`;
+                } else {
+                    appState.ketuaUsers.forEach(k => {
+                        tbodyKetua.innerHTML += `
+                            <tr>
+                                <td class="p-3 font-bold">${k.nama}</td>
+                                <td class="p-3">${k.hp}</td>
+                                <td class="p-3 font-semibold text-blue-900">${k.kelompok}</td>
+                                <td class="p-3 font-mono font-bold text-emerald-800">${k.pin || '-'}</td>
+                                <td class="p-3 text-center space-x-1 whitespace-nowrap">
+                                    <button onclick="superAdminResetKetuaPin('${k.id}')" class="bg-amber-500 text-white px-2.5 py-1 rounded text-xs font-bold cursor-pointer">Ubah PIN</button>
+                                    <button onclick="superAdminDeleteKetua('${k.id}')" class="bg-red-600 text-white px-2.5 py-1 rounded text-xs font-bold cursor-pointer">Hapus</button>
+                                </td>
+                            </tr>
+                        `;
+                    });
+                }
+            }
+        }
+
+        function superAdminResetPndPin(id) {
+            const p = appState.pendampingProfiles.find(item => item.id === id);
+            if (!p) return;
+            const newPin = prompt(`Masukkan PIN baru untuk Pendamping ${p.nama}:`, p.pin || "123456");
+            if (newPin !== null && newPin.trim().length >= 4) {
+                p.pin = newPin.trim();
+                saveState();
+                renderSuperAdminDashboard();
+                showToast("Berhasil", `PIN Pendamping ${p.nama} diperbarui.`, "success");
+            }
+        }
+
+        function superAdminResetKetuaPin(id) {
+            const k = appState.ketuaUsers.find(item => item.id === id);
+            if (!k) return;
+            const newPin = prompt(`Masukkan PIN baru untuk Ketua ${k.nama}:`, k.pin || "123456");
+            if (newPin !== null && newPin.trim().length >= 4) {
+                k.pin = newPin.trim();
+                saveState();
+                renderSuperAdminDashboard();
+                showToast("Berhasil", `PIN Ketua ${k.nama} diperbarui.`, "success");
+            }
+        }
+
+        function superAdminDeleteKetua(id) {
+            if (confirm("Hapus akun ketua kelompok ini?")) {
+                appState.ketuaUsers = appState.ketuaUsers.filter(item => item.id !== id);
+                saveState();
+                renderSuperAdminDashboard();
+                showToast("Dihapus", "Akun ketua dihapus.", "info");
+            }
         }
 
         function openSuperAdminAddPendampingModal() {
@@ -3457,6 +3674,7 @@
             document.getElementById('editPndNama').value = currentUser.nama || "";
             document.getElementById('editPndNip').value = currentUser.nip || "";
             document.getElementById('editPndKecamatan').value = currentUser.kecamatan || "";
+            document.getElementById('editPndPin').value = currentUser.pin || "";
             document.getElementById('modalEditPendampingProfile').classList.remove('hidden');
         }
         function closeEditPendampingProfileModal() { document.getElementById('modalEditPendampingProfile').classList.add('hidden'); }
@@ -3466,10 +3684,12 @@
             const nama = document.getElementById('editPndNama').value.trim();
             const nip = document.getElementById('editPndNip').value.trim();
             const kecamatan = document.getElementById('editPndKecamatan').value.trim();
+            const pin = document.getElementById('editPndPin').value.trim();
 
             currentUser.nama = nama;
             currentUser.nip = nip;
             currentUser.kecamatan = kecamatan;
+            currentUser.pin = pin;
             localStorage.setItem('SIP_PKH_CURRENT_USER', JSON.stringify(currentUser));
 
             const p = appState.pendampingProfiles.find(item => item.id === currentUser.id);
@@ -3477,13 +3697,66 @@
                 p.nama = nama;
                 p.nip = nip;
                 p.kecamatan = kecamatan;
+                p.pin = pin;
             } else {
                 appState.pendampingProfiles.push({ ...currentUser });
             }
             saveState();
             closeEditPendampingProfileModal();
             renderUI();
-            showToast("Berhasil", "Profil Pendamping berhasil diperbarui.", "success");
+            showToast("Berhasil", "Profil & PIN Pendamping berhasil diperbarui.", "success");
+        }
+
+        function openEditKetuaProfileModal() {
+            if (!currentUser || currentUser.role !== 'ketua') return;
+            document.getElementById('editKetuaNamaInput').value = currentUser.nama || "";
+            document.getElementById('editKetuaHpInput').value = currentUser.hp || "";
+            document.getElementById('editKetuaKelompokInput').value = currentUser.kelompok || "";
+            document.getElementById('editKetuaPinInput').value = currentUser.pin || "";
+            document.getElementById('modalEditKetuaProfile').classList.remove('hidden');
+        }
+        function closeEditKetuaProfileModal() { document.getElementById('modalEditKetuaProfile').classList.add('hidden'); }
+
+        function handleSaveKetuaProfile(e) {
+            e.preventDefault();
+            const nama = document.getElementById('editKetuaNamaInput').value.trim();
+            const hp = document.getElementById('editKetuaHpInput').value.trim();
+            const pin = document.getElementById('editKetuaPinInput').value.trim();
+
+            currentUser.nama = nama;
+            currentUser.hp = hp;
+            currentUser.pin = pin;
+            localStorage.setItem('SIP_PKH_CURRENT_USER', JSON.stringify(currentUser));
+
+            const k = appState.ketuaUsers.find(item => item.id === currentUser.id);
+            if (k) {
+                k.nama = nama;
+                k.hp = hp;
+                k.pin = pin;
+            }
+            saveState();
+            closeEditKetuaProfileModal();
+            renderUI();
+            showToast("Berhasil", "Profil & PIN Ketua berhasil diperbarui.", "success");
+        }
+
+        function openLupaPinModal() {
+            if (currentUser) {
+                document.getElementById('lupaNama').value = currentUser.nama || "";
+                document.getElementById('lupaHp').value = currentUser.hp || currentUser.nip || "";
+            }
+            document.getElementById('modalLupaPin').classList.remove('hidden');
+        }
+        function closeLupaPinModal() { document.getElementById('modalLupaPin').classList.add('hidden'); }
+
+        function sendWhatsAppAdminPusat() {
+            const nama = document.getElementById('lupaNama').value.trim() || "-";
+            const hp = document.getElementById('lupaHp').value.trim() || "-";
+            const pesan = document.getElementById('lupaPesan').value.trim() || "Halo Admin Pusat, saya memerlukan bantuan untuk pemulihan PIN / ingin mengirimkan saran sistem SIP-PKH.";
+            
+            const fullText = encodeURIComponent(`Halo Admin Pusat,\n\nNama/Akun: ${nama}\nNo. HP/Kontak: ${hp}\nPesan/Saran: ${pesan}`);
+            window.open(`https://wa.me/6281321312304?text=${fullText}`, '_blank');
+            closeLupaPinModal();
         }
 
         function updatePendampingNotifications() {
