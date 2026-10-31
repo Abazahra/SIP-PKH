@@ -1339,7 +1339,9 @@
                 let namaPendampingBinaan = "Encep Yuyus Syamsul Firdaus, S.Sos.I";
                 if (currentUser.pendampingId) {
                     const pnd = appState.pendampingProfiles.find(p => p.id === currentUser.pendampingId);
-                    if (pnd) namaPendampingBinaan = pnd.nama;
+                    if (pnd) {
+                        namaPendampingBinaan = pnd.nama;
+                    }
                 } else if (appState.pendampingProfiles.length > 0) {
                     namaPendampingBinaan = appState.pendampingProfiles[0].nama;
                 }
