@@ -1862,7 +1862,13 @@
                     alert("Login Admin Pusat gagal. Username atau Password salah (Gunakan Admin / Adminpusat123).");
                 }
             } else if (role === 'pendamping') {
-                const pendamping = appState.pendampingProfiles.find(p => (p.nama.toLowerCase().includes(identifier.toLowerCase()) || p.nip === identifier) && p.pin === pin);
+                // Perbaikan validasi ketat: pencocokan tepat Nama/NIP DAN PIN sesuai pendaftaran
+                const pendamping = appState.pendampingProfiles.find(p => {
+                    const matchId = (p.nama && p.nama.toLowerCase() === identifier.toLowerCase()) || (p.nip && p.nip === identifier);
+                    const matchPin = (p.pin === pin);
+                    return matchId && matchPin;
+                });
+
                 if (pendamping) {
                     if (pendamping.isLocked) {
                         alert("Akun anda sudah kadaluarsa, segera hubungi admin 081321312304 untuk mengaktifkannya kembali dengan akun Unlimited.");
@@ -1873,10 +1879,16 @@
                     showToast("Login Berhasil", "Selamat datang " + pendamping.nama, "success");
                     renderUI();
                 } else {
-                    alert("Login Pendamping gagal. Periksa kembali NIP/Nama dan PIN.");
+                    alert("Login Pendamping gagal. Nama/NIP atau PIN tidak sesuai dengan saat pendaftaran.");
                 }
             } else {
-                const ketua = appState.ketuaUsers.find(k => (k.nama.toLowerCase().includes(identifier.toLowerCase()) || k.hp === identifier) && k.pin === pin);
+                // Perbaikan validasi ketat: pencocokan tepat Nama/No HP DAN PIN sesuai pendaftaran ketua
+                const ketua = appState.ketuaUsers.find(k => {
+                    const matchId = (k.nama && k.nama.toLowerCase() === identifier.toLowerCase()) || (k.hp && k.hp === identifier);
+                    const matchPin = (k.pin === pin);
+                    return matchId && matchPin;
+                });
+
                 if (ketua) {
                     if (ketua.isLocked) {
                         alert("Akun anda sudah kadaluarsa, segera hubungi admin 081321312304 untuk mengaktifkannya kembali dengan akun Unlimited.");
@@ -1891,7 +1903,7 @@
                     showToast("Login Berhasil", "Selamat datang Ketua " + ketua.nama, "success");
                     renderUI();
                 } else {
-                    alert("Login Ketua gagal. Periksa kembali Nama/HP dan PIN. Pastikan akun sudah disetujui Pendamping.");
+                    alert("Login Ketua gagal. Nama/No. HP atau PIN tidak sesuai dengan saat pendaftaran. Pastikan akun juga sudah disetujui Pendamping.");
                 }
             }
         }
@@ -3956,7 +3968,7 @@
             const hp = document.getElementById('lupaHp').value.trim() || "-";
             const pesan = document.getElementById('lupaPesan').value.trim() || "Halo Admin Pusat, saya memerlukan bantuan untuk pemulihan PIN / ingin mengirimkan saran sistem SIP-PKH.";
             
-            const fullText = encodeURIComponent(`Hallo Admin Pusat SIP-PKH,\n\nNama/Akun: ${nama}\nNo. HP/Kontak: ${hp}\nPesan/Saran: ${pesan}`);
+            const fullText = encodeURIComponent(`Halo Admin Pusat SIP-PKH,\n\nNama/Akun: ${nama}\nNo. HP/Kontak: ${hp}\nPesan/Saran: ${pesan}`);
             window.open(`https://wa.me/6281321312304?text=${fullText}`, '_blank');
             closeLupaPinModal();
         }
