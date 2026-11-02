@@ -171,9 +171,14 @@
                         </button>
                     </div>
                 </div>
-                <button type="submit" class="w-full bg-blue-900 hover:bg-blue-800 text-white py-3 rounded-xl font-bold text-xs shadow-lg shadow-blue-900/20 transition">
-                    Masuk ke Sistem
-                </button>
+                <div class="space-y-2 pt-1">
+                    <button type="submit" class="w-full bg-blue-900 hover:bg-blue-800 text-white py-3 rounded-xl font-bold text-xs shadow-lg shadow-blue-900/20 transition">
+                        Masuk ke Sistem
+                    </button>
+                    <button type="button" onclick="openLupaPinModal()" class="w-full bg-emerald-700 hover:bg-emerald-800 text-white py-2.5 rounded-xl font-bold text-xs shadow transition flex items-center justify-center space-x-1.5 cursor-pointer">
+                        <i class="fab fa-whatsapp"></i><span>Bantuan / Lupa PIN (Hubungi Admin Pusat)</span>
+                    </button>
+                </div>
             </form>
 
             <!-- FORM REGISTER -->
@@ -670,9 +675,6 @@
                 <div class="flex items-center space-x-2">
                     <button onclick="openEditKetuaProfileModal()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3.5 py-2 rounded-xl font-bold text-xs shadow flex items-center space-x-1.5 cursor-pointer">
                         <i class="fas fa-user-edit"></i><span>Edit Profil &amp; PIN</span>
-                    </button>
-                    <button onclick="openLupaPinModal()" class="bg-amber-300 hover:bg-amber-400 text-emerald-950 px-3.5 py-2 rounded-xl font-bold text-xs shadow flex items-center space-x-1.5 cursor-pointer">
-                        <i class="fab fa-whatsapp"></i><span>Bantuan / Lupa PIN</span>
                     </button>
                 </div>
             </div>
@@ -2871,13 +2873,25 @@
         function populateKetuaKpmSelects() {
             if (!currentUser) return;
             const myKpm = appState.kpmList.filter(k => k.kelompok === currentUser.kelompok);
-            ['p2k2KpmSelect', 'komitmenKpmSelect', 'rekonKpmSelect', 'ppseKpmSelect', 'graduasiKpmSelect'].forEach(sId => {
+            ['p2k2KpmSelect', 'komitmenKpmSelect', 'rekonKpmSelect', 'graduasiKpmSelect'].forEach(sId => {
                 const select = document.getElementById(sId);
                 if (select) {
                     select.innerHTML = '<option value="">-- Pilih KPM --</option>';
                     myKpm.forEach(k => { select.innerHTML += `<option value="${k.nama}">${k.nama} (NIK: ${k.nik})</option>`; });
                 }
             });
+
+            // PPSE khusus KPM PKH Murni atau PKH & BPNT (tidak berlaku untuk BPNT Murni)
+            const ppseSelect = document.getElementById('ppseKpmSelect');
+            if (ppseSelect) {
+                ppseSelect.innerHTML = '<option value="">-- Pilih KPM (Khusus PKH Murni / PKH & BPNT) --</option>';
+                myKpm.forEach(k => {
+                    const jenis = k.jenisBantuan || 'PKH';
+                    if (jenis === 'PKH' || jenis === 'PKH & BPNT') {
+                        ppseSelect.innerHTML += `<option value="${k.nama}">${k.nama} [${jenis}] (NIK: ${k.nik})</option>`;
+                    }
+                });
+            }
         }
 
         function autoFillPpseKpmData() {
@@ -3942,7 +3956,7 @@
             const hp = document.getElementById('lupaHp').value.trim() || "-";
             const pesan = document.getElementById('lupaPesan').value.trim() || "Halo Admin Pusat, saya memerlukan bantuan untuk pemulihan PIN / ingin mengirimkan saran sistem SIP-PKH.";
             
-            const fullText = encodeURIComponent(`Halo Admin Pusat,\n\nNama/Akun: ${nama}\nNo. HP/Kontak: ${hp}\nPesan/Saran: ${pesan}`);
+            const fullText = encodeURIComponent(`Hallo Admin Pusat SIP-PKH,\n\nNama/Akun: ${nama}\nNo. HP/Kontak: ${hp}\nPesan/Saran: ${pesan}`);
             window.open(`https://wa.me/6281321312304?text=${fullText}`, '_blank');
             closeLupaPinModal();
         }
