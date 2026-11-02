@@ -3722,19 +3722,22 @@
                         <thead>
                             <tr>
                                 <th style="width: 5%;">No</th>
-                                <th style="width: 13%;">Tanggal</th>
-                                <th style="width: 17%;">Kelompok</th>
-                                <th style="width: 22%;">Nama KPM</th>
-                                <th style="width: 18%;">Modul P2K2</th>
-                                <th style="width: 12%;">Status</th>
-                                <th style="width: 13%; text-align:center;">TTD KPM</th>
+                                <th style="width: 12%;">Tanggal</th>
+                                <th style="width: 15%;">Kelompok</th>
+                                <th style="width: 18%;">Nama KPM</th>
+                                <th style="width: 17%;">NIK KPM</th>
+                                <th style="width: 15%;">Modul P2K2</th>
+                                <th style="width: 10%;">Status</th>
+                                <th style="width: 8%; text-align:center;">TTD</th>
                             </tr>
                         </thead>
                         <tbody>
                 `;
-                if (list.length === 0) tableHtml += `<tr><td colspan="7" style="text-align:center;">Tidak ada data.</td></tr>`;
+                if (list.length === 0) tableHtml += `<tr><td colspan="8" style="text-align:center;">Tidak ada data.</td></tr>`;
                 list.forEach((item, idx) => {
-                    tableHtml += `<tr><td style="text-align:center;">${idx+1}</td><td>${item.tanggal}</td><td>${item.kelompok}</td><td>${item.kpmNama}</td><td>${item.modul}</td><td>${item.status}</td><td style="text-align:center; height:35px; vertical-align:middle; font-size:10pt; color:#555;">${idx+1}. ..........</td></tr>`;
+                    const foundKpm = appState.kpmList.find(k => k.nama === item.kpmNama && k.kelompok === item.kelompok);
+                    const kpmNik = foundKpm ? foundKpm.nik : '-';
+                    tableHtml += `<tr><td style="text-align:center;">${idx+1}</td><td>${item.tanggal}</td><td>${item.kelompok}</td><td>${item.kpmNama}</td><td style="font-family:monospace;">${kpmNik}</td><td>${item.modul}</td><td>${item.status}</td><td style="text-align:center; height:35px; vertical-align:middle; font-size:9pt; color:#555;">${idx+1}. .......</td></tr>`;
                 });
                 tableHtml += `</tbody></table>`;
             } else if (type === 'komitmen') {
@@ -3752,19 +3755,22 @@
                     <table>
                         <thead>
                             <tr>
-                                <th style="width: 6%;">No</th>
-                                <th style="width: 14%;">Tanggal</th>
-                                <th style="width: 18%;">Kelompok</th>
-                                <th style="width: 24%;">Nama KPM</th>
-                                <th style="width: 26%;">Jenis Layanan Komitmen</th>
-                                <th style="width: 12%;">Status</th>
+                                <th style="width: 5%;">No</th>
+                                <th style="width: 13%;">Tanggal</th>
+                                <th style="width: 15%;">Kelompok</th>
+                                <th style="width: 20%;">Nama KPM</th>
+                                <th style="width: 17%;">NIK KPM</th>
+                                <th style="width: 20%;">Jenis Layanan Komitmen</th>
+                                <th style="width: 10%;">Status</th>
                             </tr>
                         </thead>
                         <tbody>
                 `;
-                if (list.length === 0) tableHtml += `<tr><td colspan="6" style="text-align:center;">Tidak ada data.</td></tr>`;
+                if (list.length === 0) tableHtml += `<tr><td colspan="7" style="text-align:center;">Tidak ada data.</td></tr>`;
                 list.forEach((item, idx) => {
-                    tableHtml += `<tr><td style="text-align:center;">${idx+1}</td><td>${item.tanggal}</td><td>${item.kelompok}</td><td>${item.kpmNama}</td><td>${item.jenis}</td><td>${item.status}</td></tr>`;
+                    const foundKpm = appState.kpmList.find(k => k.nama === item.kpmNama && k.kelompok === item.kelompok);
+                    const kpmNik = foundKpm ? foundKpm.nik : '-';
+                    tableHtml += `<tr><td style="text-align:center;">${idx+1}</td><td>${item.tanggal}</td><td>${item.kelompok}</td><td>${item.kpmNama}</td><td style="font-family:monospace;">${kpmNik}</td><td>${item.jenis}</td><td>${item.status}</td></tr>`;
                 });
                 tableHtml += `</tbody></table>`;
             } else if (type === 'rekonsiliasi') {
@@ -3782,19 +3788,22 @@
                     <table>
                         <thead>
                             <tr>
-                                <th style="width: 6%;">No</th>
-                                <th style="width: 16%;">Tanggal</th>
-                                <th style="width: 20%;">Kelompok</th>
-                                <th style="width: 26%;">Nama KPM</th>
-                                <th style="width: 14%;">Tahap</th>
-                                <th style="width: 18%;">Nominal (Rp)</th>
+                                <th style="width: 5%;">No</th>
+                                <th style="width: 13%;">Tanggal</th>
+                                <th style="width: 15%;">Kelompok</th>
+                                <th style="width: 20%;">Nama KPM</th>
+                                <th style="width: 17%;">NIK KPM</th>
+                                <th style="width: 13%;">Tahap</th>
+                                <th style="width: 17%;">Nominal (Rp)</th>
                             </tr>
                         </thead>
                         <tbody>
                 `;
-                if (list.length === 0) tableHtml += `<tr><td colspan="6" style="text-align:center;">Tidak ada data.</td></tr>`;
+                if (list.length === 0) tableHtml += `<tr><td colspan="7" style="text-align:center;">Tidak ada data.</td></tr>`;
                 list.forEach((item, idx) => {
-                    tableHtml += `<tr><td style="text-align:center;">${idx+1}</td><td>${item.tanggal}</td><td>${item.kelompok}</td><td>${item.kpmNama}</td><td>${item.tahap}</td><td style="text-align:right;">Rp ${(item.nominal||0).toLocaleString('id-ID')}</td></tr>`;
+                    const foundKpm = appState.kpmList.find(k => k.nama === item.kpmNama && k.kelompok === item.kelompok);
+                    const kpmNik = foundKpm ? foundKpm.nik : '-';
+                    tableHtml += `<tr><td style="text-align:center;">${idx+1}</td><td>${item.tanggal}</td><td>${item.kelompok}</td><td>${item.kpmNama}</td><td style="font-family:monospace;">${kpmNik}</td><td>${item.tahap}</td><td style="text-align:right;">Rp ${(item.nominal||0).toLocaleString('id-ID')}</td></tr>`;
                 });
                 tableHtml += `</tbody></table>`;
             } else if (type === 'ppse') {
@@ -3812,19 +3821,20 @@
                     <table>
                         <thead>
                             <tr>
-                                <th style="width: 6%;">No</th>
-                                <th style="width: 14%;">Tanggal</th>
-                                <th style="width: 16%;">Kelompok</th>
-                                <th style="width: 26%;">Nama KPM & NIK</th>
-                                <th style="width: 23%;">IDPEL & Usaha Ajuan</th>
+                                <th style="width: 5%;">No</th>
+                                <th style="width: 13%;">Tanggal</th>
+                                <th style="width: 15%;">Kelompok</th>
+                                <th style="width: 20%;">Nama KPM</th>
+                                <th style="width: 17%;">NIK KPM</th>
+                                <th style="width: 15%;">IDPEL & Usaha</th>
                                 <th style="width: 15%;">Sisa Keu (Rp)</th>
                             </tr>
                         </thead>
                         <tbody>
                 `;
-                if (list.length === 0) tableHtml += `<tr><td colspan="6" style="text-align:center;">Tidak ada data.</td></tr>`;
+                if (list.length === 0) tableHtml += `<tr><td colspan="7" style="text-align:center;">Tidak ada data.</td></tr>`;
                 list.forEach((item, idx) => {
-                    tableHtml += `<tr><td style="text-align:center;">${idx+1}</td><td>${item.tanggal}</td><td>${item.kelompok}</td><td><b>${item.kpmNama}</b><br>NIK: ${item.nik}</td><td>IDPEL: ${item.idpel}<br>Ajuan: ${item.usahaAjuan}</td><td style="text-align:right;">Rp ${(item.sisaVal||0).toLocaleString('id-ID')}</td></tr>`;
+                    tableHtml += `<tr><td style="text-align:center;">${idx+1}</td><td>${item.tanggal}</td><td>${item.kelompok}</td><td><b>${item.kpmNama}</b></td><td style="font-family:monospace;">${item.nik}</td><td>IDPEL: ${item.idpel}<br>Ajuan: ${item.usahaAjuan}</td><td style="text-align:right;">Rp ${(item.sisaVal||0).toLocaleString('id-ID')}</td></tr>`;
                 });
                 tableHtml += `</tbody></table>`;
             } else if (type === 'graduasi') {
@@ -3842,19 +3852,20 @@
                     <table>
                         <thead>
                             <tr>
-                                <th style="width: 6%;">No</th>
-                                <th style="width: 14%;">Tanggal</th>
-                                <th style="width: 16%;">Kelompok</th>
-                                <th style="width: 24%;">Nama KPM & NIK</th>
-                                <th style="width: 10%;">Kohor</th>
-                                <th style="width: 30%;">Alasan Graduasi Mandiri</th>
+                                <th style="width: 5%;">No</th>
+                                <th style="width: 12%;">Tanggal</th>
+                                <th style="width: 15%;">Kelompok</th>
+                                <th style="width: 20%;">Nama KPM</th>
+                                <th style="width: 17%;">NIK KPM</th>
+                                <th style="width: 8%;">Kohor</th>
+                                <th style="width: 23%;">Alasan Graduasi Mandiri</th>
                             </tr>
                         </thead>
                         <tbody>
                 `;
-                if (list.length === 0) tableHtml += `<tr><td colspan="6" style="text-align:center;">Tidak ada data.</td></tr>`;
+                if (list.length === 0) tableHtml += `<tr><td colspan="7" style="text-align:center;">Tidak ada data.</td></tr>`;
                 list.forEach((item, idx) => {
-                    tableHtml += `<tr><td style="text-align:center;">${idx+1}</td><td>${item.tanggal}</td><td>${item.kelompok}</td><td><b>${item.kpmNama}</b><br>NIK: ${item.nik}</td><td style="text-align:center;">${item.kohor}</td><td>${item.alasan}</td></tr>`;
+                    tableHtml += `<tr><td style="text-align:center;">${idx+1}</td><td>${item.tanggal}</td><td>${item.kelompok}</td><td><b>${item.kpmNama}</b></td><td style="font-family:monospace;">${item.nik}</td><td style="text-align:center;">${item.kohor}</td><td>${item.alasan}</td></tr>`;
                 });
                 tableHtml += `</tbody></table>`;
             }
