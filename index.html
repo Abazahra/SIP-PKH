@@ -43,11 +43,31 @@
                 background: white !important;
                 box-shadow: none !important;
                 overflow: visible !important;
+                font-size: 8pt !important;
             }
-            table { width: 100% !important; border-collapse: collapse !important; font-size: 9pt; page-break-inside: auto; }
+            table { width: 100% !important; border-collapse: collapse !important; font-size: 8pt !important; page-break-inside: auto; table-layout: fixed !important; }
             tr { page-break-inside: avoid; page-break-after: auto; }
-            th, td { border: 1px solid #000 !important; padding: 5px !important; }
-            @page { size: A4 portrait; margin: 10mm; }
+            th, td { border: 1px solid #000 !important; padding: 4px 6px !important; word-wrap: break-word !important; overflow: hidden !important; }
+            @page { size: A4 portrait; margin: 8mm; }
+        }
+        /* Styling tambahan untuk tabel pratinjau cetak agar semua kolom bergaris jelas & font otomatis */
+        #printDocTableContainer table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 9pt;
+            table-layout: fixed;
+        }
+        #printDocTableContainer th, #printDocTableContainer td {
+            border: 1px solid #000 !important;
+            padding: 6px 8px;
+            word-wrap: break-word;
+            overflow: hidden;
+        }
+        #printDocTableContainer th {
+            background-color: #f1f5f9 !important;
+            color: #000 !important;
+            font-weight: bold;
+            text-align: left;
         }
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: #f1f5f9; }
@@ -1093,7 +1113,14 @@
                         </div>
                         <div>
                             <label class="block font-bold text-slate-700 mb-1">Alasan Graduasi Mandiri Sejahtera</label>
-                            <textarea id="graduasiAlasan" required rows="3" placeholder="Jelaskan alasan peningkatan kesejahteraan ekonomi KPM..." class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl font-semibold"></textarea>
+                            <select id="graduasiAlasan" required class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl font-semibold text-slate-800">
+                                <option value="">-- Pilih Alasan Graduasi Mandiri --</option>
+                                <option value="Peningkatan Kondisi Ekonomi: Pendapatan keluarga sudah meningkat dan stabil, sehingga mampu memenuhi kebutuhan dasar tanpa bergantung pada bantuan.">Peningkatan Kondisi Ekonomi: Pendapatan keluarga sudah meningkat dan stabil, sehingga mampu memenuhi kebutuhan dasar tanpa bergantung pada bantuan.</option>
+                                <option value="Keberhasilan Usaha/Pekerjaan: KPM telah memiliki usaha mandiri yang berkembang atau anggota keluarga mendapatkan pekerjaan baru dengan penghasilan yang layak.">Keberhasilan Usaha/Pekerjaan: KPM telah memiliki usaha mandiri yang berkembang atau anggota keluarga mendapatkan pekerjaan baru dengan penghasilan yang layak.</option>
+                                <option value="Kesadaran Sosial yang Tinggi: Munculnya rasa empati untuk memberikan kesempatan kepada warga lain yang kondisinya jauh lebih miskin dan belum menerima bantuan.">Kesadaran Sosial yang Tinggi: Munculnya rasa empati untuk memberikan kesempatan kepada warga lain yang kondisinya jauh lebih miskin dan belum menerima bantuan.</option>
+                                <option value="Sudah Tidak Memiliki Komponen PKH: Anak-anak dalam keluarga sudah lulus sekolah dan tidak ada lagi komponen wajib PKH lainnya (seperti ibu hamil, balita, lansia, atau disabilitas).">Sudah Tidak Memiliki Komponen PKH: Anak-anak dalam keluarga sudah lulus sekolah dan tidak ada lagi komponen wajib PKH lainnya (seperti ibu hamil, balita, lansia, atau disabilitas).</option>
+                                <option value="Rasa Percaya Diri dan Mandiri: Adanya motivasi kuat untuk hidup mandiri secara finansial dan keluar dari label sebagai keluarga miskin/penerima bantuan sosial.">Rasa Percaya Diri dan Mandiri: Adanya motivasi kuat untuk hidup mandiri secara finansial dan keluar dari label sebagai keluarga miskin/penerima bantuan sosial.</option>
+                            </select>
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                             <div>
@@ -1449,6 +1476,15 @@
                     <label class="font-bold text-slate-700 mr-1">Filter Kelompok:</label>
                     <select id="printFilterKelompok" onchange="openPrintModal(window.currentPrintType)" class="p-1.5 bg-white border border-slate-300 rounded-lg font-semibold">
                         <option value="ALL">-- Semua Kelompok --</option>
+                    </select>
+                </div>
+                <div id="printJenisBantuanContainer" class="hidden">
+                    <label class="font-bold text-slate-700 mr-1">Filter Jenis Bantuan:</label>
+                    <select id="printFilterJenisBantuan" onchange="openPrintModal(window.currentPrintType)" class="p-1.5 bg-white border border-slate-300 rounded-lg font-semibold">
+                        <option value="ALL">-- Semua Bantuan --</option>
+                        <option value="PKH">PKH Murni</option>
+                        <option value="BPNT">BPNT Murni</option>
+                        <option value="PKH & BPNT">PKH & BPNT</option>
                     </select>
                 </div>
                 <div>
@@ -3601,9 +3637,19 @@
             window.currentPrintType = type;
             const modal = document.getElementById('modalPrintViewer');
             const container = document.getElementById('printDocTableContainer');
+            const jenisBantuanContainer = document.getElementById('printJenisBantuanContainer');
+
+            if (jenisBantuanContainer) {
+                if (type === 'p2k2') {
+                    jenisBantuanContainer.classList.remove('hidden');
+                } else {
+                    jenisBantuanContainer.classList.add('hidden');
+                }
+            }
 
             const filterKlp = document.getElementById('printFilterKelompok') ? document.getElementById('printFilterKelompok').value : 'ALL';
             const filterBulan = document.getElementById('printFilterBulan') ? document.getElementById('printFilterBulan').value : '';
+            const filterJenisBantuan = document.getElementById('printFilterJenisBantuan') ? document.getElementById('printFilterJenisBantuan').value : 'ALL';
             const myVerifiedGroups = appState.ketuaUsers.filter(k => k.pendampingId === currentUser.id && k.status === 'VERIFIED').map(k => k.kelompok.trim().toLowerCase());
 
             let logoHtml = appState.kopConfig.logoBase64 ? `<img src="${appState.kopConfig.logoBase64}" style="width:70px; height:70px; object-fit:contain;">` : `<div style="width:70px; height:70px; background:#1e3a8a; color:#fff; display:flex; align-items:center; justify-content:center; font-weight:bold; border-radius:8px;">PKH</div>`;
@@ -3630,6 +3676,12 @@
                     if (!myVerifiedGroups.includes(itemKlp)) return false;
                     if (filterKlp !== 'ALL' && item.kelompok !== filterKlp) return false;
                     if (filterBulan && item.tanggal && !item.tanggal.startsWith(filterBulan)) return false;
+
+                    if (filterJenisBantuan !== 'ALL') {
+                        const foundKpm = appState.kpmList.find(k => k.nama === item.kpmNama && k.kelompok === item.kelompok);
+                        const bantuanKpm = foundKpm ? (foundKpm.jenisBantuan || 'PKH') : 'PKH';
+                        if (bantuanKpm !== filterJenisBantuan) return false;
+                    }
                     return true;
                 });
                 tableHtml = `
@@ -3638,14 +3690,20 @@
                     <table>
                         <thead>
                             <tr>
-                                <th>No</th><th>Tanggal</th><th>Kelompok</th><th>Nama KPM</th><th>Modul P2K2</th><th>Status</th><th>Verifikasi</th>
+                                <th style="width: 5%;">No</th>
+                                <th style="width: 13%;">Tanggal</th>
+                                <th style="width: 17%;">Kelompok</th>
+                                <th style="width: 22%;">Nama KPM</th>
+                                <th style="width: 18%;">Modul P2K2</th>
+                                <th style="width: 12%;">Status</th>
+                                <th style="width: 13%; text-align:center;">TTD KPM</th>
                             </tr>
                         </thead>
                         <tbody>
                 `;
                 if (list.length === 0) tableHtml += `<tr><td colspan="7" style="text-align:center;">Tidak ada data.</td></tr>`;
                 list.forEach((item, idx) => {
-                    tableHtml += `<tr><td>${idx+1}</td><td>${item.tanggal}</td><td>${item.kelompok}</td><td>${item.kpmNama}</td><td>${item.modul}</td><td>${item.status}</td><td>${item.statusVerifikasi || 'PENDING'}</td></tr>`;
+                    tableHtml += `<tr><td style="text-align:center;">${idx+1}</td><td>${item.tanggal}</td><td>${item.kelompok}</td><td>${item.kpmNama}</td><td>${item.modul}</td><td>${item.status}</td><td style="text-align:center; height:35px; vertical-align:middle; font-size:10pt; color:#555;">${idx+1}. ..........</td></tr>`;
                 });
                 tableHtml += `</tbody></table>`;
             } else if (type === 'komitmen') {
@@ -3663,14 +3721,19 @@
                     <table>
                         <thead>
                             <tr>
-                                <th>No</th><th>Tanggal</th><th>Kelompok</th><th>Nama KPM</th><th>Jenis Layanan Komitmen</th><th>Status</th><th>Verifikasi</th>
+                                <th style="width: 6%;">No</th>
+                                <th style="width: 14%;">Tanggal</th>
+                                <th style="width: 18%;">Kelompok</th>
+                                <th style="width: 24%;">Nama KPM</th>
+                                <th style="width: 26%;">Jenis Layanan Komitmen</th>
+                                <th style="width: 12%;">Status</th>
                             </tr>
                         </thead>
                         <tbody>
                 `;
-                if (list.length === 0) tableHtml += `<tr><td colspan="7" style="text-align:center;">Tidak ada data.</td></tr>`;
+                if (list.length === 0) tableHtml += `<tr><td colspan="6" style="text-align:center;">Tidak ada data.</td></tr>`;
                 list.forEach((item, idx) => {
-                    tableHtml += `<tr><td>${idx+1}</td><td>${item.tanggal}</td><td>${item.kelompok}</td><td>${item.kpmNama}</td><td>${item.jenis}</td><td>${item.status}</td><td>${item.statusVerifikasi || 'PENDING'}</td></tr>`;
+                    tableHtml += `<tr><td style="text-align:center;">${idx+1}</td><td>${item.tanggal}</td><td>${item.kelompok}</td><td>${item.kpmNama}</td><td>${item.jenis}</td><td>${item.status}</td></tr>`;
                 });
                 tableHtml += `</tbody></table>`;
             } else if (type === 'rekonsiliasi') {
@@ -3688,14 +3751,19 @@
                     <table>
                         <thead>
                             <tr>
-                                <th>No</th><th>Tanggal</th><th>Kelompok</th><th>Nama KPM</th><th>Tahap</th><th>Nominal (Rp)</th><th>Verifikasi</th>
+                                <th style="width: 6%;">No</th>
+                                <th style="width: 16%;">Tanggal</th>
+                                <th style="width: 20%;">Kelompok</th>
+                                <th style="width: 26%;">Nama KPM</th>
+                                <th style="width: 14%;">Tahap</th>
+                                <th style="width: 18%;">Nominal (Rp)</th>
                             </tr>
                         </thead>
                         <tbody>
                 `;
-                if (list.length === 0) tableHtml += `<tr><td colspan="7" style="text-align:center;">Tidak ada data.</td></tr>`;
+                if (list.length === 0) tableHtml += `<tr><td colspan="6" style="text-align:center;">Tidak ada data.</td></tr>`;
                 list.forEach((item, idx) => {
-                    tableHtml += `<tr><td>${idx+1}</td><td>${item.tanggal}</td><td>${item.kelompok}</td><td>${item.kpmNama}</td><td>${item.tahap}</td><td>Rp ${(item.nominal||0).toLocaleString('id-ID')}</td><td>${item.statusVerifikasi || 'PENDING'}</td></tr>`;
+                    tableHtml += `<tr><td style="text-align:center;">${idx+1}</td><td>${item.tanggal}</td><td>${item.kelompok}</td><td>${item.kpmNama}</td><td>${item.tahap}</td><td style="text-align:right;">Rp ${(item.nominal||0).toLocaleString('id-ID')}</td></tr>`;
                 });
                 tableHtml += `</tbody></table>`;
             } else if (type === 'ppse') {
@@ -3713,14 +3781,19 @@
                     <table>
                         <thead>
                             <tr>
-                                <th>No</th><th>Tanggal</th><th>Kelompok</th><th>Nama KPM & NIK</th><th>IDPEL & Usaha Ajuan</th><th>Sisa Keuangan (Rp)</th><th>Status</th>
+                                <th style="width: 6%;">No</th>
+                                <th style="width: 14%;">Tanggal</th>
+                                <th style="width: 16%;">Kelompok</th>
+                                <th style="width: 26%;">Nama KPM & NIK</th>
+                                <th style="width: 23%;">IDPEL & Usaha Ajuan</th>
+                                <th style="width: 15%;">Sisa Keu (Rp)</th>
                             </tr>
                         </thead>
                         <tbody>
                 `;
-                if (list.length === 0) tableHtml += `<tr><td colspan="7" style="text-align:center;">Tidak ada data.</td></tr>`;
+                if (list.length === 0) tableHtml += `<tr><td colspan="6" style="text-align:center;">Tidak ada data.</td></tr>`;
                 list.forEach((item, idx) => {
-                    tableHtml += `<tr><td>${idx+1}</td><td>${item.tanggal}</td><td>${item.kelompok}</td><td><b>${item.kpmNama}</b><br>NIK: ${item.nik}</td><td>IDPEL: ${item.idpel}<br>Ajuan: ${item.usahaAjuan}</td><td>Rp ${(item.sisaVal||0).toLocaleString('id-ID')}</td><td>${item.statusVerifikasi || 'PENDING'}</td></tr>`;
+                    tableHtml += `<tr><td style="text-align:center;">${idx+1}</td><td>${item.tanggal}</td><td>${item.kelompok}</td><td><b>${item.kpmNama}</b><br>NIK: ${item.nik}</td><td>IDPEL: ${item.idpel}<br>Ajuan: ${item.usahaAjuan}</td><td style="text-align:right;">Rp ${(item.sisaVal||0).toLocaleString('id-ID')}</td></tr>`;
                 });
                 tableHtml += `</tbody></table>`;
             } else if (type === 'graduasi') {
@@ -3738,14 +3811,19 @@
                     <table>
                         <thead>
                             <tr>
-                                <th>No</th><th>Tanggal</th><th>Kelompok</th><th>Nama KPM & NIK</th><th>Kohor</th><th>Alasan Graduasi Mandiri</th><th>Status</th>
+                                <th style="width: 6%;">No</th>
+                                <th style="width: 14%;">Tanggal</th>
+                                <th style="width: 16%;">Kelompok</th>
+                                <th style="width: 24%;">Nama KPM & NIK</th>
+                                <th style="width: 10%;">Kohor</th>
+                                <th style="width: 30%;">Alasan Graduasi Mandiri</th>
                             </tr>
                         </thead>
                         <tbody>
                 `;
-                if (list.length === 0) tableHtml += `<tr><td colspan="7" style="text-align:center;">Tidak ada data.</td></tr>`;
+                if (list.length === 0) tableHtml += `<tr><td colspan="6" style="text-align:center;">Tidak ada data.</td></tr>`;
                 list.forEach((item, idx) => {
-                    tableHtml += `<tr><td>${idx+1}</td><td>${item.tanggal}</td><td>${item.kelompok}</td><td><b>${item.kpmNama}</b><br>NIK: ${item.nik}</td><td>${item.kohor}</td><td>${item.alasan}</td><td>${item.statusVerifikasi || 'PENDING'}</td></tr>`;
+                    tableHtml += `<tr><td style="text-align:center;">${idx+1}</td><td>${item.tanggal}</td><td>${item.kelompok}</td><td><b>${item.kpmNama}</b><br>NIK: ${item.nik}</td><td style="text-align:center;">${item.kohor}</td><td>${item.alasan}</td></tr>`;
                 });
                 tableHtml += `</tbody></table>`;
             }
