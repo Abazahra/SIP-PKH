@@ -193,8 +193,9 @@
 
                 <form id="formRegisterKetua" onsubmit="handleRegisterKetua(event)" class="space-y-3">
                     <div>
-                        <label class="block text-xs font-bold text-slate-700 mb-1">Kode Undangan dari Pendamping</label>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Kode Undangan dari Pendamping <span class="text-red-600">*Wajib Sesuai</span></label>
                         <input type="text" id="regKetuaInviteCode" required placeholder="Contoh: PKH-SUKAMAJU" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs font-mono font-bold text-blue-900 uppercase">
+                        <p class="text-[10px] text-slate-500 mt-1">Ketua kelompok akan langsung terhubung ke pendamping pemilik kode undangan ini.</p>
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-700 mb-1">Nama Lengkap Ketua</label>
@@ -1973,13 +1974,13 @@
         function handleRegisterKetua(e) {
             e.preventDefault();
             const inviteCodeInput = document.getElementById('regKetuaInviteCode').value.trim().toUpperCase();
+            
+            // Cari pendamping yang memiliki inviteCode yang sesuai secara persis
             let pndPengundang = appState.pendampingProfiles.find(p => (p.inviteCode || "").toUpperCase() === inviteCodeInput);
-            if (!pndPengundang && appState.pendampingProfiles.length > 0) {
-                pndPengundang = appState.pendampingProfiles[0];
-            }
+            
             if (!pndPengundang) {
-                pndPengundang = { id: "PND-FARAH", nama: "Farah", nip: "198310102025211098", pin: "123456", kecamatan: "Pameungpeuk", inviteCode: inviteCodeInput || "PKH-SUKAMAJU", date: "2025-01-10", isLocked: false };
-                appState.pendampingProfiles.push(pndPengundang);
+                alert(`Kode undangan "${inviteCodeInput}" tidak ditemukan dalam sistem. Pastikan Anda memasukkan kode undangan yang valid dari Pendamping wilayah Anda.`);
+                return;
             }
 
             const nama = document.getElementById('regKetuaNama').value.trim();
@@ -1996,7 +1997,7 @@
                 isLocked: false
             });
             saveState();
-            alert("Pendaftaran berhasil! Silakan tunggu verifikasi dari Pendamping PKH.");
+            alert(`Pendaftaran berhasil! Kelompok Anda telah terhubung ke Pendamping ${pndPengundang.nama} (${pndPengundang.kecamatan}). Silakan tunggu verifikasi dari Pendamping.`);
             switchMainTab('login');
         }
 
