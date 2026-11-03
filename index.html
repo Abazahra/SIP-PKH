@@ -272,7 +272,10 @@
                     <button onclick="openSuperAdminAddPendampingModal()" class="bg-amber-400 hover:bg-amber-300 text-purple-950 px-4 py-2.5 rounded-xl font-bold text-xs shadow-lg flex items-center space-x-2 transition cursor-pointer">
                         <i class="fas fa-user-plus"></i><span>Tambah Pendamping Baru</span>
                     </button>
-                    <a href="https://wa.me/6281321312304?text=Halo%20Admin%20Pusat,%20saya%20ingin%20mengirimkan%20saran%20atau%20meminta%20bantuan%20sistem%20SIP-PKH." target="_blank" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2.5 rounded-xl font-bold text-xs shadow-lg flex items-center space-x-2 transition cursor-pointer">
+                    <button onclick="openEditAdminWaModal()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2.5 rounded-xl font-bold text-xs shadow-lg flex items-center space-x-2 transition cursor-pointer">
+                        <i class="fas fa-phone-alt"></i><span>Edit WA Admin</span>
+                    </button>
+                    <a id="superAdminWaLink" href="https://wa.me/6281321312304?text=Halo%20Admin%20Pusat,%20saya%20ingin%20mengirimkan%20saran%20atau%20meminta%20bantuan%20sistem%20SIP-PKH." target="_blank" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2.5 rounded-xl font-bold text-xs shadow-lg flex items-center space-x-2 transition cursor-pointer">
                         <i class="fab fa-whatsapp"></i><span>WA Pusat</span>
                     </a>
                 </div>
@@ -335,6 +338,8 @@
                                 <th class="p-3">Nama Ketua</th>
                                 <th class="p-3">No. WhatsApp</th>
                                 <th class="p-3">Kelompok</th>
+                                <th class="p-3">Jumlah KPM</th>
+                                <th class="p-3">Pendamping Pembina & NIP</th>
                                 <th class="p-3">Tanggal Daftar</th>
                                 <th class="p-3">Status / Masa Aktif</th>
                                 <th class="p-3">PIN Keamanan</th>
@@ -1175,9 +1180,26 @@
     <!-- FOOTER -->
     <footer class="bg-white border-t border-slate-200 py-4 mt-8 text-center text-xs text-slate-500 space-y-1">
         <p>SIP-PKH © 2026 | Sistem Informasi Pelaksanaan Program Keluarga Harapan</p>
-        <p class="text-[11px] text-slate-600 font-semibold">Butuh Saran atau Lupa PIN? Hubungi Admin Pusat WhatsApp: <a href="https://wa.me/6281321312304?text=Halo%20Admin%20Pusat,%20saya%20ingin%20mengirimkan%20saran%20atau%20meminta%20bantuan%20PIN%20SIP-PKH." target="_blank" class="text-blue-700 underline font-bold">081321312304</a></p>
+        <p class="text-[11px] text-slate-600 font-semibold">Butuh Saran atau Lupa PIN? Hubungi Admin Pusat WhatsApp: <a id="footerAdminWaText" href="https://wa.me/6281321312304?text=Halo%20Admin%20Pusat,%20saya%20ingin%20mengirimkan%20saran%20atau%20meminta%20bantuan%20PIN%20SIP-PKH." target="_blank" class="text-blue-700 underline font-bold">081321312304</a></p>
         <p class="text-[10px] text-slate-400">Pengembang: Encep Yuyus Syamsul Firdaus, S.Sos.I (ASN PPPK KEMENSOS)</p>
     </footer>
+
+    <!-- MODAL EDIT WA ADMIN PUSAT -->
+    <div id="modalEditAdminWa" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-sm rounded-2xl shadow-xl overflow-hidden p-6 space-y-4">
+            <div class="flex justify-between items-center pb-3 border-b border-slate-100">
+                <h3 class="font-bold text-slate-800 text-sm">Edit Nomor WhatsApp Admin Pusat</h3>
+                <button onclick="closeEditAdminWaModal()" class="text-slate-400 hover:text-slate-700"><i class="fas fa-times"></i></button>
+            </div>
+            <form onsubmit="handleSaveAdminWa(event)" class="space-y-3">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Nomor WhatsApp Admin (Format 62...)</label>
+                    <input type="text" id="inputAdminWaNumber" required placeholder="6281321312304" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs font-mono font-bold text-slate-900">
+                </div>
+                <button type="submit" class="w-full bg-purple-900 text-white py-2.5 rounded-xl font-bold text-xs shadow">Simpan Nomor WA</button>
+            </form>
+        </div>
+    </div>
 
     <!-- MODAL EDIT KOP SURAT -->
     <div id="modalEditKop" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
@@ -1603,6 +1625,7 @@
         let currentUser = null;
         let appState = {
             inviteCode: "PKH-SUKAMAJU",
+            adminWaNumber: "6281321312304",
             kopConfig: {
                 baris1: "Kementerian Sosial Republik Indonesia",
                 baris2: "Direktorat Jenderal Perlindungan dan Jaminan Sosial",
@@ -1689,7 +1712,45 @@
             initRealtimeSync();
             checkUrlInviteParams();
             updateShareInviteUrl();
+            updateAdminWaDisplay();
         });
+
+        function updateAdminWaDisplay() {
+            const waNum = appState.adminWaNumber || "6281321312304";
+            const formattedWaDisplay = waNum.startsWith("62") ? "0" + waNum.substring(2) : waNum;
+            
+            const saLink = document.getElementById('superAdminWaLink');
+            if (saLink) {
+                saLink.href = `https://wa.me/${waNum}?text=Halo%20Admin%20Pusat,%20saya%20ingin%20mengirimkan%20saran%20atau%20meminta%20bantuan%20sistem%20SIP-PKH.`;
+            }
+
+            const footerWa = document.getElementById('footerAdminWaText');
+            if (footerWa) {
+                footerWa.href = `https://wa.me/${waNum}?text=Halo%20Admin%20Pusat,%20saya%20ingin%20mengirimkan%20saran%20atau%20meminta%20bantuan%20PIN%20SIP-PKH.`;
+                footerWa.innerText = formattedWaDisplay;
+            }
+        }
+
+        function openEditAdminWaModal() {
+            const input = document.getElementById('inputAdminWaNumber');
+            if (input) input.value = appState.adminWaNumber || "6281321312304";
+            document.getElementById('modalEditAdminWa').classList.remove('hidden');
+        }
+
+        function closeEditAdminWaModal() {
+            document.getElementById('modalEditAdminWa').classList.add('hidden');
+        }
+
+        function handleSaveAdminWa(e) {
+            e.preventDefault();
+            const val = document.getElementById('inputAdminWaNumber').value.trim();
+            if (!val) return;
+            appState.adminWaNumber = val;
+            saveState();
+            updateAdminWaDisplay();
+            closeEditAdminWaModal();
+            showToast("Berhasil", "Nomor WhatsApp Admin Pusat berhasil diperbarui.", "success");
+        }
 
         function checkUrlInviteParams() {
             const urlParams = new URLSearchParams(window.location.search);
@@ -2127,7 +2188,7 @@
             if (tbodyKetua) {
                 tbodyKetua.innerHTML = '';
                 if (appState.ketuaUsers.length === 0) {
-                    tbodyKetua.innerHTML = `<tr><td colspan="7" class="text-center p-4 text-slate-400">Belum ada ketua kelompok terdaftar.</td></tr>`;
+                    tbodyKetua.innerHTML = `<tr><td colspan="9" class="text-center p-4 text-slate-400">Belum ada ketua kelompok terdaftar.</td></tr>`;
                 } else {
                     appState.ketuaUsers.forEach(k => {
                         let regDateStr = k.date || "2025-01-10";
@@ -2146,11 +2207,33 @@
                             `<button onclick="superAdminToggleLockKetua('${k.id}', false)" class="bg-emerald-600 hover:bg-emerald-700 text-white px-2 py-1 rounded text-xs font-bold cursor-pointer" title="Buka Kunci"><i class="fas fa-lock-open"></i> Buka</button>` :
                             `<button onclick="superAdminToggleLockKetua('${k.id}', true)" class="bg-slate-700 hover:bg-slate-800 text-white px-2 py-1 rounded text-xs font-bold cursor-pointer" title="Kunci Akun"><i class="fas fa-lock"></i> Kunci</button>`;
 
+                        // Hitung jumlah KPM di kelompok ini
+                        const kpmCount = appState.kpmList.filter(item => item.kelompok === k.kelompok).length;
+
+                        // Cari info Pendamping Pembina
+                        let pndName = "-";
+                        let pndNip = "-";
+                        if (k.pendampingId) {
+                            const foundPnd = appState.pendampingProfiles.find(p => p.id === k.pendampingId);
+                            if (foundPnd) {
+                                pndName = foundPnd.nama;
+                                pndNip = foundPnd.nip || "-";
+                            }
+                        } else if (appState.pendampingProfiles.length > 0) {
+                            pndName = appState.pendampingProfiles[0].nama;
+                            pndNip = appState.pendampingProfiles[0].nip || "-";
+                        }
+
                         tbodyKetua.innerHTML += `
                             <tr>
                                 <td class="p-3 font-bold">${k.nama}</td>
                                 <td class="p-3">${k.hp}</td>
                                 <td class="p-3 font-semibold text-blue-900">${k.kelompok}</td>
+                                <td class="p-3 font-bold text-slate-700">${kpmCount} KPM</td>
+                                <td class="p-3">
+                                    <div class="font-bold text-slate-900">${pndName}</div>
+                                    <div class="text-[10px] text-slate-500 font-mono">NIP: ${pndNip}</div>
+                                </td>
                                 <td class="p-3 font-mono">${regDateStr}</td>
                                 <td class="p-3">${statusBadge}</td>
                                 <td class="p-3 font-mono font-bold text-emerald-800">${k.pin || '-'}</td>
@@ -3979,8 +4062,9 @@
             const hp = document.getElementById('lupaHp').value.trim() || "-";
             const pesan = document.getElementById('lupaPesan').value.trim() || "Halo Admin Pusat, saya memerlukan bantuan untuk pemulihan PIN / ingin mengirimkan saran sistem SIP-PKH.";
             
+            const adminWa = appState.adminWaNumber || "6281321312304";
             const fullText = encodeURIComponent(`Halo Admin Pusat SIP-PKH,\n\nNama/Akun: ${nama}\nNo. HP/Kontak: ${hp}\nPesan/Saran: ${pesan}`);
-            window.open(`https://wa.me/6281321312304?text=${fullText}`, '_blank');
+            window.open(`https://wa.me/${adminWa}?text=${fullText}`, '_blank');
             closeLupaPinModal();
         }
 
