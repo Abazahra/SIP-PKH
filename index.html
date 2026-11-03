@@ -325,7 +325,7 @@
                 </div>
             </div>
 
-            <!-- TABEL KETUA KELOMPOK SE-SISTEM UNTUK ADMIN PUSAT -->
+            // TABEL KETUA KELOMPOK SE-SISTEM UNTukan ADMIN PUSAT
             <div class="bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden">
                 <div class="bg-slate-900 text-white p-4 font-bold text-xs flex justify-between items-center">
                     <span>Daftar Seluruh Ketua Kelompok Se-Sistem (Tanggal, Kunci, &amp; Kontrol PIN)</span>
@@ -429,6 +429,7 @@
                                     <th class="p-3">Kelompok</th>
                                     <th class="p-3">Jenis Laporan</th>
                                     <th class="p-3">KPM & Keterangan</th>
+                                    <th class="p-3">NIK KPM</th>
                                     <th class="p-3">Bukti Foto / Struk</th>
                                     <th class="p-3">Status</th>
                                     <th class="p-3 text-center">Aksi Verifikasi</th>
@@ -2281,39 +2282,22 @@
         }
 
         function superAdminResetPndPin(id) {
-        function handleRegisterPendamping(e) {
-            e.preventDefault();
-            const nama = document.getElementById('regPndNama').value.trim();
-            const nip = document.getElementById('regPndNip').value.trim();
-            const kecamatan = document.getElementById('regPndKecamatan').value.trim();
-            const invite = document.getElementById('regPndInvite').value.trim().toUpperCase();
-            const pin = document.getElementById('regPndPin').value.trim();
-
-            appState.pendampingProfiles.push({ id: "PND-" + Date.now(), nama, nip, kecamatan, pin, inviteCode: invite, date: new Date().toISOString().split('T')[0], isLocked: false });
-            saveState();
-            showToast("Berhasil", "Akun pendamping terdaftar.", "success");
-            switchMainTab('login');
-        }
-        }
-
-        function superAdminResetKetuaPin(id) {
-            const k = appState.ketuaUsers.find(item => item.id === id);
-            if (!k) return;
-            const newPin = prompt(`Masukkan PIN baru untuk Ketua ${k.nama}:`, k.pin || "123456");
+            const p = appState.pendampingProfiles.find(item => item.id === id);
+            if (!p) return;
+            const newPin = prompt(`Masukkan PIN baru untuk Pendamping ${p.nama}:`, "123456");
             if (newPin !== null && newPin.trim().length >= 4) {
-                k.pin = newPin.trim();
+                p.pin = newPin.trim();
                 saveState();
-                renderSuperAdminDashboard();
-                showToast("Berhasil", `PIN Ketua ${k.nama} diperbarui.`, "success");
+                showToast("Berhasil", `PIN Pendamping ${p.nama} direset.`, "success");
             }
         }
 
-        function superAdminDeleteKetua(id) {
-            if (confirm("Hapus akun ketua kelompok ini?")) {
-                appState.ketuaUsers = appState.ketuaUsers.filter(item => item.id !== id);
+        function superAdminDeletePnd(id) {
+            if (confirm("Hapus akun pendamping ini beserta kelompok binaannya?")) {
+                appState.pendampingProfiles = appState.pendampingProfiles.filter(item => item.id !== id);
                 saveState();
                 renderSuperAdminDashboard();
-                showToast("Dihapus", "Akun ketua dihapus.", "info");
+                showToast("Dihapus", "Akun pendamping dihapus.", "info");
             }
         }
 
@@ -2581,7 +2565,7 @@
             }
 
             if (allReports.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" class="text-center p-6 text-slate-400 font-semibold">Belum ada laporan rutin masuk sesuai filter.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="8" class="text-center p-6 text-slate-400 font-semibold">Belum ada laporan rutin masuk sesuai filter.</td></tr>`;
                 return;
             }
 
@@ -2602,6 +2586,15 @@
                 if (r.reportType === 'P2K2') detailInfo = `Modul: ${r.modul || '-'} (Status: ${r.status || '-'})`;
                 else if (r.reportType === 'Rekonsiliasi') detailInfo = `Tahap: ${r.tahap || '-'} (Rp ${(r.nominal || 0).toLocaleString('id-ID')})`;
 
+                // Cari NIK KPM dari daftar kpmList berdasarkan nama dan kelompok
+                let foundNik = '-';
+                if (r.kpmNama && r.kelompok) {
+                    const matchedKpm = appState.kpmList.find(k => k.nama.toLowerCase() === r.kpmNama.toLowerCase() && k.kelompok.toLowerCase() === r.kelompok.toLowerCase());
+                    if (matchedKpm && matchedKpm.nik) {
+                        foundNik = matchedKpm.nik;
+                    }
+                }
+
                 tbody.innerHTML += `
                     <tr>
                         <td class="p-3">${r.tanggal || '-'}</td>
@@ -2611,6 +2604,7 @@
                             <div class="font-bold text-slate-900">${r.kpmNama || '-'}</div>
                             <div class="text-[11px] text-slate-500 font-medium">${detailInfo}</div>
                         </td>
+                        <td class="p-3 font-mono font-semibold text-slate-700">${foundNik}</td>
                         <td class="p-3">${fotoHtml}</td>
                         <td class="p-3"><span class="px-2.5 py-1 rounded-full font-bold text-[10px] ${badgeStatus}">${r.statusVerifikasi || 'PENDING'}</span></td>
                         <td class="p-3 text-center space-x-1 whitespace-nowrap">
