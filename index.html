@@ -810,6 +810,7 @@
                         <table class="w-full text-left border-collapse text-xs">
                             <thead>
                                 <tr class="bg-slate-100 text-slate-700 font-bold border-b border-slate-200">
+                                    <th class="p-3 w-12 text-center">No</th>
                                     <th class="p-3">Nama KPM</th>
                                     <th class="p-3">NIK</th>
                                     <th class="p-3">Kohor</th>
@@ -830,8 +831,12 @@
             <!-- KONTEN KETUA: P2K2 -->
             <div id="kContentP2k2" class="hidden space-y-6">
                 <div class="bg-white rounded-2xl shadow-xl border border-slate-100 p-6 space-y-4">
-                    <h3 class="font-bold text-slate-800 text-sm">Input Presensi Pertemuan P2K2</h3>
+                    <div class="flex justify-between items-center pb-3 border-b border-slate-100">
+                        <h3 id="formP2k2Title" class="font-bold text-slate-800 text-sm">Input Presensi Pertemuan P2K2</h3>
+                        <button type="button" id="btnCancelP2k2Edit" onclick="cancelP2k2Edit()" class="hidden text-xs bg-slate-200 text-slate-700 px-3 py-1 rounded-lg font-bold">Batal Edit</button>
+                    </div>
                     <form id="formP2k2" onsubmit="handleSaveP2k2(event)" class="space-y-4 text-xs">
+                        <input type="hidden" id="editP2k2Id">
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                             <div>
                                 <label class="block font-bold text-slate-700 mb-1">Pilih Anggota KPM</label>
@@ -862,7 +867,7 @@
                             <label class="block font-bold text-slate-700 mb-1">Bukti Foto Kegiatan P2K2 (Kamera / Galeri)</label>
                             <input type="file" id="p2k2Foto" accept="image/*" class="w-full p-2 bg-slate-50 border border-slate-300 rounded-xl file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-emerald-50 file:text-emerald-800">
                         </div>
-                        <button type="submit" class="bg-emerald-700 hover:bg-emerald-800 text-white px-6 py-3 rounded-xl font-bold shadow cursor-pointer">Simpan Presensi P2K2</button>
+                        <button type="submit" id="btnSubmitP2k2" class="bg-emerald-700 hover:bg-emerald-800 text-white px-6 py-3 rounded-xl font-bold shadow cursor-pointer">Simpan Presensi P2K2</button>
                     </form>
                 </div>
 
@@ -874,6 +879,7 @@
                                 <tr class="bg-slate-100 text-slate-700 font-bold border-b border-slate-200">
                                     <th class="p-3">Tanggal</th>
                                     <th class="p-3">Nama KPM</th>
+                                    <th class="p-3">NIK</th>
                                     <th class="p-3">Modul P2K2</th>
                                     <th class="p-3">Status</th>
                                     <th class="p-3">Verifikasi</th>
@@ -928,7 +934,9 @@
                                 <tr class="bg-slate-100 text-slate-700 font-bold border-b border-slate-200">
                                     <th class="p-3">Tanggal</th>
                                     <th class="p-3">Nama KPM</th>
-                                    <th class="p-3">Jenis Layanan &amp; Bukti Foto</th>
+                                    <th class="p-3">NIK</th>
+                                    <th class="p-3">Jenis Layanan</th>
+                                    <th class="p-3">Bukti Foto</th>
                                     <th class="p-3">Status</th>
                                     <th class="p-3">Verifikasi</th>
                                     <th class="p-3 text-center">Aksi</th>
@@ -984,6 +992,7 @@
                                 <tr class="bg-slate-100 text-slate-700 font-bold border-b border-slate-200">
                                     <th class="p-3">Tanggal</th>
                                     <th class="p-3">Nama KPM</th>
+                                    <th class="p-3">NIK</th>
                                     <th class="p-3">Tahap</th>
                                     <th class="p-3">Nominal (Rp)</th>
                                     <th class="p-3">Verifikasi</th>
@@ -1086,8 +1095,11 @@
                                 <tr class="bg-slate-100 text-slate-700 font-bold border-b border-slate-200">
                                     <th class="p-3">Tanggal</th>
                                     <th class="p-3">Nama KPM</th>
+                                    <th class="p-3">NIK</th>
                                     <th class="p-3">Kohor &amp; Usia</th>
                                     <th class="p-3">Ajuan Usaha</th>
+                                    <th class="p-3">Analisis Keuangan Rumah Tangga</th>
+                                    <th class="p-3">Foto Usaha</th>
                                     <th class="p-3">Status</th>
                                     <th class="p-3 text-center">Aksi</th>
                                 </tr>
@@ -1162,8 +1174,12 @@
                                 <tr class="bg-slate-100 text-slate-700 font-bold border-b border-slate-200">
                                     <th class="p-3">Tanggal</th>
                                     <th class="p-3">Nama KPM</th>
+                                    <th class="p-3">NIK</th>
                                     <th class="p-3">Kohor</th>
                                     <th class="p-3">Alasan</th>
+                                    <th class="p-3">Foto KPM</th>
+                                    <th class="p-3">Foto Rumah</th>
+                                    <th class="p-3">Foto Surat Pernyataan</th>
                                     <th class="p-3">Status</th>
                                     <th class="p-3 text-center">Aksi</th>
                                 </tr>
@@ -1622,7 +1638,11 @@
 
         try { firebase.initializeApp(firebaseConfig); } catch (e) {}
         let db = null;
-        try { db = firebase.firestore(); } catch (e) {}
+        try { 
+            db = firebase.firestore(); 
+        } catch (e) {
+            console.warn("Firestore initialization warning:", e);
+        }
 
         let currentUser = null;
         let appState = {
@@ -1765,82 +1785,71 @@
         }
 
         function saveState() {
+            // Selalu simpan ke localStorage terlebih dahulu sebagai sumber kebenaran utama (Primary Storage)
             try {
                 localStorage.setItem('SIP_PKH_STATE_V6', JSON.stringify(appState));
             } catch (err) {
-                console.error("LocalStorage save error:", err);
+                console.error("Local storage save error:", err);
             }
+            
+            // Sinkronisasi asinkron ke cloud/Firestore tanpa menimpa data lokal jika offline/gagal
             if (db) {
                 try {
-                    // Clone state and strip large photo data or truncate arrays for Firestore to prevent exceeding the 1MB document limit
-                    const lightState = {
-                        ...appState,
-                        komitmenList: (appState.komitmenList || []).map(item => ({ ...item, foto: item.foto ? ["compressed_image"] : [] })),
-                        p2k2List: (appState.p2k2List || []).map(item => ({ ...item, foto: item.foto ? "compressed_image" : "" })),
-                        rekonsiliasiList: (appState.rekonsiliasiList || []).map(item => ({ ...item, foto: item.foto ? "compressed_image" : "" })),
-                        ppseList: (appState.ppseList || []).map(item => ({ ...item, foto: item.foto ? "compressed_image" : "" })),
-                        graduasiList: (appState.graduasiList || []).map(item => ({ ...item, fotoKpm: "", fotoRumah: "", fotoSurat: "" }))
-                    };
-                    db.collection("pkh_database").doc("main_state").set(lightState).catch(err => {
-                        console.error("Firestore sync error (handled):", err);
+                    db.collection("pkh_database").doc("main_state").set(appState).catch(err => {
+                        console.warn("Firestore sync skipped:", err);
                     });
                 } catch (e) {}
             }
         }
 
         function initRealtimeSync() {
+            // Muat data lokal seketika saat startup agar data tidak pernah kosong/hilang
+            const saved = localStorage.getItem('SIP_PKH_STATE_V6');
+            if (saved) {
+                try { 
+                    const parsed = JSON.parse(saved);
+                    if (parsed && parsed.pendampingProfiles) {
+                        appState = { ...appState, ...parsed };
+                    }
+                } catch (err) {}
+            }
+
             if (db) {
                 try {
                     db.collection("pkh_database").doc("main_state").onSnapshot((doc) => {
                         if (doc.exists && doc.data() && doc.data().pendampingProfiles) {
                             const remoteState = doc.data();
-                            // Merge remote lists carefully with local state to preserve full local photos and data
-                            const mergedKpm = [...(appState.kpmList || [])];
-                            (remoteState.kpmList || []).forEach(rk => {
-                                if (!mergedKpm.some(lk => lk.id === rk.id)) mergedKpm.push(rk);
-                            });
-
-                            const mergedP2k2 = [...(appState.p2k2List || [])];
-                            (remoteState.p2k2List || []).forEach(rp => {
-                                if (!mergedP2k2.some(lp => lp.id === rp.id)) mergedP2k2.push(rp);
-                            });
-
-                            const mergedKom = [...(appState.komitmenList || [])];
-                            (remoteState.komitmenList || []).forEach(rk => {
-                                if (!mergedKom.some(lk => lk.id === rk.id)) mergedKom.push(rk);
-                            });
-
-                            const mergedRekon = [...(appState.rekonsiliasiList || [])];
-                            (remoteState.rekonsiliasiList || []).forEach(rr => {
-                                if (!mergedRekon.some(lr => lr.id === rr.id)) mergedRekon.push(rr);
-                            });
-
-                            const mergedPpse = [...(appState.ppseList || [])];
-                            (remoteState.ppseList || []).forEach(rp => {
-                                if (!mergedPpse.some(lp => lp.id === rp.id)) mergedPpse.push(rp);
-                            });
-
-                            const mergedGrad = [...(appState.graduasiList || [])];
-                            (remoteState.graduasiList || []).forEach(rg => {
-                                if (!mergedGrad.some(lg => lg.id === rg.id)) mergedGrad.push(rg);
-                            });
-
-                            appState = {
-                                ...remoteState,
-                                kpmList: mergedKpm,
-                                p2k2List: mergedP2k2,
-                                komitmenList: mergedKom,
-                                rekonsiliasiList: mergedRekon,
-                                ppseList: mergedPpse,
-                                graduasiList: mergedGrad
-                            };
+                            // Hanya sinkronkan jika data remote tidak kosong untuk mencegah data lokal tertimpa
+                            if (remoteState.kpmList && remoteState.kpmList.length >= (appState.kpmList || []).length) {
+                                appState.kpmList = remoteState.kpmList;
+                            }
+                            if (remoteState.p2k2List && remoteState.p2k2List.length >= (appState.p2k2List || []).length) {
+                                appState.p2k2List = remoteState.p2k2List;
+                            }
+                            if (remoteState.komitmenList && remoteState.komitmenList.length >= (appState.komitmenList || []).length) {
+                                appState.komitmenList = remoteState.komitmenList;
+                            }
+                            if (remoteState.rekonsiliasiList && remoteState.rekonsiliasiList.length >= (appState.rekonsiliasiList || []).length) {
+                                appState.rekonsiliasiList = remoteState.rekonsiliasiList;
+                            }
+                            if (remoteState.ppseList && remoteState.ppseList.length >= (appState.ppseList || []).length) {
+                                appState.ppseList = remoteState.ppseList;
+                            }
+                            if (remoteState.graduasiList && remoteState.graduasiList.length >= (appState.graduasiList || []).length) {
+                                appState.graduasiList = remoteState.graduasiList;
+                            }
+                            if (remoteState.ketuaUsers && remoteState.ketuaUsers.length >= (appState.ketuaUsers || []).length) {
+                                appState.ketuaUsers = remoteState.ketuaUsers;
+                            }
                             localStorage.setItem('SIP_PKH_STATE_V6', JSON.stringify(appState));
                             renderUI();
                         }
                     }, err => {
-                        console.error("Realtime sync error:", err);
+                        console.warn("Realtime sync listener warning:", err);
                     });
-                } catch (e) {}
+                } catch (e) {
+                    console.warn("Realtime sync init warning:", e);
+                }
             }
         }
 
@@ -1866,30 +1875,9 @@
                     const doc = await db.collection("pkh_database").doc("main_state").get();
                     if (doc.exists && doc.data() && doc.data().pendampingProfiles) {
                         const remote = doc.data();
-                        // Merge lists safely
-                        const mergedKpm = [...(appState.kpmList || [])];
-                        (remote.kpmList || []).forEach(rk => { if (!mergedKpm.some(lk => lk.id === rk.id)) mergedKpm.push(rk); });
-                        const mergedP2k2 = [...(appState.p2k2List || [])];
-                        (remote.p2k2List || []).forEach(rp => { if (!mergedP2k2.some(lp => lp.id === rp.id)) mergedP2k2.push(rp); });
-                        const mergedKom = [...(appState.komitmenList || [])];
-                        (remote.komitmenList || []).forEach(rk => { if (!mergedKom.some(lk => lk.id === rk.id)) mergedKom.push(rk); });
-                        const mergedRekon = [...(appState.rekonsiliasiList || [])];
-                        (remote.rekonsiliasiList || []).forEach(rr => { if (!mergedRekon.some(lr => lr.id === rr.id)) mergedRekon.push(rr); });
-                        const mergedPpse = [...(appState.ppseList || [])];
-                        (remote.ppseList || []).forEach(rp => { if (!mergedPpse.some(lp => lp.id === rp.id)) mergedPpse.push(rp); });
-                        const mergedGrad = [...(appState.graduasiList || [])];
-                        (remote.graduasiList || []).forEach(rg => { if (!mergedGrad.some(lg => lg.id === rg.id)) mergedGrad.push(rg); });
-
-                        appState = { 
-                            ...appState, 
-                            ...remote,
-                            kpmList: mergedKpm,
-                            p2k2List: mergedP2k2,
-                            komitmenList: mergedKom,
-                            rekonsiliasiList: mergedRekon,
-                            ppseList: mergedPpse,
-                            graduasiList: mergedGrad
-                        };
+                        if (remote.p2k2List && remote.p2k2List.length >= (appState.p2k2List || []).length) {
+                            appState = { ...appState, ...remote };
+                        }
                     }
                 }
             } catch (e) {}
@@ -3151,22 +3139,28 @@
             const tbodyKpm = document.getElementById('tbodyKetuaKpm');
             if (tbodyKpm) {
                 tbodyKpm.innerHTML = '';
-                appState.kpmList.filter(k => k.kelompok === myKelompok).forEach(k => {
-                    tbodyKpm.innerHTML += `
-                        <tr>
-                            <td class="p-3 font-bold">${k.nama}</td>
-                            <td class="p-3 font-mono">${k.nik}</td>
-                            <td class="p-3 text-center font-mono">${k.kohor || '2026'}</td>
-                            <td class="p-3 font-semibold text-emerald-800">${k.jenisBantuan || 'PKH'}</td>
-                            <td class="p-3">${k.komponen}</td>
-                            <td class="p-3">${k.alamat}</td>
-                            <td class="p-3 text-center space-x-1">
-                                <button onclick="editKpm('${k.id}')" class="bg-amber-500 text-white px-2 py-1 rounded text-xs font-bold cursor-pointer">Edit</button>
-                                <button onclick="deleteKpm('${k.id}')" class="bg-red-600 text-white px-2 py-1 rounded text-xs font-bold cursor-pointer">Hapus</button>
-                            </td>
-                        </tr>
-                    `;
-                });
+                const myKpmData = appState.kpmList.filter(k => k.kelompok === myKelompok);
+                if (myKpmData.length === 0) {
+                    tbodyKpm.innerHTML = `<tr><td colspan="8" class="text-center p-4 text-slate-400">Belum ada anggota KPM.</td></tr>`;
+                } else {
+                    myKpmData.forEach((k, index) => {
+                        tbodyKpm.innerHTML += `
+                            <tr>
+                                <td class="p-3 text-center font-bold text-slate-600">${index + 1}</td>
+                                <td class="p-3 font-bold">${k.nama}</td>
+                                <td class="p-3 font-mono">${k.nik}</td>
+                                <td class="p-3 text-center font-mono">${k.kohor || '2026'}</td>
+                                <td class="p-3 font-semibold text-emerald-800">${k.jenisBantuan || 'PKH'}</td>
+                                <td class="p-3">${k.komponen}</td>
+                                <td class="p-3">${k.alamat}</td>
+                                <td class="p-3 text-center space-x-1 whitespace-nowrap">
+                                    <button onclick="editKpm('${k.id}')" class="bg-amber-500 text-white px-2 py-1 rounded text-xs font-bold cursor-pointer">Edit</button>
+                                    <button onclick="deleteKpm('${k.id}')" class="bg-red-600 text-white px-2 py-1 rounded text-xs font-bold cursor-pointer">Hapus</button>
+                                </td>
+                            </tr>
+                        `;
+                    });
+                }
             }
 
             const tbodyP2k2 = document.getElementById('tbodyKetuaP2k2');
@@ -3178,15 +3172,27 @@
                     if (p.statusVerifikasi === 'DISETUJUI') badgeStatus = 'bg-emerald-100 text-emerald-800';
                     if (p.statusVerifikasi === 'DITOLAK') badgeStatus = 'bg-red-100 text-red-800';
 
+                    let foundNik = '-';
+                    if (p.kpmNama && p.kelompok) {
+                        const matchedKpm = appState.kpmList.find(k => k.nama.toLowerCase() === p.kpmNama.toLowerCase() && k.kelompok.toLowerCase() === p.kelompok.toLowerCase());
+                        if (matchedKpm && matchedKpm.nik) {
+                            foundNik = matchedKpm.nik;
+                        }
+                    }
+
                     tbodyP2k2.innerHTML += `
                         <tr>
                             <td class="p-3">${p.tanggal}</td>
                             <td class="p-3 font-bold">${p.kpmNama}</td>
+                            <td class="p-3 font-mono text-slate-700">${foundNik}</td>
                             <td class="p-3">${p.modul}</td>
                             <td class="p-3">${p.status}</td>
                             <td class="p-3"><span class="px-2.5 py-1 rounded-full font-bold text-[10px] ${badgeStatus}">${p.statusVerifikasi || 'PENDING'}</span></td>
                             <td class="p-3">${p2k2Thumb}</td>
-                            <td class="p-3 text-center"><button onclick="deleteP2k2('${p.id}')" class="bg-red-600 text-white px-2 py-1 rounded text-xs cursor-pointer">Hapus</button></td>
+                            <td class="p-3 text-center space-x-1 whitespace-nowrap">
+                                <button onclick="editP2k2('${p.id}')" class="bg-amber-500 text-white px-2 py-1 rounded text-xs font-bold cursor-pointer">Edit</button>
+                                <button onclick="deleteP2k2('${p.id}')" class="bg-red-600 text-white px-2 py-1 rounded text-xs font-bold cursor-pointer">Hapus</button>
+                            </td>
                         </tr>
                     `;
                 });
@@ -3196,50 +3202,71 @@
             if (tbodyKomitmen) {
                 tbodyKomitmen.innerHTML = '';
                 appState.komitmenList.filter(k => k.kelompok === myKelompok).forEach(k => {
-                    let fotoLinks = '-';
+                    let fotoHtml = '-';
                     if (Array.isArray(k.foto) && k.foto.length > 0) {
-                        fotoLinks = k.foto.map(f => `<img src="${f}" alt="Foto" onclick="openImageViewer('${f}')" class="inline-block w-10 h-10 object-cover rounded border border-slate-300 mr-1 cursor-pointer hover:opacity-80" title="Klik untuk memperbesar">`).join('');
-                    } else if (k.foto && typeof k.foto === 'string' && k.foto.trim() !== '') {
-                        fotoLinks = `<img src="${k.foto}" alt="Bukti" onclick="openImageViewer('${k.foto}')" class="inline-block w-10 h-10 object-cover rounded border border-slate-300 cursor-pointer hover:opacity-80" title="Klik untuk memperbesar">`;
+                        fotoHtml = k.foto.map(f => `<img src="${f}" alt="Foto" onclick="openImageViewer('${f}')" class="inline-block w-10 h-10 object-cover rounded border border-slate-300 mr-1 cursor-pointer hover:opacity-80" title="Klik untuk memperbesar">`).join('');
+                    } else if (typeof k.foto === 'string' && k.foto.trim() !== '') {
+                        fotoHtml = `<img src="${k.foto}" alt="Bukti" onclick="openImageViewer('${k.foto}')" class="w-10 h-10 object-cover rounded border border-slate-300 cursor-pointer hover:opacity-80" title="Klik untuk memperbesar">`;
                     }
+
                     let badgeStatus = 'bg-amber-100 text-amber-800';
                     if (k.statusVerifikasi === 'DISETUJUI') badgeStatus = 'bg-emerald-100 text-emerald-800';
                     if (k.statusVerifikasi === 'DITOLAK') badgeStatus = 'bg-red-100 text-red-800';
+
+                    let foundNik = '-';
+                    if (k.kpmNama && k.kelompok) {
+                        const matchedKpm = appState.kpmList.find(item => item.nama.toLowerCase() === k.kpmNama.toLowerCase() && item.kelompok.toLowerCase() === k.kelompok.toLowerCase());
+                        if (matchedKpm && matchedKpm.nik) {
+                            foundNik = matchedKpm.nik;
+                        }
+                    }
 
                     tbodyKomitmen.innerHTML += `
                         <tr>
                             <td class="p-3">${k.tanggal}</td>
                             <td class="p-3 font-bold">${k.kpmNama}</td>
-                            <td class="p-3">
-                                <div>${k.jenis}</div>
-                                <div class="mt-1">${fotoLinks}</div>
-                            </td>
+                            <td class="p-3 font-mono text-slate-700">${foundNik}</td>
+                            <td class="p-3 font-semibold text-blue-900">${k.jenis}</td>
+                            <td class="p-3">${fotoHtml}</td>
                             <td class="p-3">${k.status}</td>
                             <td class="p-3"><span class="px-2.5 py-1 rounded-full font-bold text-[10px] ${badgeStatus}">${k.statusVerifikasi || 'PENDING'}</span></td>
-                            <td class="p-3 text-center"><button onclick="deleteKomitmen('${k.id}')" class="bg-red-600 text-white px-2 py-1 rounded text-xs cursor-pointer">Hapus</button></td>
+                            <td class="p-3 text-center">
+                                <button onclick="deleteKomitmen('${k.id}')" class="bg-red-600 text-white px-2 py-1 rounded text-xs font-bold cursor-pointer">Hapus</button>
+                            </td>
                         </tr>
                     `;
                 });
             }
 
-            const tbodyRekon = document.getElementById('tbodyKetuaRekonsiliasi');
-            if (tbodyRekon) {
-                tbodyRekon.innerHTML = '';
+            const tbodyRekonsiliasi = document.getElementById('tbodyKetuaRekonsiliasi');
+            if (tbodyRekonsiliasi) {
+                tbodyRekonsiliasi.innerHTML = '';
                 appState.rekonsiliasiList.filter(r => r.kelompok === myKelompok).forEach(r => {
                     let rekonThumb = r.foto ? `<img src="${r.foto}" alt="Struk" onclick="openImageViewer('${r.foto}')" class="w-10 h-10 object-cover rounded border border-slate-300 cursor-pointer hover:opacity-80" title="Klik untuk memperbesar">` : '-';
                     let badgeStatus = 'bg-amber-100 text-amber-800';
                     if (r.statusVerifikasi === 'DISETUJUI') badgeStatus = 'bg-emerald-100 text-emerald-800';
                     if (r.statusVerifikasi === 'DITOLAK') badgeStatus = 'bg-red-100 text-red-800';
 
-                    tbodyRekon.innerHTML += `
+                    let foundNik = '-';
+                    if (r.kpmNama && r.kelompok) {
+                        const matchedKpm = appState.kpmList.find(item => item.nama.toLowerCase() === r.kpmNama.toLowerCase() && item.kelompok.toLowerCase() === r.kelompok.toLowerCase());
+                        if (matchedKpm && matchedKpm.nik) {
+                            foundNik = matchedKpm.nik;
+                        }
+                    }
+
+                    tbodyRekonsiliasi.innerHTML += `
                         <tr>
                             <td class="p-3">${r.tanggal}</td>
                             <td class="p-3 font-bold">${r.kpmNama}</td>
+                            <td class="p-3 font-mono text-slate-700">${foundNik}</td>
                             <td class="p-3">${r.tahap}</td>
-                            <td class="p-3 font-semibold text-blue-900">Rp ${(r.nominal || 0).toLocaleString('id-ID')}</td>
+                            <td class="p-3 font-mono font-semibold">Rp ${(r.nominal||0).toLocaleString('id-ID')}</td>
                             <td class="p-3"><span class="px-2.5 py-1 rounded-full font-bold text-[10px] ${badgeStatus}">${r.statusVerifikasi || 'PENDING'}</span></td>
                             <td class="p-3">${rekonThumb}</td>
-                            <td class="p-3 text-center"><button onclick="deleteRekonsiliasi('${r.id}')" class="bg-red-600 text-white px-2 py-1 rounded text-xs cursor-pointer">Hapus</button></td>
+                            <td class="p-3 text-center">
+                                <button onclick="deleteRekonsiliasi('${r.id}')" class="bg-red-600 text-white px-2 py-1 rounded text-xs font-bold cursor-pointer">Hapus</button>
+                            </td>
                         </tr>
                     `;
                 });
@@ -3253,22 +3280,24 @@
                     if (p.statusVerifikasi === 'DISETUJUI') badgeStatus = 'bg-emerald-100 text-emerald-800';
                     if (p.statusVerifikasi === 'DITOLAK') badgeStatus = 'bg-red-100 text-red-800';
 
+                    let fotoThumb = p.foto ? `<img src="${p.foto}" alt="Foto Usaha" onclick="openImageViewer('${p.foto}')" class="w-10 h-10 object-cover rounded border border-slate-300 cursor-pointer hover:opacity-80 shadow-sm" title="Klik untuk memperbesar">` : '-';
+                    let sisaClass = (p.sisaVal || 0) < 0 ? 'text-red-600 font-bold' : 'text-blue-900 font-bold';
+
                     tbodyPpse.innerHTML += `
                         <tr>
                             <td class="p-3">${p.tanggal}</td>
-                            <td class="p-3">
-                                <div class="font-bold">${p.kpmNama}</div>
-                                <div class="text-[10px] font-mono text-slate-500">${p.nik}</div>
+                            <td class="p-3 font-bold">${p.kpmNama}</td>
+                            <td class="p-3 font-mono text-slate-700">${p.nik}</td>
+                            <td class="p-3">Kohor: ${p.kohor} | Usia: ${p.usia} Thn</td>
+                            <td class="p-3 font-semibold text-emerald-800">${p.usahaAjuan}</td>
+                            <td class="p-3 text-[11px]">
+                                <div>Makan/Minum: Rp ${(p.makan || 0).toLocaleString('id-ID')}</div>
+                                <div>Bersih: Rp ${(p.bersih || 0).toLocaleString('id-ID')}</div>
+                                <div>Keluarga: Rp ${(p.keluarga || 0).toLocaleString('id-ID')}</div>
+                                <div class="${sisaClass}">Sisa: Rp ${(p.sisaVal || 0).toLocaleString('id-ID')}</div>
                             </td>
-                            <td class="p-3">
-                                <div>Kohor: ${p.kohor}</div>
-                                <div class="text-[10px] text-slate-500">Usia: ${p.usia} Thn</div>
-                            </td>
-                            <td class="p-3">
-                                <div class="font-bold text-emerald-800">${p.usahaAjuan}</div>
-                                <div class="text-[10px] text-slate-500">Sisa: Rp ${(p.sisaVal || 0).toLocaleString('id-ID')}</div>
-                            </td>
-                            <td class="p-3"><span class="px-2 py-0.5 rounded-full font-bold text-[10px] ${badgeStatus}">${p.statusVerifikasi || 'PENDING'}</span></td>
+                            <td class="p-3">${fotoThumb}</td>
+                            <td class="p-3"><span class="px-2.5 py-1 rounded-full font-bold text-[10px] ${badgeStatus}">${p.statusVerifikasi || 'PENDING'}</span></td>
                             <td class="p-3 text-center space-x-1 whitespace-nowrap">
                                 <button onclick="editPpse('${p.id}')" class="bg-amber-500 text-white px-2 py-1 rounded text-xs font-bold cursor-pointer">Edit</button>
                                 <button onclick="deletePpse('${p.id}')" class="bg-red-600 text-white px-2 py-1 rounded text-xs font-bold cursor-pointer">Hapus</button>
@@ -3286,15 +3315,20 @@
                     if (g.statusVerifikasi === 'DISETUJUI') badgeStatus = 'bg-emerald-100 text-emerald-800';
                     if (g.statusVerifikasi === 'DITOLAK') badgeStatus = 'bg-red-100 text-red-800';
 
+                    let fotoKpmThumb = g.fotoKpm ? `<img src="${g.fotoKpm}" alt="KPM" onclick="openImageViewer('${g.fotoKpm}')" class="w-10 h-10 object-cover rounded border border-slate-300 cursor-pointer hover:opacity-80 shadow-sm" title="Klik untuk memperbesar">` : '-';
+                    let fotoRumahThumb = g.fotoRumah ? `<img src="${g.fotoRumah}" alt="Rumah" onclick="openImageViewer('${g.fotoRumah}')" class="w-10 h-10 object-cover rounded border border-slate-300 cursor-pointer hover:opacity-80 shadow-sm" title="Klik untuk memperbesar">` : '-';
+                    let fotoSuratThumb = g.fotoSurat ? `<img src="${g.fotoSurat}" alt="Surat" onclick="openImageViewer('${g.fotoSurat}')" class="w-10 h-10 object-cover rounded border border-slate-300 cursor-pointer hover:opacity-80 shadow-sm" title="Klik untuk memperbesar">` : '-';
+
                     tbodyGraduasi.innerHTML += `
                         <tr>
                             <td class="p-3">${g.tanggal}</td>
-                            <td class="p-3">
-                                <div class="font-bold">${g.kpmNama}</div>
-                                <div class="text-[10px] font-mono text-slate-500">${g.nik}</div>
-                            </td>
+                            <td class="p-3 font-bold">${g.kpmNama}</td>
+                            <td class="p-3 font-mono text-slate-700">${g.nik}</td>
                             <td class="p-3 text-center font-mono">${g.kohor}</td>
                             <td class="p-3">${g.alasan}</td>
+                            <td class="p-3">${fotoKpmThumb}</td>
+                            <td class="p-3">${fotoRumahThumb}</td>
+                            <td class="p-3">${fotoSuratThumb}</td>
                             <td class="p-3"><span class="px-2 py-0.5 rounded-full font-bold text-[10px] ${badgeStatus}">${g.statusVerifikasi || 'PENDING'}</span></td>
                             <td class="p-3 text-center space-x-1 whitespace-nowrap">
                                 <button onclick="editGraduasi('${g.id}')" class="bg-amber-500 text-white px-2 py-1 rounded text-xs font-bold cursor-pointer">Edit</button>
@@ -3596,31 +3630,69 @@
 
         function handleSaveP2k2(e) {
             e.preventDefault();
+            const editId = document.getElementById('editP2k2Id').value;
             const kpmNama = document.getElementById('p2k2KpmSelect').value;
             const modul = document.getElementById('p2k2Modul').value;
             const status = document.getElementById('p2k2Status').value;
             const fileInput = document.getElementById('p2k2Foto');
 
             const saveRecord = (fotoUrl = "") => {
-                appState.p2k2List.push({
-                    id: "P2K-" + Date.now(),
-                    tanggal: new Date().toISOString().split('T')[0],
-                    kelompok: currentUser.kelompok,
-                    kpmNama, modul, status,
-                    foto: fotoUrl,
-                    statusVerifikasi: "PENDING"
-                });
+                if (editId) {
+                    const found = appState.p2k2List.find(i => i.id === editId);
+                    if (found) {
+                        found.kpmNama = kpmNama;
+                        found.modul = modul;
+                        found.status = status;
+                        if (fotoUrl) found.foto = fotoUrl;
+                    }
+                    document.getElementById('editP2k2Id').value = '';
+                    document.getElementById('formP2k2Title').innerText = "Input Presensi Pertemuan P2K2";
+                    document.getElementById('btnSubmitP2k2').innerText = "Simpan Presensi P2K2";
+                    document.getElementById('btnCancelP2k2Edit').classList.add('hidden');
+                    showToast("Berhasil", "Presensi P2K2 berhasil diperbarui.", "success");
+                } else {
+                    if (!appState.p2k2List) appState.p2k2List = [];
+                    appState.p2k2List.push({
+                        id: "P2K-" + Date.now(),
+                        tanggal: new Date().toISOString().split('T')[0],
+                        kelompok: currentUser.kelompok,
+                        kpmNama, modul, status,
+                        foto: fotoUrl,
+                        statusVerifikasi: "PENDING"
+                    });
+                    showToast("Berhasil", "Presensi P2K2 berhasil disimpan.", "success");
+                }
                 saveState();
                 document.getElementById('formP2k2').reset();
                 renderKetuaAllTables();
-                showToast("Berhasil", "Presensi P2K2 disimpan.", "success");
             };
 
             if (fileInput.files && fileInput.files[0]) {
-                compressImage(fileInput.files[0], (base64) => { saveRecord(base64); }, 800, 0.7);
+                compressImage(fileInput.files[0], (base64) => { saveRecord(base64); }, 700, 0.6);
             } else {
-                saveRecord("");
+                const existing = editId ? appState.p2k2List.find(i => i.id === editId) : null;
+                saveRecord(existing ? existing.foto : "");
             }
+        }
+
+        function editP2k2(id) {
+            const item = appState.p2k2List.find(i => i.id === id);
+            if (!item) return;
+            document.getElementById('editP2k2Id').value = item.id;
+            document.getElementById('p2k2KpmSelect').value = item.kpmNama;
+            document.getElementById('p2k2Modul').value = item.modul;
+            document.getElementById('p2k2Status').value = item.status;
+            document.getElementById('formP2k2Title').innerText = "Edit Presensi P2K2";
+            document.getElementById('btnSubmitP2k2').innerText = "Perbarui Presensi P2K2";
+            document.getElementById('btnCancelP2k2Edit').classList.remove('hidden');
+        }
+
+        function cancelP2k2Edit() {
+            document.getElementById('editP2k2Id').value = '';
+            document.getElementById('formP2k2').reset();
+            document.getElementById('formP2k2Title').innerText = "Input Presensi Pertemuan P2K2";
+            document.getElementById('btnSubmitP2k2').innerText = "Simpan Presensi P2K2";
+            document.getElementById('btnCancelP2k2Edit').classList.add('hidden');
         }
 
         function deleteP2k2(id) {
@@ -4209,6 +4281,12 @@
                     ctx.drawImage(img, 0, 0, width, height);
                     callback(canvas.toDataURL('image/jpeg', quality));
                 };
+                img.onerror = function() {
+                    callback(event.target.result); // Fallback jika kompresi gagal
+                };
+            };
+            reader.onerror = function() {
+                callback("");
             };
         }
 
