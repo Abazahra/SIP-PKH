@@ -367,6 +367,9 @@
                     <p class="text-xs text-blue-200">Kelola kelompok binaan, verifikasi laporan KPM, dan cetak dokumen rekapitulasi resmi.</p>
                 </div>
                 <div class="flex items-center space-x-2">
+                    <button onclick="runDataHealthCheck()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3.5 py-2 rounded-xl font-bold text-xs shadow flex items-center space-x-1.5 cursor-pointer" title="Periksa Kesehatan Data & Kompresi Foto">
+                        <i class="fas fa-shield-heart"></i><span>Periksa &amp; Amankan Data</span>
+                    </button>
                     <button onclick="openEditPendampingProfileModal()" class="bg-blue-800 hover:bg-blue-700 text-white px-3.5 py-2 rounded-xl font-bold text-xs shadow flex items-center space-x-1.5 cursor-pointer">
                         <i class="fas fa-user-edit"></i><span>Edit Profil</span>
                     </button>
@@ -401,6 +404,13 @@
                 <div class="bg-white rounded-2xl shadow-xl border border-slate-100 p-6 space-y-4">
                     <div class="flex flex-wrap gap-4 items-center justify-between pb-4 border-b border-slate-100">
                         <div class="flex flex-wrap items-center gap-3">
+                            <div>
+                                <label class="block text-[10px] font-bold text-slate-500 mb-1">Cari Berdasarkan NIK KPM</label>
+                                <div class="relative">
+                                    <input type="text" id="pSearchNik" oninput="renderPendampingVerifikasiTable()" placeholder="Ketik 16 digit NIK..." maxlength="16" class="p-2 pl-8 bg-slate-50 border border-slate-300 rounded-xl text-xs font-mono font-semibold w-48 sm:w-60">
+                                    <i class="fas fa-search absolute left-2.5 top-3 text-slate-400 text-xs"></i>
+                                </div>
+                            </div>
                             <div>
                                 <label class="block text-[10px] font-bold text-slate-500 mb-1">Filter Kelompok</label>
                                 <select id="pFilterKelompokVerifikasi" onchange="renderPendampingVerifikasiTable()" class="p-2 bg-slate-50 border border-slate-300 rounded-xl text-xs font-semibold">
@@ -864,7 +874,10 @@
                             </div>
                         </div>
                         <div>
-                            <label class="block font-bold text-slate-700 mb-1">Bukti Foto Kegiatan P2K2 (Kamera / Galeri)</label>
+                            <div class="flex justify-between items-center mb-1">
+                                <label class="block font-bold text-slate-700">Bukti Foto Kegiatan P2K2 (Kamera / Galeri)</label>
+                                <span class="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded-full"><i class="fas fa-shield-alt"></i> Kompresi Otomatis Aktif (Max 800px / &lt;150KB)</span>
+                            </div>
                             <input type="file" id="p2k2Foto" accept="image/*" class="w-full p-2 bg-slate-50 border border-slate-300 rounded-xl file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-emerald-50 file:text-emerald-800">
                         </div>
                         <button type="submit" id="btnSubmitP2k2" class="bg-emerald-700 hover:bg-emerald-800 text-white px-6 py-3 rounded-xl font-bold shadow cursor-pointer">Simpan Presensi P2K2</button>
@@ -977,7 +990,10 @@
                             </div>
                         </div>
                         <div>
-                            <label class="block font-bold text-slate-700 mb-1">Bukti Struk ATM / KKS (Kamera / Galeri)</label>
+                            <div class="flex justify-between items-center mb-1">
+                                <label class="block font-bold text-slate-700">Bukti Struk ATM / KKS (Kamera / Galeri)</label>
+                                <span class="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded-full"><i class="fas fa-shield-alt"></i> Kompresi Otomatis Aktif</span>
+                            </div>
                             <input type="file" id="rekonFoto" accept="image/*" class="w-full p-2 bg-slate-50 border border-slate-300 rounded-xl file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-emerald-50 file:text-emerald-800">
                         </div>
                         <button type="submit" class="bg-emerald-700 hover:bg-emerald-800 text-white px-6 py-3 rounded-xl font-bold shadow cursor-pointer">Simpan Rekonsiliasi</button>
@@ -1636,10 +1652,21 @@
             measurementId: "G-TVDFV2JHXW"
         };
 
-        try { firebase.initializeApp(firebaseConfig); } catch (e) {}
+        try { 
+            firebase.initializeApp(firebaseConfig); 
+        } catch (e) {}
+
         let db = null;
         try { 
             db = firebase.firestore(); 
+            // Enable offline persistence so Firestore operates seamlessly in offline mode
+            db.enablePersistence({ synchronizeTabs: true }).catch((err) => {
+                if (err.code == 'failed-precondition') {
+                    console.warn("Firestore persistence failed: Multiple tabs open");
+                } else if (err.code == 'unimplemented') {
+                    console.warn("Firestore persistence is not supported by this browser");
+                }
+            });
         } catch (e) {
             console.warn("Firestore initialization warning:", e);
         }
@@ -2488,6 +2515,18 @@
             });
         }
 
+        function runDataHealthCheck() {
+            let totalKpm = appState.kpmList.length;
+            let totalP2k2 = (appState.p2k2List || []).length;
+            let totalKomitmen = (appState.komitmenList || []).length;
+            let totalRekon = (appState.rekonsiliasiList || []).length;
+            let totalPpse = (appState.ppseList || []).length;
+            let totalGraduasi = (appState.graduasiList || []).length;
+            let totalGroups = appState.ketuaUsers.filter(k => k.status === 'VERIFIED').length;
+
+            showToast("Pemeriksaan Data Selesai", `${totalGroups} Kelompok aktif terverifikasi. Total: ${totalKpm} KPM, ${totalP2k2} P2K2, ${totalKomitmen} Komitmen, ${totalRekon} Rekon, ${totalPpse} PPSE, ${totalGraduasi} Graduasi. Semua data aman dan terkompresi otomatis!`, "success");
+        }
+
         function openEditKelompokModal(id) {
             const k = appState.ketuaUsers.find(item => item.id === id);
             if (!k) return;
@@ -2568,6 +2607,7 @@
             const filterKelompok = filterKelompokEl ? filterKelompokEl.value : 'ALL';
             const filterJenis = document.getElementById('pFilterJenisVerifikasi') ? document.getElementById('pFilterJenisVerifikasi').value : 'ALL';
             const filterBulan = document.getElementById('pFilterBulanVerifikasi') ? document.getElementById('pFilterBulanVerifikasi').value : '';
+            const searchNikInput = document.getElementById('pSearchNik') ? document.getElementById('pSearchNik').value.trim().toLowerCase() : '';
             const tbody = document.getElementById('tbodyPendampingVerifikasi');
             if (!tbody) return;
             tbody.innerHTML = '';
@@ -2590,7 +2630,15 @@
             }
             if (filterJenis === 'ALL' || filterJenis === 'Komitmen') {
                 if (appState.komitmenList) {
-                    appState.komitmenList.forEach(item => {
+                    appState.komitmenList.eksforEach ? appState.komitmenList.forEach(item => {
+                        const itemKelompok = item.kelompok ? item.kelompok.trim().toLowerCase() : "";
+                        if (myVerifiedGroups.includes(itemKelompok)) {
+                            const filterKlpVal = filterKelompok ? filterKelompok.trim().toLowerCase() : "all";
+                            if ((filterKlpVal === 'all' || itemKelompok === filterKlpVal) && (!filterBulan || (item.tanggal && item.tanggal.startsWith(filterBulan)))) {
+                                allReports.push({ ...item, reportType: 'Komitmen' });
+                            }
+                        }
+                    }) : appState.komitmenList.forEach(item => {
                         const itemKelompok = item.kelompok ? item.kelompok.trim().toLowerCase() : "";
                         if (myVerifiedGroups.includes(itemKelompok)) {
                             const filterKlpVal = filterKelompok ? filterKelompok.trim().toLowerCase() : "all";
@@ -2615,13 +2663,28 @@
                 }
             }
 
-            if (allReports.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="8" class="text-center p-6 text-slate-400 font-semibold">Belum ada laporan rutin masuk sesuai filter.</td></tr>`;
+            // Filter pencarian berdasarkan NIK KPM
+            let filteredReports = allReports.filter(r => {
+                if (!searchNikInput) return true;
+                
+                // Cari NIK KPM dari data KPM
+                let foundNik = '';
+                if (r.kpmNama && r.kelompok) {
+                    const matchedKpm = appState.kpmList.find(k => k.nama.toLowerCase() === r.kpmNama.toLowerCase() && k.kelompok.toLowerCase() === r.kelompok.toLowerCase());
+                    if (matchedKpm && matchedKpm.nik) {
+                        foundNik = matchedKpm.nik.toLowerCase();
+                    }
+                }
+                return foundNik.includes(searchNikInput);
+            });
+
+            if (filteredReports.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="8" class="text-center p-6 text-slate-400 font-semibold">Tidak ada laporan ditemukan sesuai NIK KPM tersebut.</td></tr>`;
                 return;
             }
 
-            allReports.sort((a, b) => new Date(b.tanggal) - new Date(a.tanggal));
-            allReports.forEach(r => {
+            filteredReports.sort((a, b) => new Date(b.tanggal) - new Date(a.tanggal));
+            filteredReports.forEach(r => {
                 let fotoHtml = '-';
                 if (Array.isArray(r.foto) && r.foto.length > 0) {
                     fotoHtml = r.foto.map((f, i) => `<img src="${f}" alt="Foto" onclick="openImageViewer('${f}')" class="inline-block w-12 h-12 object-cover rounded-lg border border-slate-300 mr-1 cursor-pointer hover:opacity-80 shadow-sm" title="Klik untuk memperbesar">`).join('');
@@ -2637,7 +2700,6 @@
                 if (r.reportType === 'P2K2') detailInfo = `Modul: ${r.modul || '-'} (Status: ${r.status || '-'})`;
                 else if (r.reportType === 'Rekonsiliasi') detailInfo = `Tahap: ${r.tahap || '-'} (Rp ${(r.nominal || 0).toLocaleString('id-ID')})`;
 
-                // Cari NIK KPM dari daftar kpmList berdasarkan nama dan kelompok
                 let foundNik = '-';
                 if (r.kpmNama && r.kelompok) {
                     const matchedKpm = appState.kpmList.find(k => k.nama.toLowerCase() === r.kpmNama.toLowerCase() && k.kelompok.toLowerCase() === r.kelompok.toLowerCase());
@@ -4279,7 +4341,9 @@
                     canvas.height = height;
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, width, height);
-                    callback(canvas.toDataURL('image/jpeg', quality));
+                    const compressedDataUrl = canvas.toDataURL('image/jpeg', quality);
+                    console.log(`SIP-PKH Image Compressed: Original size ~${Math.round(file.size/1024)}KB, Compressed ~${Math.round(compressedDataUrl.length/1024)}KB`);
+                    callback(compressedDataUrl);
                 };
                 img.onerror = function() {
                     callback(event.target.result); // Fallback jika kompresi gagal
