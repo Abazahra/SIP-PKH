@@ -3809,7 +3809,7 @@
 
                 appState.komitmenList.push(newKomitmenRecord);
                 
-                // Simpan permanen ke localStorage & Firestore seketika
+                // Simpan permanen ke localStorage & Firestore seketika dan panggil saveState()
                 saveState();
 
                 document.getElementById('formKomitmen').reset();
