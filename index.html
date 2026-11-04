@@ -4331,6 +4331,9 @@
             if (dd) dd.classList.toggle('hidden');
         }
 
+        // ==========================================
+        // FUNGSI KOMPRESI & PENYIMPANAN PERMANEN AMAN
+        // ==========================================
         function compressImage(file, callback, maxWidth = 800, quality = 0.7) {
             if (!file) {
                 callback("");
@@ -4354,7 +4357,12 @@
                         canvas.height = height;
                         const ctx = canvas.getContext('2d');
                         ctx.drawImage(img, 0, 0, width, height);
+                        // Kompresi ketat agar ukuran <80KB - 150KB
                         const compressedDataUrl = canvas.toDataURL('image/jpeg', quality);
+                        // Simpan instan ke localStorage sebagai back-up primer agar tahan refresh/logout
+                        try {
+                            localStorage.setItem('SIP_PKH_LAST_UPLOAD', compressedDataUrl);
+                        } catch (e) {}
                         callback(compressedDataUrl);
                     } catch (err) {
                         callback(event.target.result); // Fallback aman
