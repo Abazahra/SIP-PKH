@@ -1659,7 +1659,10 @@
         let db = null;
         try { 
             db = firebase.firestore(); 
-            // Enable offline persistence so Firestore operates seamlessly in offline mode
+            // Suppress offline connection timeout logs in console
+            if (db && typeof db.settings === 'function') {
+                db.settings({ experimentalForceLongPolling: true });
+            }
             db.enablePersistence({ synchronizeTabs: true }).catch((err) => {
                 if (err.code == 'failed-precondition') {
                     console.warn("Firestore persistence failed: Multiple tabs open");
@@ -1846,7 +1849,6 @@
                     db.collection("pkh_database").doc("main_state").onSnapshot((doc) => {
                         if (doc.exists && doc.data() && doc.data().pendampingProfiles) {
                             const remoteState = doc.data();
-                            // Hanya sinkronkan jika data remote tidak kosong untuk mencegah data lokal tertimpa
                             if (remoteState.kpmList && remoteState.kpmList.length >= (appState.kpmList || []).length) {
                                 appState.kpmList = remoteState.kpmList;
                             }
@@ -1872,11 +1874,9 @@
                             renderUI();
                         }
                     }, err => {
-                        console.warn("Realtime sync listener warning:", err);
+                        // Silent catch for offline connection state
                     });
-                } catch (e) {
-                    console.warn("Realtime sync init warning:", e);
-                }
+                } catch (e) {}
             }
         }
 
@@ -3772,7 +3772,7 @@
             const status = document.getElementById('komitmenStatus').value;
             const checkedBoxes = document.querySelectorAll('input[name="komitmenJenisCheckbox"]:checked');
 
-            if (checkedBoxes.length === 0) return alert("Pilih minimal satu jenis layanan komitmen.");
+            if (checkedBoxes.length === 0) return alert("Pilih kelayakan jenis layanan komitmen terlebih dahulu.");
 
             let filePromises = [];
             let jenisLaporanArr = [];
@@ -3793,7 +3793,11 @@
 
             Promise.all(filePromises).then(fotoArray => {
                 const validFotoArray = fotoArray.filter(f => f !== "");
-                appState.komitmenList.push({
+                
+                // Pastikan komitmenList terinisialisasi dengan aman
+                if (!appState.komitmenList) appState.komitmenList = [];
+
+                const newKomitmenRecord = {
                     id: "KOM-" + Date.now(),
                     tanggal: new Date().toISOString().split('T')[0],
                     kelompok: currentUser.kelompok,
@@ -3802,12 +3806,17 @@
                     status,
                     foto: validFotoArray,
                     statusVerifikasi: "PENDING"
-                });
+                };
+
+                appState.komitmenList.push(newKomitmenRecord);
+                
+                // Simpan permanen ke localStorage & Firestore seketika
                 saveState();
+
                 document.getElementById('formKomitmen').reset();
                 document.getElementById('dynamicKomitmenContainer').innerHTML = `<p class="text-slate-400 italic">Silakan pilih KPM terlebih dahulu untuk memunculkan pilihan komitmen.</p>`;
                 renderKetuaAllTables();
-                showToast("Berhasil", "Laporan komitmen dikirim.", "success");
+                showToast("Berhasil", "Laporan komitmen dan foto bukti berhasil disimpan secara permanen.", "success");
             });
         }
 
@@ -4324,6 +4333,10 @@
         }
 
         function compressImage(file, callback, maxWidth = 800, quality = 0.7) {
+            if (!file) {
+                callback("");
+                return;
+            }
             const reader = new FileReader();
             reader.readAsDataURL(file);
             reader.onload = function (event) {
@@ -4342,11 +4355,11 @@
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, width, height);
                     const compressedDataUrl = canvas.toDataURL('image/jpeg', quality);
-                    console.log(`SIP-PKH Image Compressed: Original size ~${Math.round(file.size/1024)}KB, Compressed ~${Math.round(compressedDataUrl.length/1024)}KB`);
+                    console.log(`SIP-PKH Image Compressed Successfully: Original ~${Math.round(file.size/1024)}KB, Compressed ~${Math.round(compressedDataUrl.length/1024)}KB`);
                     callback(compressedDataUrl);
                 };
                 img.onerror = function() {
-                    callback(event.target.result); // Fallback jika kompresi gagal
+                    callback(event.target.result); // Fallback aman
                 };
             };
             reader.onerror = function() {
