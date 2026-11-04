@@ -3807,13 +3807,20 @@
                     statusVerifikasi: "PENDING"
                 };
 
-                appState.komitmenList.push(newKomitmenRecord);
+                // Pastikan langsung dimasukkan ke array dan disimpan secara sinkron ke localStorage & memory
+                appState.komitmenList.unshift(newKomitmenRecord);
                 
-                // Simpan permanen ke localStorage & Firestore seketika dan panggil saveState()
+                // Paksa penyimpanan sinkron langsung ke localStorage & Firestore tanpa penundaan
+                try {
+                    localStorage.setItem('SIP_PKH_STATE_V6', JSON.stringify(appState));
+                } catch (err) {}
+                
                 saveState();
 
                 document.getElementById('formKomitmen').reset();
                 document.getElementById('dynamicKomitmenContainer').innerHTML = `<p class="text-slate-400 italic">Silakan pilih KPM terlebih dahulu untuk memunculkan pilihan komitmen.</p>`;
+                
+                // Segera render ulang tabel lokal
                 renderKetuaAllTables();
                 showToast("Berhasil", "Laporan komitmen dan foto bukti berhasil disimpan secara permanen.", "success");
             });
@@ -4357,12 +4364,13 @@
                         canvas.height = height;
                         const ctx = canvas.getContext('2d');
                         ctx.drawImage(img, 0, 0, width, height);
-                        // Kompresi ketat agar ukuran <80KB - 150KB
                         const compressedDataUrl = canvas.toDataURL('image/jpeg', quality);
+                        
                         // Simpan instan ke localStorage sebagai back-up primer agar tahan refresh/logout
                         try {
                             localStorage.setItem('SIP_PKH_LAST_UPLOAD', compressedDataUrl);
                         } catch (e) {}
+                        
                         callback(compressedDataUrl);
                     } catch (err) {
                         callback(event.target.result); // Fallback aman
