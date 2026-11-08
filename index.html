@@ -18,6 +18,32 @@
     <!-- Google Fonts Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
+        /* Notifikasi Pendamping: nyaman di desktop dan tidak menutupi layar HP */
+        #pendampingNotifDropdown {
+            width: min(22rem, calc(100vw - 24px));
+            max-width: calc(100vw - 24px);
+            max-height: min(70vh, 520px);
+        }
+        @media (max-width: 640px) {
+            #pendampingNotificationContainer { position: static !important; }
+            #pendampingNotifDropdown {
+                position: fixed !important;
+                top: 72px !important;
+                right: 12px !important;
+                left: 12px !important;
+                width: auto !important;
+                max-width: none !important;
+                max-height: calc(100dvh - 92px) !important;
+                margin-top: 0 !important;
+                z-index: 9999 !important;
+                border-radius: 14px !important;
+            }
+            #pendampingNotifList {
+                max-height: calc(100dvh - 190px) !important;
+                overflow-y: auto !important;
+                -webkit-overflow-scrolling: touch;
+            }
+        }
         @media print {
             body * { visibility: hidden !important; }
             #modalPrintViewer, #modalPrintViewer * { visibility: visible !important; }
@@ -86,6 +112,7 @@
                 <div>
                     <h1 class="font-bold text-sm md:text-base tracking-wide">SIP-PKH</h1>
                     <p class="text-[10px] text-blue-200">Sistem Informasi Pelaksanaan Program Keluarga Harapan</p>
+                    <span id="appVersionLabel" class="inline-flex items-center mt-1 px-2.5 py-1 rounded-full bg-amber-300 text-blue-950 text-[11px] font-extrabold tracking-wider border border-amber-200 shadow-sm">VERSI 15.2 — REVISI KOLOM PDF</span>
                 </div>
             </div>
             
@@ -100,7 +127,10 @@
                     <div id="pendampingNotifDropdown" class="hidden absolute right-0 mt-2 w-80 bg-white rounded-2xl shadow-2xl border border-slate-200 z-50 overflow-hidden text-slate-800">
                         <div class="bg-blue-900 text-white px-4 py-3 flex justify-between items-center text-xs font-bold">
                             <span class="flex items-center space-x-1.5"><i class="fas fa-bell text-amber-300"></i><span>Notifikasi Pembaruan Data</span></span>
-                            <span id="pendampingNotifCount" class="bg-blue-800 text-amber-300 px-2 py-0.5 rounded-full text-[10px]">0 baru</span>
+                            <div class="flex items-center gap-2">
+                                <span id="pendampingNotifCount" class="bg-blue-800 text-amber-300 px-2 py-0.5 rounded-full text-[10px]">0 baru</span>
+                                <button type="button" onclick="closePendampingNotificationDropdown()" aria-label="Tutup notifikasi" class="text-white/90 hover:text-white px-1.5 py-1 rounded hover:bg-blue-800"><i class="fas fa-times"></i></button>
+                            </div>
                         </div>
                         <div id="pendampingNotifList" class="max-h-72 overflow-y-auto divide-y divide-slate-100 text-xs">
                             <!-- Populated dynamically -->
@@ -300,6 +330,14 @@
                 </div>
             </div>
 
+            <!-- RINGKASAN JUMLAH KPM ADMIN PUSAT -->
+            <section id="adminKpmSummary" class="grid grid-cols-2 lg:grid-cols-4 gap-3" aria-label="Ringkasan jumlah seluruh KPM">
+                <div class="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm"><div class="text-[11px] font-semibold text-slate-500">Jumlah Total KPM</div><div id="adminStatTotal" class="text-2xl font-extrabold text-slate-900 mt-1">0</div></div>
+                <div class="bg-white rounded-2xl p-4 border border-emerald-100 shadow-sm"><div class="text-[11px] font-semibold text-slate-500">KPM PKH</div><div id="adminStatPkh" class="text-2xl font-extrabold text-emerald-700 mt-1">0</div></div>
+                <div class="bg-white rounded-2xl p-4 border border-blue-100 shadow-sm"><div class="text-[11px] font-semibold text-slate-500">KPM BPNT</div><div id="adminStatBpnt" class="text-2xl font-extrabold text-blue-700 mt-1">0</div></div>
+                <div class="bg-white rounded-2xl p-4 border border-violet-100 shadow-sm"><div class="text-[11px] font-semibold text-slate-500">KPM PKH + BPNT</div><div id="adminStatPkhBpnt" class="text-2xl font-extrabold text-violet-700 mt-1">0</div></div>
+            </section>
+
             <!-- TABEL DAFTAR PENDAMPING -->
             <div class="bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden">
                 <div class="bg-slate-900 text-white p-4 font-bold text-xs flex justify-between items-center">
@@ -378,6 +416,14 @@
                     </button>
                 </div>
             </div>
+
+            <!-- RINGKASAN JUMLAH KPM PENDAMPING -->
+            <section id="pendampingKpmSummary" class="grid grid-cols-2 lg:grid-cols-4 gap-3" aria-label="Ringkasan jumlah KPM wilayah pendamping">
+                <div class="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm"><div class="text-[11px] font-semibold text-slate-500">Jumlah Total KPM</div><div id="pendampingStatTotal" class="text-2xl font-extrabold text-slate-900 mt-1">0</div></div>
+                <div class="bg-white rounded-2xl p-4 border border-emerald-100 shadow-sm"><div class="text-[11px] font-semibold text-slate-500">KPM PKH</div><div id="pendampingStatPkh" class="text-2xl font-extrabold text-emerald-700 mt-1">0</div></div>
+                <div class="bg-white rounded-2xl p-4 border border-blue-100 shadow-sm"><div class="text-[11px] font-semibold text-slate-500">KPM BPNT</div><div id="pendampingStatBpnt" class="text-2xl font-extrabold text-blue-700 mt-1">0</div></div>
+                <div class="bg-white rounded-2xl p-4 border border-violet-100 shadow-sm"><div class="text-[11px] font-semibold text-slate-500">KPM PKH + BPNT</div><div id="pendampingStatPkhBpnt" class="text-2xl font-extrabold text-violet-700 mt-1">0</div></div>
+            </section>
 
             <!-- TABS NAVIGATION PENDAMPING -->
             <div class="flex flex-wrap gap-2 bg-white p-2 rounded-2xl shadow-sm border border-slate-100">
@@ -636,9 +682,14 @@
                             <h3 class="font-bold text-slate-800 text-sm">Cetak Laporan &amp; Rekapitulasi Resmi Berstandar Dinas</h3>
                             <p class="text-xs text-slate-500">Pilih jenis laporan rekapitulasi untuk pratinjau dan pencetakan dokumen PDF.</p>
                         </div>
-                        <button onclick="openEditKopModal()" class="bg-amber-300 hover:bg-amber-400 text-blue-950 px-4 py-2.5 rounded-xl font-bold text-xs shadow flex items-center space-x-2 transition cursor-pointer">
-                            <i class="fas fa-stamp"></i><span>Atur Kop Surat</span>
-                        </button>
+                        <div class="flex flex-wrap items-center gap-2">
+                            <button onclick="cleanupOrphanedKpmReports()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 px-3 py-2 rounded-xl font-bold text-[11px] flex items-center space-x-2 transition cursor-pointer" title="Perawatan data laporan yang KPM induknya sudah dihapus">
+                                <i class="fas fa-broom"></i><span>Bersihkan Data Yatim</span>
+                            </button>
+                            <button onclick="openEditKopModal()" class="bg-amber-300 hover:bg-amber-400 text-blue-950 px-4 py-2.5 rounded-xl font-bold text-xs shadow flex items-center space-x-2 transition cursor-pointer">
+                                <i class="fas fa-stamp"></i><span>Atur Kop Surat</span>
+                            </button>
+                        </div>
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div class="bg-slate-50 p-5 rounded-2xl border border-slate-200 flex flex-col justify-between space-y-4">
@@ -701,6 +752,26 @@
                     </button>
                 </div>
             </div>
+
+            <!-- RINGKASAN JUMLAH KPM KETUA KELOMPOK - VERSI 15.1 -->
+            <section id="ketuaKpmSummary" class="grid grid-cols-2 lg:grid-cols-4 gap-3" aria-label="Ringkasan jumlah KPM kelompok">
+                <div class="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm">
+                    <div class="text-[11px] font-semibold text-slate-500">Jumlah Total KPM</div>
+                    <div id="ketuaStatTotal" class="text-2xl font-extrabold text-slate-900 mt-1">0</div>
+                </div>
+                <div class="bg-white rounded-2xl p-4 border border-emerald-100 shadow-sm">
+                    <div class="text-[11px] font-semibold text-slate-500">KPM PKH</div>
+                    <div id="ketuaStatPkh" class="text-2xl font-extrabold text-emerald-700 mt-1">0</div>
+                </div>
+                <div class="bg-white rounded-2xl p-4 border border-blue-100 shadow-sm">
+                    <div class="text-[11px] font-semibold text-slate-500">KPM BPNT</div>
+                    <div id="ketuaStatBpnt" class="text-2xl font-extrabold text-blue-700 mt-1">0</div>
+                </div>
+                <div class="bg-white rounded-2xl p-4 border border-violet-100 shadow-sm">
+                    <div class="text-[11px] font-semibold text-slate-500">KPM PKH + BPNT</div>
+                    <div id="ketuaStatPkhBpnt" class="text-2xl font-extrabold text-violet-700 mt-1">0</div>
+                </div>
+            </section>
 
             <!-- TABS NAVIGATION KETUA -->
             <div class="flex flex-wrap gap-2 bg-white p-2 rounded-2xl shadow-sm border border-slate-100">
@@ -771,7 +842,7 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <label class="block font-bold text-slate-700 mb-1">Jenis Bantuan</label>
-                                <select id="kpmJenisBantuan" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl font-semibold">
+                                <select id="kpmJenisBantuan" onchange="aturPilihanKomponenKpm()" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl font-semibold">
                                     <option value="PKH">PKH Murni</option>
                                     <option value="BPNT">BPNT Murni</option>
                                     <option value="PKH & BPNT">PKH & BPNT</option>
@@ -785,32 +856,39 @@
                         <div>
                             <label class="block font-bold text-slate-700 mb-2">Komponen Bantuan & Kuantitas Anggota</label>
                             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
+                                <div id="kpmNonKomponenWrap" class="hidden bg-amber-50 p-3 rounded-xl border border-amber-200 space-y-2">
+                                    <label class="flex items-center space-x-2 font-bold text-amber-900">
+                                        <input type="checkbox" id="kpmNonKomponen" onchange="pilihNonKomponenKpm()" class="rounded text-amber-700">
+                                        <span>Non-Komponen</span>
+                                    </label>
+                                    <p class="text-[10px] text-amber-800">Untuk KPM BPNT yang tidak memiliki komponen PKH.</p>
+                                </div>
                                 <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-2">
-                                    <label class="flex items-center space-x-2 font-bold"><input type="checkbox" name="kpmKomponen" value="Ibu Hamil" onchange="toggleCompQty(this)" class="rounded text-emerald-700"><span>Ibu Hamil</span></label>
+                                    <label class="flex items-center space-x-2 font-bold"><input type="checkbox" name="kpmKomponen" value="Ibu Hamil" data-qty-id="qty_Ibu_Hamil" onchange="toggleCompQty(this)" class="rounded text-emerald-700"><span>Ibu Hamil</span></label>
                                     <input type="number" id="qty_Ibu_Hamil" min="1" max="5" value="1" disabled class="w-full p-1 bg-white border border-slate-300 rounded text-xs disabled:opacity-50">
                                 </div>
                                 <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-2">
-                                    <label class="flex items-center space-x-2 font-bold"><input type="checkbox" name="kpmKomponen" value="Anak Balita / PAUD" onchange="toggleCompQty(this)" class="rounded text-emerald-700"><span>Anak Balita</span></label>
+                                    <label class="flex items-center space-x-2 font-bold"><input type="checkbox" name="kpmKomponen" value="Anak Balita / PAUD" data-qty-id="qty_Anak_Balita___PAUD" onchange="toggleCompQty(this)" class="rounded text-emerald-700"><span>Anak Balita</span></label>
                                     <input type="number" id="qty_Anak_Balita___PAUD" min="1" max="5" value="1" disabled class="w-full p-1 bg-white border border-slate-300 rounded text-xs disabled:opacity-50">
                                 </div>
                                 <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-2">
-                                    <label class="flex items-center space-x-2 font-bold"><input type="checkbox" name="kpmKomponen" value="Anak SD" onchange="toggleCompQty(this)" class="rounded text-emerald-700"><span>Anak SD</span></label>
+                                    <label class="flex items-center space-x-2 font-bold"><input type="checkbox" name="kpmKomponen" value="Anak SD" data-qty-id="qty_Anak_SD" onchange="toggleCompQty(this)" class="rounded text-emerald-700"><span>Anak SD</span></label>
                                     <input type="number" id="qty_Anak_SD" min="1" max="5" value="1" disabled class="w-full p-1 bg-white border border-slate-300 rounded text-xs disabled:opacity-50">
                                 </div>
                                 <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-2">
-                                    <label class="flex items-center space-x-2 font-bold"><input type="checkbox" name="kpmKomponen" value="Anak SMP" onchange="toggleCompQty(this)" class="rounded text-emerald-700"><span>Anak SMP</span></label>
+                                    <label class="flex items-center space-x-2 font-bold"><input type="checkbox" name="kpmKomponen" value="Anak SMP" data-qty-id="qty_Anak_SMP" onchange="toggleCompQty(this)" class="rounded text-emerald-700"><span>Anak SMP</span></label>
                                     <input type="number" id="qty_Anak_SMP" min="1" max="5" value="1" disabled class="w-full p-1 bg-white border border-slate-300 rounded text-xs disabled:opacity-50">
                                 </div>
                                 <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-2">
-                                    <label class="flex items-center space-x-2 font-bold"><input type="checkbox" name="kpmKomponen" value="Anak SMA" onchange="toggleCompQty(this)" class="rounded text-emerald-700"><span>Anak SMA</span></label>
+                                    <label class="flex items-center space-x-2 font-bold"><input type="checkbox" name="kpmKomponen" value="Anak SMA" data-qty-id="qty_Anak_SMA" onchange="toggleCompQty(this)" class="rounded text-emerald-700"><span>Anak SMA</span></label>
                                     <input type="number" id="qty_Anak_SMA" min="1" max="5" value="1" disabled class="w-full p-1 bg-white border border-slate-300 rounded text-xs disabled:opacity-50">
                                 </div>
                                 <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-2">
-                                    <label class="flex items-center space-x-2 font-bold"><input type="checkbox" name="kpmKomponen" value="Lansia (>=60 Thn)" onchange="toggleCompQty(this)" class="rounded text-emerald-700"><span>Lansia (>=60)</span></label>
+                                    <label class="flex items-center space-x-2 font-bold"><input type="checkbox" name="kpmKomponen" value="Lansia (>=60 Thn)" data-qty-id="qty_Lansia__60___" onchange="toggleCompQty(this)" class="rounded text-emerald-700"><span>Lansia (>=60)</span></label>
                                     <input type="number" id="qty_Lansia__60___" min="1" max="5" value="1" disabled class="w-full p-1 bg-white border border-slate-300 rounded text-xs disabled:opacity-50">
                                 </div>
                                 <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-2">
-                                    <label class="flex items-center space-x-2 font-bold"><input type="checkbox" name="kpmKomponen" value="Disabilitas Berat" onchange="toggleCompQty(this)" class="rounded text-emerald-700"><span>Disabilitas</span></label>
+                                    <label class="flex items-center space-x-2 font-bold"><input type="checkbox" name="kpmKomponen" value="Disabilitas Berat" data-qty-id="qty_Disabilitas_Berat" onchange="toggleCompQty(this)" class="rounded text-emerald-700"><span>Disabilitas</span></label>
                                     <input type="number" id="qty_Disabilitas_Berat" min="1" max="5" value="1" disabled class="w-full p-1 bg-white border border-slate-300 rounded text-xs disabled:opacity-50">
                                 </div>
                             </div>
@@ -833,6 +911,7 @@
                                     <th class="p-3">Bantuan</th>
                                     <th class="p-3">Komponen</th>
                                     <th class="p-3">Alamat</th>
+                                    <th class="p-3">Waktu Transaksi</th>
                                     <th class="p-3 text-center">Aksi</th>
                                 </tr>
                             </thead>
@@ -903,6 +982,7 @@
                                     <th class="p-3">Status</th>
                                     <th class="p-3">Verifikasi</th>
                                     <th class="p-3">Foto</th>
+                                    <th class="p-3">Waktu Transaksi</th>
                                     <th class="p-3 text-center">Aksi</th>
                                 </tr>
                             </thead>
@@ -962,6 +1042,7 @@
                                     <th class="p-3">Bukti Foto</th>
                                     <th class="p-3">Status Kepatuhan</th>
                                     <th class="p-3">Verifikasi Pendamping</th>
+                                    <th class="p-3">Waktu Transaksi</th>
                                     <th class="p-3 text-center">Aksi</th>
                                 </tr>
                             </thead>
@@ -1023,6 +1104,7 @@
                                     <th class="p-3">Nominal (Rp)</th>
                                     <th class="p-3">Verifikasi</th>
                                     <th class="p-3">Struk ATM</th>
+                                    <th class="p-3">Waktu Transaksi</th>
                                     <th class="p-3 text-center">Aksi</th>
                                 </tr>
                             </thead>
@@ -1127,6 +1209,7 @@
                                     <th class="p-3">Analisis Keuangan Rumah Tangga</th>
                                     <th class="p-3">Foto Usaha</th>
                                     <th class="p-3">Status</th>
+                                    <th class="p-3">Waktu Transaksi</th>
                                     <th class="p-3 text-center">Aksi</th>
                                 </tr>
                             </thead>
@@ -1207,6 +1290,7 @@
                                     <th class="p-3">Foto Rumah</th>
                                     <th class="p-3">Foto Surat Pernyataan</th>
                                     <th class="p-3">Status</th>
+                                    <th class="p-3">Waktu Transaksi</th>
                                     <th class="p-3 text-center">Aksi</th>
                                 </tr>
                             </thead>
@@ -1564,6 +1648,13 @@
                     <label class="font-bold text-slate-700 mr-1">Filter Bulan:</label>
                     <input type="month" id="printFilterBulan" onchange="openPrintModal(window.currentPrintType)" class="p-1.5 bg-white border border-slate-300 rounded-lg font-semibold">
                 </div>
+                <div class="relative">
+                    <button type="button" onclick="togglePrintColumnPanel()" class="px-3 py-1.5 bg-white border border-slate-300 rounded-lg font-bold text-blue-900"><i class="fas fa-table-columns mr-1"></i> Atur Kolom</button>
+                </div>
+            </div>
+            <div id="printColumnPanel" class="hidden bg-blue-50 border-b border-blue-100 px-4 py-3 no-print">
+                <div class="flex items-center justify-between gap-2 mb-2"><span class="font-bold text-blue-900">Pilih kolom yang ditampilkan</span><button type="button" onclick="resetPrintColumns()" class="text-blue-700 underline font-semibold">Pilih Semua</button></div>
+                <div id="printColumnOptions" class="flex flex-wrap gap-x-4 gap-y-2"></div>
             </div>
             <div id="printAreaContainer" class="p-6 overflow-y-auto bg-white flex-grow space-y-4 text-black">
                 <div id="printDocTitle" class="hidden"></div>
@@ -1588,11 +1679,16 @@
                 <h3 class="font-bold text-slate-800 text-sm">Pratinjau Berkas / Foto Bukti</h3>
                 <button onclick="closeImageViewerModal()" class="text-slate-400 hover:text-slate-700 font-bold"><i class="fas fa-times"></i></button>
             </div>
-            <div class="flex justify-center items-center bg-slate-100 rounded-xl p-3 max-h-[70vh] overflow-auto">
-                <img id="modalImagePreviewTarget" src="" alt="Pratinjau Bukti" class="max-h-[60vh] max-w-full object-contain rounded-lg bg-white shadow">
+            <div class="relative flex justify-center items-center bg-slate-100 rounded-xl p-3 min-h-[150px] max-h-[70vh] overflow-auto">
+                <div id="modalImageLoading" class="flex flex-col items-center gap-2 py-6 text-slate-600 text-xs font-semibold">
+                    <i class="fas fa-circle-notch fa-spin text-blue-700 text-2xl"></i>
+                    <span>Memuat foto bukti...</span>
+                </div>
+                <img id="modalImagePreviewTarget" src="" alt="Pratinjau Bukti" class="hidden max-h-[60vh] max-w-full object-contain rounded-lg bg-white shadow">
+                <div id="modalImageError" class="hidden py-6 text-center text-red-600 text-xs font-semibold">Foto tidak dapat dimuat. Silakan coba kembali.</div>
             </div>
             <div class="flex justify-end space-x-2">
-                <a id="modalImageDownloadBtn" href="" download="bukti_pkh.jpg" target="_blank" class="bg-blue-900 hover:bg-blue-800 text-white px-4 py-2 rounded-xl text-xs font-bold shadow flex items-center space-x-1.5">
+                <a id="modalImageDownloadBtn" href="" download="bukti_pkh.jpg" target="_blank" class="hidden bg-blue-900 hover:bg-blue-800 text-white px-4 py-2 rounded-xl text-xs font-bold shadow flex items-center space-x-1.5">
                     <i class="fas fa-download"></i><span>Unduh Gambar</span>
                 </a>
                 <button onclick="closeImageViewerModal()" class="bg-slate-300 hover:bg-slate-400 text-slate-800 px-4 py-2 rounded-xl text-xs font-bold">Tutup</button>
@@ -1649,6 +1745,7 @@
 
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 
     <script>
@@ -1667,6 +1764,8 @@
         } catch (e) {}
 
         let db = null;
+        let auth = null;
+        try { auth = firebase.auth(); } catch (e) { console.warn("Firebase Auth initialization warning:", e); }
         try { 
             db = firebase.firestore(); 
             // Suppress offline connection timeout logs in console
@@ -1682,6 +1781,94 @@
             });
         } catch (e) {
             console.warn("Firestore initialization warning:", e);
+        }
+
+        // Backend foto SIP-PKH (Google Drive). Endpoint Apps Script yang sudah diuji.
+        const SIP_FOTO_BACKEND_URL = "https://script.google.com/macros/s/AKfycbycK3JKNvWket2N8qE5pWcj-0WmBanxrkaR-SzlOFfqpLp-U6427PXcvpYP41SyhX3e/exec";
+
+        async function createPhotoSession(role, identifier, pin) {
+            try {
+                const response = await fetch(SIP_FOTO_BACKEND_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify({ action: 'legacyLogin', role, identifier, pin })
+                });
+                const result = await response.json();
+                if (result && result.ok && result.sessionToken) return result.sessionToken;
+                console.warn('Sesi foto belum tersedia:', result && result.error);
+            } catch (err) {
+                console.warn('Backend foto belum dapat dijangkau:', err);
+            }
+            return '';
+        }
+
+        function photoViewerRef(photo) {
+            if (!photo) return '';
+            if (typeof photo === 'string') return photo;
+            if (photo.fileId) return 'DRIVE:' + photo.fileId;
+            if (photo.driveUrl) return photo.driveUrl;
+            return '';
+        }
+
+        // Cache foto di memori browser: pembukaan ulang foto yang sama tidak perlu
+        // meminta ulang file dari Google Drive. URL dicabut saat halaman ditutup.
+        const sipPhotoObjectUrlCache = new Map();
+        const sipPhotoPendingCache = new Map();
+        const sipPhotoMimeCache = new Map();
+        async function loadDrivePhoto(fileId) {
+            if (!currentUser || !currentUser.photoSessionToken) throw new Error('Sesi pengguna tidak tersedia. Silakan keluar lalu login kembali.');
+            if (!fileId || !/^[a-zA-Z0-9_-]{10,}$/.test(String(fileId))) throw new Error('ID foto Google Drive tidak valid.');
+            const cacheKey = String(currentUser.photoSessionToken).slice(-24) + ':' + String(fileId);
+            if (sipPhotoObjectUrlCache.has(cacheKey)) return sipPhotoObjectUrlCache.get(cacheKey);
+            if (sipPhotoPendingCache.has(cacheKey)) return sipPhotoPendingCache.get(cacheKey);
+            const pending = (async () => {
+                const response = await fetch(SIP_FOTO_BACKEND_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify({ action: 'getPhoto', sessionToken: currentUser.photoSessionToken, fileId })
+                });
+                if (!response.ok) throw new Error('Server foto merespons HTTP ' + response.status);
+                const result = await response.json();
+                if (!result || !result.ok || typeof result.base64 !== 'string' || !result.base64.length) {
+                    throw new Error((result && result.error) || 'Server tidak mengirim data gambar.');
+                }
+                const raw = atob(result.base64.replace(/\s/g, ''));
+                const bytes = new Uint8Array(raw.length);
+                for (let i = 0; i < raw.length; i++) bytes[i] = raw.charCodeAt(i);
+                if (bytes.length < 16) throw new Error('Data foto dari Drive kosong atau terpotong.');
+                const mime = /^image\/(jpeg|png|webp)$/i.test(result.mimeType || '') ? result.mimeType : 'image/jpeg';
+                const objectUrl = URL.createObjectURL(new Blob([bytes], { type: mime }));
+                sipPhotoObjectUrlCache.set(cacheKey, objectUrl);
+                sipPhotoMimeCache.set(objectUrl, mime);
+                return objectUrl;
+            })();
+            sipPhotoPendingCache.set(cacheKey, pending);
+            try { return await pending; }
+            finally { sipPhotoPendingCache.delete(cacheKey); }
+        }
+        window.addEventListener('beforeunload', () => {
+            sipPhotoObjectUrlCache.forEach(url => URL.revokeObjectURL(url));
+            sipPhotoObjectUrlCache.clear();
+        });
+
+        async function uploadPhotoToDrive(dataUrl, fileName, sessionToken) {
+            if (!sessionToken) throw new Error('Sesi unggah foto belum tersedia. Keluar lalu login kembali, kemudian coba lagi.');
+            const parts = String(dataUrl || '').split(',');
+            if (parts.length !== 2) throw new Error('Format foto tidak valid.');
+            const mimeMatch = parts[0].match(/data:([^;]+);base64/i);
+            const mimeType = mimeMatch ? mimeMatch[1] : 'image/jpeg';
+            const response = await fetch(SIP_FOTO_BACKEND_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify({ action: 'uploadPhoto', sessionToken, fileName, mimeType, base64: parts[1] })
+            });
+            const result = await response.json();
+            if (!result || !result.ok || !result.fileId) throw new Error((result && result.error) || 'Unggah foto ke Google Drive gagal.');
+            return { fileId: result.fileId, fileName: result.fileName, mimeType: result.mimeType, size: result.size, driveUrl: result.driveUrl, storage: 'google_drive' };
+        }
+
+        function compressImageAsync(file) {
+            return new Promise(resolve => compressImage(file, resolve));
         }
 
         let currentUser = null;
@@ -1742,18 +1929,14 @@
             const role = document.getElementById('loginRole').value;
             const identInput = document.getElementById('loginIdentifier');
             const labelIdent = document.getElementById('labelLoginIdentitas');
-
-            if (role === 'superadmin') {
-                labelIdent.innerText = "Username Admin";
-                identInput.value = "Admin";
-                identInput.readOnly = true;
-                identInput.className = "w-full p-2.5 bg-slate-200 border border-slate-300 rounded-xl text-xs font-semibold text-slate-600";
-            } else {
-                identInput.readOnly = false;
-                identInput.value = "";
-                identInput.className = "w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs font-semibold text-slate-800";
-                labelIdent.innerText = role === 'pendamping' ? "Nama atau NIP Pendamping" : "Nama Ketua atau No. HP";
-            }
+            identInput.readOnly = false;
+            identInput.value = '';
+            identInput.type = 'text';
+            identInput.autocomplete = 'username';
+            identInput.placeholder = role === 'pendamping' ? 'Masukkan Nama atau NIP...' : 'Masukkan Nama atau No. HP...';
+            identInput.className = "w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs font-semibold text-slate-800";
+            labelIdent.innerText = role === 'pendamping' ? 'Nama atau NIP Pendamping (atau Email Admin)' : 'Nama Ketua atau No. HP (atau Email Admin)';
+            document.getElementById('loginPin').placeholder = 'PIN / Password';
         }
 
         function togglePasswordVisibility(inputId, iconId) {
@@ -1775,6 +1958,7 @@
             checkUrlInviteParams();
             updateShareInviteUrl();
             updateAdminWaDisplay();
+            aturPilihanKomponenKpm();
         });
 
         function updateAdminWaDisplay() {
@@ -1824,22 +2008,35 @@
             }
         }
 
+        // Simpan perubahan umum secara berurutan dan jangan pernah menimpa daftar
+        // Graduasi terbaru yang mungkin baru saja diubah pengguna lain.
+        let sipSaveQueue = Promise.resolve();
         function saveState() {
-            // Selalu simpan ke localStorage terlebih dahulu sebagai sumber kebenaran utama (Primary Storage) secara sinkron
-            try {
-                localStorage.setItem('SIP_PKH_STATE_V6', JSON.stringify(appState));
-            } catch (err) {
-                console.error("Local storage save error:", err);
-            }
-            
-            // Sinkronisasi asinkron ke cloud/Firestore tanpa menimpa data lokal jika offline/gagal
-            if (db) {
-                try {
-                    db.collection("pkh_database").doc("main_state").set(appState).catch(err => {
-                        console.warn("Firestore sync skipped:", err);
-                    });
-                } catch (e) {}
-            }
+            try { localStorage.setItem('SIP_PKH_STATE_V6', JSON.stringify(appState)); }
+            catch (err) { console.error("Local storage save error:", err); }
+            if (!db) return Promise.resolve(false);
+            const ref = db.collection("pkh_database").doc("main_state");
+            const snapshot = JSON.parse(JSON.stringify(appState));
+            sipSaveQueue = sipSaveQueue.then(() => db.runTransaction(async tx => {
+                const snap = await tx.get(ref);
+                const remote = snap.exists ? (snap.data() || {}) : {};
+                const latestGraduasi = Array.isArray(remote.graduasiList) ? remote.graduasiList : (snapshot.graduasiList || []);
+                const payload = { ...snapshot, graduasiList: latestGraduasi };
+                tx.set(ref, payload);
+                return latestGraduasi;
+            })).then(latestGraduasi => {
+                // Sinkronkan daftar graduasi yang lebih baru dari server ke memori lokal.
+                if (Array.isArray(latestGraduasi)) {
+                    appState.graduasiList = latestGraduasi;
+                    try { localStorage.setItem('SIP_PKH_STATE_V6', JSON.stringify(appState)); } catch (e) {}
+                }
+                return true;
+            }).catch(err => {
+                console.error("Firestore save failed:", err);
+                showToast("Sinkronisasi tertunda", "Perubahan tersimpan lokal, tetapi belum berhasil disinkronkan ke server. Periksa koneksi lalu coba lagi.", "warning");
+                return false;
+            });
+            return sipSaveQueue;
         }
 
         function initRealtimeSync() {
@@ -1857,27 +2054,28 @@
             if (db) {
                 try {
                     db.collection("pkh_database").doc("main_state").onSnapshot((doc) => {
+                        if (doc.metadata && doc.metadata.hasPendingWrites) return;
                         if (doc.exists && doc.data() && doc.data().pendampingProfiles) {
                             const remoteState = doc.data();
-                            if (remoteState.kpmList && remoteState.kpmList.length >= (appState.kpmList || []).length) {
+                            if (Array.isArray(remoteState.kpmList)) {
                                 appState.kpmList = remoteState.kpmList;
                             }
-                            if (remoteState.p2k2List && remoteState.p2k2List.length >= (appState.p2k2List || []).length) {
+                            if (Array.isArray(remoteState.p2k2List)) {
                                 appState.p2k2List = remoteState.p2k2List;
                             }
-                            if (remoteState.komitmenList && remoteState.komitmenList.length >= (appState.komitmenList || []).length) {
+                            if (Array.isArray(remoteState.komitmenList)) {
                                 appState.komitmenList = remoteState.komitmenList;
                             }
-                            if (remoteState.rekonsiliasiList && remoteState.rekonsiliasiList.length >= (appState.rekonsiliasiList || []).length) {
+                            if (Array.isArray(remoteState.rekonsiliasiList)) {
                                 appState.rekonsiliasiList = remoteState.rekonsiliasiList;
                             }
-                            if (remoteState.ppseList && remoteState.ppseList.length >= (appState.ppseList || []).length) {
+                            if (Array.isArray(remoteState.ppseList)) {
                                 appState.ppseList = remoteState.ppseList;
                             }
-                            if (remoteState.graduasiList && remoteState.graduasiList.length >= (appState.graduasiList || []).length) {
+                            if (Array.isArray(remoteState.graduasiList)) {
                                 appState.graduasiList = remoteState.graduasiList;
                             }
-                            if (remoteState.ketuaUsers && remoteState.ketuaUsers.length >= (appState.ketuaUsers || []).length) {
+                            if (Array.isArray(remoteState.ketuaUsers)) {
                                 appState.ketuaUsers = remoteState.ketuaUsers;
                             }
                             localStorage.setItem('SIP_PKH_STATE_V6', JSON.stringify(appState));
@@ -1912,9 +2110,9 @@
                     const doc = await db.collection("pkh_database").doc("main_state").get();
                     if (doc.exists && doc.data() && doc.data().pendampingProfiles) {
                         const remote = doc.data();
-                        if (remote.p2k2List && remote.p2k2List.length >= (appState.p2k2List || []).length) {
-                            appState = { ...appState, ...remote };
-                        }
+                        // Dokumen cloud adalah keadaan tersimpan terakhir; terima juga array
+                        // yang lebih pendek/kosong agar penghapusan tidak dipulihkan dari cache lama.
+                        appState = { ...appState, ...remote };
                     }
                 }
             } catch (e) {}
@@ -1992,26 +2190,40 @@
             showToast("Berhasil", "Kode undangan diperbarui.", "success");
         }
 
-        function handleLogin(e) {
+        async function handleLogin(e) {
             e.preventDefault();
-            let role = document.getElementById('loginRole').value;
+            const role = document.getElementById('loginRole').value;
             const identifier = document.getElementById('loginIdentifier').value.trim();
-            const pin = document.getElementById('loginPin').value.trim();
+            const pin = document.getElementById('loginPin').value;
 
-            if (identifier === "Admin" && pin === "Adminpusat123") {
-                role = 'superadmin';
+            // Admin dikenali otomatis melalui email Firebase; tidak perlu memilih role Admin.
+            // Jika identitas berbentuk email, autentikasi dilakukan ke Firebase terlebih dahulu.
+            if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(identifier)) {
+                if (!auth || !db) { alert('Layanan autentikasi belum siap. Muat ulang halaman.'); return; }
+                const submit = document.querySelector('#formLogin button[type="submit"]');
+                if (submit) { submit.disabled = true; submit.dataset.oldText = submit.innerText; submit.innerText = 'Memverifikasi...'; }
+                try {
+                    const credential = await auth.signInWithEmailAndPassword(identifier, pin);
+                    const user = credential.user;
+                    const profileSnap = await db.collection('sip_users').doc(user.uid).get();
+                    if (!profileSnap.exists) throw new Error('Profil pengguna belum terdaftar pada sistem.');
+                    const profile = profileSnap.data() || {};
+                    if (profile.role !== 'admin' || profile.active !== true) throw new Error('Email ini bukan akun Admin Pusat yang aktif.');
+                    currentUser = { role: 'superadmin', nama: profile.nama || user.email || 'Admin Pusat', uid: user.uid, email: user.email };
+                    localStorage.setItem('SIP_PKH_CURRENT_USER', JSON.stringify(currentUser));
+                    showToast('Login Berhasil', 'Selamat datang Admin Pusat', 'success');
+                    renderUI();
+                } catch (err) {
+                    console.error('Login email:', err);
+                    alert('Login email gagal: ' + (err.message || 'Periksa email dan password.'));
+                    try { if (auth.currentUser) await auth.signOut(); } catch (_) {}
+                } finally {
+                    if (submit) { submit.disabled = false; submit.innerText = submit.dataset.oldText || 'Masuk ke Sistem'; }
+                }
+                return;
             }
 
-            if (role === 'superadmin') {
-                if (identifier === "Admin" && pin === "Adminpusat123") {
-                    currentUser = { role: 'superadmin', nama: "Admin Pusat" };
-                    localStorage.setItem('SIP_PKH_CURRENT_USER', JSON.stringify(currentUser));
-                    showToast("Login Berhasil", "Selamat datang Admin Pusat", "success");
-                    renderUI();
-                } else {
-                    alert("Login Admin Pusat gagal. Username atau Password salah (Gunakan Admin / Adminpusat123).");
-                }
-            } else if (role === 'pendamping') {
+            if (role === 'pendamping') {
                 // Perbaikan validasi ketat: pencocokan tepat Nama/NIP DAN PIN sesuai pendaftaran
                 const pendamping = appState.pendampingProfiles.find(p => {
                     const matchId = (p.nama && p.nama.toLowerCase() === identifier.toLowerCase()) || (p.nip && p.nip === identifier);
@@ -2024,7 +2236,8 @@
                         alert("Akun anda sudah kadaluarsa, segera hubungi admin 081321312304 untuk mengaktifkannya kembali dengan akun Unlimited.");
                         return;
                     }
-                    currentUser = { role: 'pendamping', ...pendamping };
+                    const photoSessionToken = await createPhotoSession('pendamping', identifier, pin);
+                    currentUser = { role: 'pendamping', ...pendamping, photoSessionToken };
                     localStorage.setItem('SIP_PKH_CURRENT_USER', JSON.stringify(currentUser));
                     showToast("Login Berhasil", "Selamat datang " + pendamping.nama, "success");
                     renderUI();
@@ -2044,11 +2257,14 @@
                         alert("Akun anda sudah kadaluarsa, segera hubungi admin 081321312304 untuk mengaktifkannya kembali dengan akun Unlimited.");
                         return;
                     }
+                    // Status pendaftaran tidak boleh berubah hanya karena pengguna berhasil login.
+                    // Hanya Pendamping yang berwenang memverifikasi akun Ketua Kelompok.
                     if (ketua.status && ketua.status !== 'VERIFIED') {
-                        ketua.status = 'VERIFIED';
-                        saveState();
+                        alert('Akun Anda masih menunggu verifikasi Pendamping.');
+                        return;
                     }
-                    currentUser = { role: 'ketua', ...ketua };
+                    const photoSessionToken = await createPhotoSession('ketua', identifier, pin);
+                    currentUser = { role: 'ketua', ...ketua, photoSessionToken };
                     localStorage.setItem('SIP_PKH_CURRENT_USER', JSON.stringify(currentUser));
                     showToast("Login Berhasil", "Selamat datang Ketua " + ketua.nama, "success");
                     renderUI();
@@ -2173,6 +2389,7 @@
                 if (pWelcomeDetail) pWelcomeDetail.innerText = `NIP: ${pNip} | Wilayah Kerja Kecamatan: ${pKec}`;
 
                 populatePendampingFilters();
+                renderPendampingKpmSummary();
                 renderPendampingVerifikasiTable();
                 renderPendampingPpseTable();
                 renderPendampingGraduasiTable();
@@ -2233,6 +2450,7 @@
 
             if (totalPnd) totalPnd.innerText = appState.pendampingProfiles.length;
             if (totalKlp) totalKlp.innerText = appState.ketuaUsers.filter(k => k.status === 'VERIFIED').length;
+            renderAdminKpmSummary();
 
             const nowTime = new Date().getTime();
             const oneYearMs = 365 * 24 * 60 * 60 * 1000;
@@ -2515,10 +2733,13 @@
 
             // P2K2
             appState.p2k2List.forEach(item => {
-                if (myKlpNames.length > 0 && !myKlpNames.includes(item.kelompok)) return;
-                const kpmObj = appState.kpmList.find(k => k.id === item.kpmId);
-                const nik = kpmObj ? kpmObj.nik : (item.nik || "");
-                const namaKpm = kpmObj ? kpmObj.nama : (item.namaKpm || "-");
+                // Hanya tampilkan laporan dari kelompok binaan yang sudah terverifikasi
+                // dan masih memiliki data KPM yang valid.
+                if (!myKlpNames.includes(item.kelompok)) return;
+                const kpmObj = appState.kpmList.find(k => String(k.id) === String(item.kpmId));
+                if (!kpmObj || !item.kpmId) return;
+                const nik = kpmObj.nik || "";
+                const namaKpm = kpmObj.nama || "-";
                 allReports.push({
                     id: item.id,
                     type: 'P2K2',
@@ -2598,7 +2819,7 @@
                         `<span class="bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full font-bold text-[10px]">Menunggu</span>`);
 
                 let fotoBtn = rep.foto ?
-                    `<button onclick="openImageViewer('${rep.foto}')" class="bg-blue-50 text-blue-800 hover:bg-blue-100 px-2 py-1 rounded text-[11px] font-bold"><i class="fas fa-image"></i> Lihat</button>` :
+                    `<button onclick="openImageViewer('${photoViewerRef(rep.foto)}'${photoDownloadArgs(rep.namaKpm, rep.nik, 'BUKTI-LAPORAN', rep.kpmId)})" class="bg-blue-50 text-blue-800 hover:bg-blue-100 px-2 py-1 rounded text-[11px] font-bold"><i class="fas fa-image"></i> Lihat</button>` :
                     `<span class="text-slate-400 text-[10px]">Tanpa Foto</span>`;
 
                 let actionBtn = "";
@@ -2641,13 +2862,13 @@
         function pendampingToggleVerifikasi(type, id, newStatus) {
             if (type === 'P2K2') {
                 const item = appState.p2k2List.find(i => i.id === id);
-                if (item) item.statusVerifikasi = newStatus;
+                if (item) { markPendampingNotificationRead(type, item); item.statusVerifikasi = newStatus; }
             } else if (type === 'Komitmen') {
                 const item = appState.komitmenList.find(i => i.id === id);
-                if (item) item.statusVerifikasi = newStatus;
+                if (item) { markPendampingNotificationRead(type, item); item.statusVerifikasi = newStatus; }
             } else if (type === 'Rekonsiliasi') {
                 const item = appState.rekonsiliasiList.find(i => i.id === id);
-                if (item) item.statusVerifikasi = newStatus;
+                if (item) { markPendampingNotificationRead(type, item); item.statusVerifikasi = newStatus; }
             }
             saveState();
             renderPendampingVerifikasiTable();
@@ -2698,7 +2919,7 @@
                     `<span class="bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full font-bold text-[10px]">Menunggu</span>`;
 
                 let fotoBtn = item.foto ?
-                    `<button onclick="openImageViewer('${item.foto}')" class="bg-blue-50 text-blue-800 px-2 py-1 rounded text-[11px] font-bold"><i class="fas fa-image"></i> Lihat</button>` :
+                    `<button onclick="openImageViewer('${photoViewerRef(item.foto)}'${photoDownloadArgs(item.namaKpm, item.nik, 'BUKTI-PPSE', item.kpmId)})" class="bg-blue-50 text-blue-800 px-2 py-1 rounded text-[11px] font-bold"><i class="fas fa-image"></i> Lihat</button>` :
                     `<span class="text-slate-400 text-[10px]">Tanpa Foto</span>`;
 
                 let actionBtn = item.statusVerifikasi === 'VERIFIED' ?
@@ -2763,9 +2984,9 @@
                     `<span class="bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full font-bold text-[10px]">Disetujui</span>` :
                     `<span class="bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full font-bold text-[10px]">Menunggu</span>`;
 
-                let fotoKpmBtn = item.fotoKpm ? `<button onclick="openImageViewer('${item.fotoKpm}')" class="text-blue-700 underline font-semibold text-[10px]">Foto KPM</button>` : '-';
-                let fotoRumahBtn = item.fotoRumah ? `<button onclick="openImageViewer('${item.fotoRumah}')" class="text-blue-700 underline font-semibold text-[10px]">Foto Rumah</button>` : '-';
-                let fotoSuratBtn = item.fotoSurat ? `<button onclick="openImageViewer('${item.fotoSurat}')" class="text-blue-700 underline font-semibold text-[10px]">Foto Surat</button>` : '-';
+                let fotoKpmBtn = item.fotoKpm ? `<button onclick="openImageViewer('${photoViewerRef(item.fotoKpm)}'${photoDownloadArgs(item.namaKpm, item.nik, 'FOTO-KPM', item.kpmId)})" class="text-blue-700 underline font-semibold text-[10px]">Foto KPM</button>` : '-';
+                let fotoRumahBtn = item.fotoRumah ? `<button onclick="openImageViewer('${photoViewerRef(item.fotoRumah)}'${photoDownloadArgs(item.namaKpm, item.nik, 'FOTO-RUMAH', item.kpmId)})" class="text-blue-700 underline font-semibold text-[10px]">Foto Rumah</button>` : '-';
+                let fotoSuratBtn = item.fotoSurat ? `<button onclick="openImageViewer('${photoViewerRef(item.fotoSurat)}'${photoDownloadArgs(item.namaKpm, item.nik, 'FOTO-SURAT', item.kpmId)})" class="text-blue-700 underline font-semibold text-[10px]">Foto Surat</button>` : '-';
 
                 let actionBtn = item.statusVerifikasi === 'VERIFIED' ?
                     `<button onclick="pendampingToggleGraduasi('${item.id}', 'PENDING')" class="bg-amber-600 text-white px-2.5 py-1 rounded text-xs font-bold">Batalkan</button>` :
@@ -3097,7 +3318,66 @@
             populateKetuaKpmSelects();
         }
 
+        // Klasifikasi bantuan: setiap KPM masuk tepat satu kategori.
+        function hitungRingkasanJenisKpm(daftarKpm) {
+            const hasil = { total: daftarKpm.length, pkh: 0, bpnt: 0, pkhBpnt: 0 };
+            daftarKpm.forEach(kpm => {
+                const jenis = String(kpm.jenisBantuan || 'PKH')
+                    .toUpperCase()
+                    .replace(/\s+/g, '')
+                    .replace(/&AMP;/g, '&');
+                const adaPkh = jenis.includes('PKH');
+                const adaBpnt = jenis.includes('BPNT');
+                if (adaPkh && adaBpnt) hasil.pkhBpnt++;
+                else if (adaPkh) hasil.pkh++;
+                else if (adaBpnt) hasil.bpnt++;
+            });
+            return hasil;
+        }
+
+        function isiKartuRingkasanKpm(prefix, daftarKpm) {
+            const ringkasan = hitungRingkasanJenisKpm(daftarKpm);
+            const isi = (suffix, angka) => {
+                const el = document.getElementById(prefix + suffix);
+                if (el) el.textContent = String(angka);
+            };
+            isi('Total', ringkasan.total);
+            isi('Pkh', ringkasan.pkh);
+            isi('Bpnt', ringkasan.bpnt);
+            isi('PkhBpnt', ringkasan.pkhBpnt);
+        }
+
+        // KPM dari kelompok yang terdaftar di bawah Pendamping aktif.
+        function renderPendampingKpmSummary() {
+            if (!document.getElementById('pendampingStatTotal')) return;
+            const kelompokBinaan = appState.ketuaUsers
+                .filter(k => k.pendampingId === currentUser.id && k.status === 'VERIFIED')
+                .map(k => String(k.kelompok || '').trim())
+                .filter(Boolean);
+            const daftar = (Array.isArray(appState.kpmList) ? appState.kpmList : [])
+                .filter(kpm => kelompokBinaan.includes(String(kpm.kelompok || '').trim()));
+            isiKartuRingkasanKpm('pendampingStat', daftar);
+        }
+
+        // Seluruh KPM yang tersimpan pada sistem untuk Admin Pusat.
+        function renderAdminKpmSummary() {
+            if (!document.getElementById('adminStatTotal')) return;
+            isiKartuRingkasanKpm('adminStat', Array.isArray(appState.kpmList) ? appState.kpmList : []);
+        }
+
+        // Statistik KPM khusus kelompok Ketua yang sedang login.
+        function renderKetuaKpmSummary() {
+            if (!document.getElementById('ketuaStatTotal')) return;
+            const kelompokAktif = currentUser && currentUser.kelompok;
+            const semuaKpm = Array.isArray(appState.kpmList) ? appState.kpmList : [];
+            const anggota = kelompokAktif
+                ? semuaKpm.filter(k => String(k.kelompok || '').trim() === String(kelompokAktif).trim())
+                : [];
+            isiKartuRingkasanKpm('ketuaStat', anggota);
+        }
+
         function renderKetuaAllTables() {
+            renderKetuaKpmSummary();
             renderKetuaKpmTable();
             renderKetuaP2k2Table();
             renderKetuaKomitmenTable();
@@ -3123,11 +3403,57 @@
             });
         }
 
+        function aturPilihanKomponenKpm() {
+            const bantuan = document.getElementById('kpmJenisBantuan')?.value || 'PKH';
+            const nonWrap = document.getElementById('kpmNonKomponenWrap');
+            const nonCheck = document.getElementById('kpmNonKomponen');
+            const tampilkanNon = bantuan === 'BPNT';
+            if (nonWrap) nonWrap.classList.toggle('hidden', !tampilkanNon);
+            if (!tampilkanNon && nonCheck) nonCheck.checked = false;
+            if (nonCheck?.checked) {
+                document.querySelectorAll('input[name="kpmKomponen"]').forEach(cb => {
+                    cb.checked = false;
+                    const qty = document.getElementById(cb.dataset.qtyId || '');
+                    if (qty) qty.disabled = true;
+                });
+            }
+        }
+
+        function pilihNonKomponenKpm() {
+            const nonCheck = document.getElementById('kpmNonKomponen');
+            if (nonCheck?.checked) {
+                document.querySelectorAll('input[name="kpmKomponen"]').forEach(cb => {
+                    cb.checked = false;
+                    const qty = document.getElementById(cb.dataset.qtyId || '');
+                    if (qty) qty.disabled = true;
+                });
+            }
+        }
+
         function toggleCompQty(checkbox) {
-            const val = checkbox.value.replace(/[\s\/()>=]/g, '_');
-            const qtyInput = document.getElementById('qty_' + val);
+            if (!checkbox) return;
+
+            // Cari kolom jumlah berdasarkan ID, lalu fallback ke kartu komponen
+            // agar komponen Lansia tetap berfungsi walaupun ID lama tidak cocok.
+            let qtyInput = checkbox.dataset.qtyId
+                ? document.getElementById(checkbox.dataset.qtyId)
+                : null;
+
+            if (!qtyInput) {
+                const card = checkbox.closest('.bg-slate-50') || checkbox.parentElement?.parentElement;
+                qtyInput = card ? card.querySelector('input[type="number"]') : null;
+            }
+
             if (qtyInput) {
                 qtyInput.disabled = !checkbox.checked;
+                if (checkbox.checked && (!qtyInput.value || Number(qtyInput.value) < 1)) {
+                    qtyInput.value = '1';
+                }
+            }
+
+            if (checkbox.checked) {
+                const nonCheck = document.getElementById('kpmNonKomponen');
+                if (nonCheck) nonCheck.checked = false;
             }
         }
 
@@ -3175,6 +3501,15 @@
             reader.readAsDataURL(file);
         }
 
+        // Waktu transaksi otomatis untuk setiap input/perubahan oleh Ketua Kelompok.
+        function sipNowIso() { return new Date().toISOString(); }
+        function sipFormatDateTime(value) {
+            if (!value) return '-';
+            const d = new Date(value);
+            if (isNaN(d.getTime())) return '-';
+            return d.toLocaleString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+        }
+
         // KPM Management Ketua
         function handleSaveKpm(e) {
             e.preventDefault();
@@ -3188,11 +3523,20 @@
             const checkboxes = document.querySelectorAll('input[name="kpmKomponen"]:checked');
             let komponen = [];
             checkboxes.forEach(cb => {
-                const cleanVal = cb.value.replace(/[\s\/()>=]/g, '_');
-                const qtyInput = document.getElementById('qty_' + cleanVal);
-                const qty = qtyInput ? qtyInput.value : 1;
+                const qtyInput = document.getElementById(cb.dataset.qtyId || '');
+                const qty = qtyInput ? (qtyInput.value || 1) : 1;
                 komponen.push(`${cb.value} (${qty})`);
             });
+
+            const nonKomponen = document.getElementById('kpmNonKomponen')?.checked === true;
+            if (jenisBantuan === 'BPNT' && nonKomponen) {
+                komponen = ['Non-Komponen'];
+            } else if (komponen.length === 0) {
+                alert(jenisBantuan === 'BPNT'
+                    ? 'Pilih minimal satu komponen atau centang Non-Komponen.'
+                    : 'Pilih minimal satu komponen PKH.');
+                return;
+            }
 
             if (nik.length !== 16) {
                 alert("NIK KPM harus tepat 16 digit!");
@@ -3208,19 +3552,27 @@
                     item.jenisBantuan = jenisBantuan;
                     item.alamat = alamat;
                     item.komponen = komponen;
+                    item.updatedAt = sipNowIso();
                 }
                 showToast("Berhasil", "Data KPM berhasil diperbarui.", "success");
             } else {
                 appState.kpmList.push({
                     id: "KPM-" + Date.now(),
                     kelompok: currentUser.kelompok,
-                    nama, nik, kohor, jenisBantuan, alamat, komponen
+                    nama, nik, kohor, jenisBantuan, alamat, komponen,
+                    createdAt: sipNowIso(), updatedAt: sipNowIso()
                 });
                 showToast("Berhasil", "Anggota KPM baru berhasil disimpan.", "success");
             }
 
             saveState();
             document.getElementById('formKpm').reset();
+            document.querySelectorAll('input[name="kpmKomponen"]').forEach(cb => {
+                const qty = document.getElementById(cb.dataset.qtyId || '');
+                if (qty) qty.disabled = true;
+            });
+            const nonWrap = document.getElementById('kpmNonKomponenWrap');
+            if (nonWrap) nonWrap.classList.add('hidden');
             document.getElementById('editKpmId').value = "";
             document.getElementById('formKpmTitle').innerText = "Tambah Anggota KPM Baru";
             document.getElementById('btnSubmitKpm').innerText = "Simpan Anggota KPM";
@@ -3236,7 +3588,7 @@
 
             tbody.innerHTML = '';
             if (members.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="8" class="text-center p-6 text-slate-400">Belum ada anggota KPM dalam kelompok ini.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="9" class="text-center p-6 text-slate-400">Belum ada anggota KPM dalam kelompok ini.</td></tr>`;
                 return;
             }
 
@@ -3252,6 +3604,7 @@
                         <td class="p-3">${m.jenisBantuan || 'PKH'}</td>
                         <td class="p-3 space-y-0.5">${compStr}</td>
                         <td class="p-3 text-slate-600">${m.alamat || '-'}</td>
+                        <td class="p-3 text-[10px] font-mono whitespace-nowrap">${sipFormatDateTime(m.updatedAt || m.createdAt)}</td>
                         <td class="p-3 text-center space-x-1">
                             <button onclick="editKpm('${m.id}')" class="bg-amber-500 text-white px-2 py-1 rounded text-xs font-bold">Edit</button>
                             <button onclick="deleteKpm('${m.id}')" class="bg-red-600 text-white px-2 py-1 rounded text-xs font-bold">Hapus</button>
@@ -3298,8 +3651,48 @@
             document.getElementById('modalPendampingKelompokDetail').classList.remove('hidden');
         }
 
+        function editKpm(id) {
+            const item = (appState.kpmList || []).find(k => String(k.id) === String(id));
+            if (!item) {
+                showToast("Data tidak ditemukan", "Data KPM tidak ditemukan. Muat ulang halaman.", "warning");
+                return;
+            }
+            document.getElementById('editKpmId').value = item.id;
+            document.getElementById('kpmNama').value = item.nama || '';
+            document.getElementById('kpmNik').value = item.nik || '';
+            document.getElementById('kpmKohor').value = String(item.kohor || '2026');
+            document.getElementById('kpmJenisBantuan').value = item.jenisBantuan || 'PKH';
+            document.getElementById('kpmAlamat').value = item.alamat || '';
+
+            const saved = Array.isArray(item.komponen) ? item.komponen : [item.komponen || ''];
+            document.querySelectorAll('input[name="kpmKomponen"]').forEach(cb => {
+                const qty = document.getElementById(cb.dataset.qtyId || '');
+                const match = saved.find(v => String(v).startsWith(cb.value + ' ('));
+                cb.checked = !!match;
+                if (qty) {
+                    const m = match && String(match).match(/\\((\\d+)\\)/);
+                    if (m) qty.value = m[1];
+                    qty.disabled = !cb.checked;
+                }
+            });
+            const nonCheck = document.getElementById('kpmNonKomponen');
+            if (nonCheck) nonCheck.checked = saved.some(v => String(v).toLowerCase().includes('non-komponen'));
+            aturPilihanKomponenKpm();
+
+            document.getElementById('formKpmTitle').innerText = "Edit Data Anggota KPM";
+            document.getElementById('btnSubmitKpm').innerText = "Simpan Perubahan KPM";
+            document.getElementById('btnCancelKpmEdit').classList.remove('hidden');
+            document.getElementById('formKpm').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
         function cancelKpmEdit() {
             document.getElementById('formKpm').reset();
+            document.querySelectorAll('input[name="kpmKomponen"]').forEach(cb => {
+                const qty = document.getElementById(cb.dataset.qtyId || '');
+                if (qty) qty.disabled = true;
+            });
+            const nonWrap = document.getElementById('kpmNonKomponenWrap');
+            if (nonWrap) nonWrap.classList.add('hidden');
             document.getElementById('editKpmId').value = "";
             document.getElementById('formKpmTitle').innerText = "Tambah Anggota KPM Baru";
             document.getElementById('btnSubmitKpm').innerText = "Simpan Anggota KPM";
@@ -3333,6 +3726,7 @@
                         item.modul = modul;
                         item.statusKehadiran = statusKehadiran;
                         if (compressedBase64) item.foto = compressedBase64;
+                        item.updatedAt = sipNowIso();
                     }
                     showToast("Berhasil", "Presensi P2K2 diperbarui.", "success");
                 } else {
@@ -3342,7 +3736,8 @@
                         kpmId, modul, statusKehadiran,
                         foto: compressedBase64 || '',
                         statusVerifikasi: "PENDING",
-                        date: new Date().toISOString().split('T')[0]
+                        date: new Date().toISOString().split('T')[0],
+                        createdAt: sipNowIso(), updatedAt: sipNowIso()
                     });
                     showToast("Berhasil", "Presensi P2K2 disimpan.", "success");
                 }
@@ -3375,7 +3770,7 @@
                     `<span class="bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full font-bold text-[10px]">Menunggu</span>`;
 
                 let fotoBtn = item.foto ?
-                    `<button onclick="openImageViewer('${item.foto}')" class="bg-blue-50 text-blue-800 px-2 py-1 rounded text-[11px] font-bold"><i class="fas fa-image"></i> Lihat</button>` :
+                    `<button onclick="openImageViewer('${photoViewerRef(item.foto)}'${photoDownloadArgs(kpm ? kpm.nama : '', kpm ? kpm.nik : '', 'BUKTI-P2K2', item.kpmId)})" class="bg-blue-50 text-blue-800 px-2 py-1 rounded text-[11px] font-bold"><i class="fas fa-image"></i> Lihat</button>` :
                     `<span class="text-slate-400 text-[10px]">Tanpa Foto</span>`;
 
                 tbody.innerHTML += `
@@ -3387,6 +3782,7 @@
                         <td class="p-3 font-semibold">${item.statusKehadiran}</td>
                         <td class="p-3">${badgeStatus}</td>
                         <td class="p-3">${fotoBtn}</td>
+                        <td class="p-3 text-[10px] font-mono whitespace-nowrap">${sipFormatDateTime(item.updatedAt || item.createdAt)}</td>
                         <td class="p-3 text-center space-x-1">
                             <button onclick="editP2k2('${item.id}')" class="bg-amber-500 text-white px-2 py-1 rounded text-xs font-bold">Edit</button>
                             <button onclick="deleteP2k2('${item.id}')" class="bg-red-600 text-white px-2 py-1 rounded text-xs font-bold">Hapus</button>
@@ -3458,87 +3854,69 @@
             });
         }
 
-        function handleSaveKomitmen(e) {
+        async function handleSaveKomitmen(e) {
             e.preventDefault();
             const editId = document.getElementById('editKomitmenId').value;
             const kpmId = document.getElementById('komitmenKpmSelect').value;
             const statusKepatuhan = document.getElementById('komitmenStatus').value;
-            const fileInputs = document.querySelectorAll('#dynamicKomitmenContainer input[type="file"]');
+            const fileInputs = Array.from(document.querySelectorAll('#dynamicKomitmenContainer input[type="file"]'));
+            if (!kpmId) { alert("Pilih KPM terlebih dahulu."); return; }
 
-            if (!kpmId) {
-                alert("Pilih KPM terlebih dahulu.");
-                return;
-            }
-
-            if (editId) {
-                const item = appState.komitmenList.find(i => i.id === editId);
-                if (item) {
-                    item.kpmId = kpmId;
-                    item.statusKepatuhan = statusKepatuhan;
-                    const singleFile = fileInputs.length > 0 ? fileInputs[0].files[0] : null;
-                    if (singleFile) {
-                        compressImage(singleFile, function(b64) {
-                            if (b64) item.foto = b64;
-                            saveState();
-                            resetKomitmenForm();
-                            renderKetuaAllTables();
-                            showToast("Berhasil", "Laporan komitmen diperbarui.", "success");
-                        });
-                        return;
-                    }
+            const submit = document.getElementById('btnSubmitKomitmen');
+            if (submit) { submit.disabled = true; submit.dataset.oldText = submit.innerText; submit.innerText = 'Mengunggah foto...'; }
+            try {
+                const uploads = [];
+                for (let i = 0; i < fileInputs.length; i++) {
+                    const file = fileInputs[i].files && fileInputs[i].files[0];
+                    if (!file) continue;
+                    const compressed = await compressImageAsync(file);
+                    if (!compressed) continue;
+                    const meta = await uploadPhotoToDrive(compressed, `komitmen-${Date.now()}-${i}.jpg`, currentUser && currentUser.photoSessionToken);
+                    uploads.push({ komponen: fileInputs[i].getAttribute('data-komponen'), meta });
                 }
-                saveState();
-                resetKomitmenForm();
-                renderKetuaAllTables();
-                showToast("Berhasil", "Laporan komitmen diperbarui.", "success");
-                return;
-            }
 
-            if (fileInputs.length === 0) {
-                appState.komitmenList.push({
-                    id: "KOM-" + Date.now(),
-                    kelompok: currentUser.kelompok,
-                    kpmId, jenisLayanan: "Komponen Umum", statusKepatuhan,
-                    foto: "", statusVerifikasi: "PENDING", date: new Date().toISOString().split('T')[0]
-                });
-                saveState();
-                resetKomitmenForm();
-                renderKetuaAllTables();
-                showToast("Berhasil", "Laporan komitmen disimpan.", "success");
-                return;
-            }
-
-            let index = 0;
-            function processNextFile() {
-                if (index >= fileInputs.length) {
+                if (editId) {
+                    const item = appState.komitmenList.find(i => i.id === editId);
+                    if (item) {
+                        item.kpmId = kpmId;
+                        item.statusKepatuhan = statusKepatuhan;
+                        if (uploads.length) item.foto = uploads[0].meta;
+                        item.updatedAt = sipNowIso();
+                    }
                     saveState();
                     resetKomitmenForm();
                     renderKetuaAllTables();
-                    showToast("Berhasil", "Laporan komitmen layanan berhasil dikirim.", "success");
+                    showToast("Berhasil", "Laporan komitmen diperbarui.", "success");
                     return;
                 }
 
-                const fileInput = fileInputs[index];
-                const komponenName = fileInput.getAttribute('data-komponen');
-                const file = fileInput.files[0];
-
-                compressImage(file, function(compressedBase64) {
-                    appState.komitmenList.push({
+                const inputTime = sipNowIso();
+                if (fileInputs.length === 0) {
+                    appState.komitmenList.push({ id: "KOM-" + Date.now(), kelompok: currentUser.kelompok, kpmId, jenisLayanan: "Komponen Umum", statusKepatuhan, foto: "", statusVerifikasi: "PENDING", date: new Date().toISOString().split('T')[0], createdAt: inputTime, updatedAt: inputTime });
+                } else {
+                    if (!uploads.length) throw new Error('Pilih minimal satu foto bukti untuk diunggah.');
+                    uploads.forEach((entry, index) => appState.komitmenList.push({
                         id: "KOM-" + Date.now() + "-" + index,
                         kelompok: currentUser.kelompok,
                         kpmId,
-                        jenisLayanan: komponenName,
+                        jenisLayanan: entry.komponen || "Komponen Umum",
                         statusKepatuhan,
-                        foto: compressedBase64 || '',
+                        foto: entry.meta,
                         statusVerifikasi: "PENDING",
-                        date: new Date().toISOString().split('T')[0]
-                    });
-                    index++;
-                    processNextFile();
-                });
+                        date: new Date().toISOString().split('T')[0],
+                        createdAt: inputTime, updatedAt: inputTime
+                    }));
+                }
+                saveState();
+                resetKomitmenForm();
+                renderKetuaAllTables();
+                showToast("Berhasil", "Laporan komitmen tersimpan; foto bukti masuk Google Drive.", "success");
+            } catch (err) {
+                console.error('Simpan komitmen:', err);
+                alert('Laporan belum disimpan: ' + (err.message || err));
+            } finally {
+                if (submit) { submit.disabled = false; submit.innerText = submit.dataset.oldText || 'Kirim Laporan Komitmen'; }
             }
-
-            processNextFile();
         }
 
         function resetKomitmenForm() {
@@ -3588,7 +3966,7 @@
                         `<span class="bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full font-bold text-[10px]">Menunggu Verifikasi</span>`);
 
                 let fotoBtn = item.foto ?
-                    `<button onclick="openImageViewer('${item.foto}')" class="bg-blue-50 text-blue-800 px-2 py-1 rounded text-[11px] font-bold"><i class="fas fa-image"></i> Lihat</button>` :
+                    `<button onclick="openImageViewer('${photoViewerRef(item.foto)}'${photoDownloadArgs(kpm ? kpm.nama : '', kpm ? kpm.nik : '', 'BUKTI-KOMITMEN', item.kpmId)})" class="bg-blue-50 text-blue-800 px-2 py-1 rounded text-[11px] font-bold"><i class="fas fa-image"></i> Lihat</button>` :
                     `<span class="text-slate-400 text-[10px]">Tanpa Foto</span>`;
 
                 tbody.innerHTML += `
@@ -3600,6 +3978,7 @@
                         <td class="p-3">${fotoBtn}</td>
                         <td class="p-3 font-medium">${item.statusKepatuhan || '-'}</td>
                         <td class="p-3">${badgeStatus}</td>
+                        <td class="p-3 text-[10px] font-mono whitespace-nowrap">${sipFormatDateTime(item.updatedAt || item.createdAt)}</td>
                         <td class="p-3 text-center space-x-1">
                             <button onclick="editKomitmen('${item.id}')" class="bg-amber-500 text-white px-2 py-1 rounded text-xs font-bold">Edit</button>
                             <button onclick="deleteKomitmen('${item.id}')" class="bg-red-600 text-white px-2 py-1 rounded text-xs font-bold">Hapus</button>
@@ -3633,7 +4012,8 @@
                     kpmId, tahap, nominal,
                     foto: compressedBase64 || '',
                     statusVerifikasi: "PENDING",
-                    date: new Date().toISOString().split('T')[0]
+                    date: new Date().toISOString().split('T')[0],
+                    createdAt: sipNowIso(), updatedAt: sipNowIso()
                 });
                 saveState();
                 document.getElementById('formRekonsiliasi').reset();
@@ -3660,7 +4040,7 @@
                     `<span class="bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full font-bold text-[10px]">Menunggu</span>`;
 
                 let fotoBtn = item.foto ?
-                    `<button onclick="openImageViewer('${item.foto}')" class="bg-blue-50 text-blue-800 px-2 py-1 rounded text-[11px] font-bold"><i class="fas fa-image"></i> Lihat</button>` :
+                    `<button onclick="openImageViewer('${photoViewerRef(item.foto)}'${photoDownloadArgs(kpm ? kpm.nama : '', kpm ? kpm.nik : '', 'BUKTI-REKONSILIASI', item.kpmId)})" class="bg-blue-50 text-blue-800 px-2 py-1 rounded text-[11px] font-bold"><i class="fas fa-image"></i> Lihat</button>` :
                     `<span class="text-slate-400 text-[10px]">Tanpa Foto</span>`;
 
                 tbody.innerHTML += `
@@ -3672,6 +4052,7 @@
                         <td class="p-3 font-mono font-bold text-emerald-800">Rp ${parseInt(item.nominal || 0).toLocaleString('id-ID')}</td>
                         <td class="p-3">${badgeStatus}</td>
                         <td class="p-3">${fotoBtn}</td>
+                        <td class="p-3 text-[10px] font-mono whitespace-nowrap">${sipFormatDateTime(item.updatedAt || item.createdAt)}</td>
                         <td class="p-3 text-center">
                             <button onclick="deleteRekonsiliasi('${item.id}')" class="bg-red-600 text-white px-2 py-1 rounded text-xs font-bold">Hapus</button>
                         </td>
@@ -3751,6 +4132,7 @@
                         item.makan = makan;
                         item.sisa = sisa;
                         if (compressedBase64) item.foto = compressedBase64;
+                        item.updatedAt = sipNowIso();
                     }
                     showToast("Berhasil", "Usulan PPSE diperbarui.", "success");
                 } else {
@@ -3761,7 +4143,8 @@
                         bersih, keluarga, makan, sisa,
                         foto: compressedBase64 || '',
                         statusVerifikasi: "PENDING",
-                        date: new Date().toISOString().split('T')[0]
+                        date: new Date().toISOString().split('T')[0],
+                        createdAt: sipNowIso(), updatedAt: sipNowIso()
                     });
                     showToast("Berhasil", "Usulan PPSE disimpan.", "success");
                 }
@@ -3794,7 +4177,7 @@
                     `<span class="bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full font-bold text-[10px]">Menunggu</span>`;
 
                 let fotoBtn = item.foto ?
-                    `<button onclick="openImageViewer('${item.foto}')" class="bg-blue-50 text-blue-800 px-2 py-1 rounded text-[11px] font-bold"><i class="fas fa-image"></i> Lihat</button>` :
+                    `<button onclick="openImageViewer('${photoViewerRef(item.foto)}'${photoDownloadArgs(item.namaKpm, item.nik, 'BUKTI-PPSE', item.kpmId)})" class="bg-blue-50 text-blue-800 px-2 py-1 rounded text-[11px] font-bold"><i class="fas fa-image"></i> Lihat</button>` :
                     `<span class="text-slate-400 text-[10px]">Tanpa Foto</span>`;
 
                 tbody.innerHTML += `
@@ -3807,6 +4190,7 @@
                         <td class="p-3 font-mono text-xs">Sisa: Rp ${parseInt(item.sisa || 0).toLocaleString('id-ID')}</td>
                         <td class="p-3">${fotoBtn}</td>
                         <td class="p-3">${badgeStatus}</td>
+                        <td class="p-3 text-[10px] font-mono whitespace-nowrap">${sipFormatDateTime(item.updatedAt || item.createdAt)}</td>
                         <td class="p-3 text-center space-x-1">
                             <button onclick="editPpse('${item.id}')" class="bg-amber-500 text-white px-2 py-1 rounded text-xs font-bold">Edit</button>
                             <button onclick="deletePpse('${item.id}')" class="bg-red-600 text-white px-2 py-1 rounded text-xs font-bold">Hapus</button>
@@ -3872,60 +4256,91 @@
             }
         }
 
-        function handleSaveGraduasi(e) {
-            e.preventDefault();
-            const editId = document.getElementById('editGraduasiId').value;
-            const kpmId = document.getElementById('graduasiKpmSelect').value;
-            const kpm = appState.kpmList.find(k => k.id === kpmId);
-            const namaKpm = kpm ? kpm.nama : "-";
-            const nik = document.getElementById('graduasiNik').value;
-            const kohor = document.getElementById('graduasiKohor').value;
-            const alasan = document.getElementById('graduasiAlasan').value;
-
-            const fKpm = document.getElementById('graduasiFotoKpm').files[0];
-            const fRumah = document.getElementById('graduasiFotoRumah').files[0];
-            const fSurat = document.getElementById('graduasiFotoSurat').files[0];
-
-            compressImage(fKpm, function(b64Kpm) {
-                compressImage(fRumah, function(b64Rumah) {
-                    compressImage(fSurat, function(b64Surat) {
-                        if (editId) {
-                            const item = appState.graduasiList.find(i => i.id === editId);
-                            if (item) {
-                                item.kpmId = kpmId;
-                                item.namaKpm = namaKpm;
-                                item.nik = nik;
-                                item.kohor = kohor;
-                                item.alasan = alasan;
-                                if (b64Kpm) item.fotoKpm = b64Kpm;
-                                if (b64Rumah) item.fotoRumah = b64Rumah;
-                                if (b64Surat) item.fotoSurat = b64Surat;
-                            }
-                            showToast("Berhasil", "Usulan graduasi diperbarui.", "success");
-                        } else {
-                            appState.graduasiList.push({
-                                id: "GRAD-" + Date.now(),
-                                kelompok: currentUser.kelompok,
-                                kpmId, namaKpm, nik, kohor, alasan,
-                                fotoKpm: b64Kpm || '',
-                                fotoRumah: b64Rumah || '',
-                                fotoSurat: b64Surat || '',
-                                statusVerifikasi: "PENDING",
-                                date: new Date().toISOString().split('T')[0]
-                            });
-                            showToast("Berhasil", "Usulan graduasi disimpan.", "success");
-                        }
-
-                        saveState();
-                        document.getElementById('formGraduasi').reset();
-                        document.getElementById('editGraduasiId').value = "";
-                        document.getElementById('formGraduasiTitle').innerText = "Usulan Graduasi Mandiri KPM";
-                        document.getElementById('btnSubmitGraduasi').innerText = "Simpan Usulan Graduasi";
-                        document.getElementById('btnCancelGraduasiEdit').classList.add('hidden');
-                        renderKetuaAllTables();
-                    });
-                });
+        async function commitGraduasiListMutation(mutator) {
+            if (!db) throw new Error('Koneksi database belum tersedia. Graduasi tidak dapat disimpan ke server.');
+            const ref = db.collection("pkh_database").doc("main_state");
+            const resultList = await db.runTransaction(async tx => {
+                const snap = await tx.get(ref);
+                if (!snap.exists) throw new Error('Dokumen data utama SIP-PKH tidak ditemukan.');
+                const data = snap.data() || {};
+                const list = Array.isArray(data.graduasiList) ? data.graduasiList.slice() : [];
+                const next = mutator(list);
+                if (!Array.isArray(next)) throw new Error('Perubahan data graduasi tidak valid.');
+                tx.update(ref, { graduasiList: next });
+                return next;
             });
+            appState.graduasiList = resultList;
+            try { localStorage.setItem('SIP_PKH_STATE_V6', JSON.stringify(appState)); } catch (e) {}
+            renderKetuaAllTables();
+            return resultList;
+        }
+
+        async function handleSaveGraduasi(e) {
+            e.preventDefault();
+            const submit = document.getElementById('btnSubmitGraduasi');
+            if (submit) { submit.disabled = true; submit.dataset.oldText = submit.innerText; submit.innerText = 'Menyimpan...'; }
+            try {
+                const editId = document.getElementById('editGraduasiId').value;
+                const kpmId = document.getElementById('graduasiKpmSelect').value;
+                const kpm = appState.kpmList.find(k => String(k.id) === String(kpmId));
+                if (!kpm) throw new Error('Pilih anggota KPM yang valid.');
+                if (!currentUser || !currentUser.kelompok) throw new Error('Sesi Ketua Kelompok tidak valid. Silakan login kembali.');
+                const namaKpm = kpm.nama || '-';
+                const nik = kpm.nik || document.getElementById('graduasiNik').value || '';
+                const kohor = document.getElementById('graduasiKohor').value || kpm.kohor || '2026';
+                const alasan = document.getElementById('graduasiAlasan').value;
+                if (!alasan) throw new Error('Pilih alasan graduasi terlebih dahulu.');
+
+                const oldItem = editId ? appState.graduasiList.find(i => String(i.id) === String(editId)) : null;
+                if (editId && !oldItem) throw new Error('Data yang akan diedit tidak ditemukan. Muat ulang halaman.');
+                const photoInputs = [
+                    ['graduasiFotoKpm', 'fotoKpm', 'graduasi-kpm'],
+                    ['graduasiFotoRumah', 'fotoRumah', 'graduasi-rumah'],
+                    ['graduasiFotoSurat', 'fotoSurat', 'graduasi-surat']
+                ];
+                const photoValues = {};
+                for (const [inputId, field, prefix] of photoInputs) {
+                    const file = document.getElementById(inputId).files[0];
+                    if (!file) { photoValues[field] = oldItem ? (oldItem[field] || '') : ''; continue; }
+                    const compressed = await compressImageAsync(file);
+                    if (!compressed) throw new Error('Foto ' + prefix + ' gagal diproses.');
+                    const meta = await uploadPhotoToDrive(compressed, `${prefix}-${Date.now()}.jpg`, currentUser.photoSessionToken);
+                    photoValues[field] = meta;
+                }
+
+                const record = {
+                    id: editId || ('GRAD-' + Date.now()),
+                    kelompok: currentUser.kelompok,
+                    kpmId, namaKpm, nik, kohor, alasan,
+                    ...photoValues,
+                    statusVerifikasi: oldItem ? (oldItem.statusVerifikasi || 'PENDING') : 'PENDING',
+                    date: oldItem ? (oldItem.date || new Date().toISOString().split('T')[0]) : new Date().toISOString().split('T')[0],
+                    createdAt: oldItem ? (oldItem.createdAt || null) : sipNowIso(),
+                    updatedAt: sipNowIso()
+                };
+                await commitGraduasiListMutation(list => {
+                    const idx = list.findIndex(i => String(i.id) === String(record.id));
+                    if (editId) {
+                        if (idx < 0) throw new Error('Data graduasi sudah berubah atau dihapus oleh pengguna lain.');
+                        if (list[idx].kelompok !== currentUser.kelompok) throw new Error('Tidak berhak mengubah data kelompok lain.');
+                        list[idx] = record;
+                    } else {
+                        list.push(record);
+                    }
+                    return list;
+                });
+                document.getElementById('formGraduasi').reset();
+                document.getElementById('editGraduasiId').value = '';
+                document.getElementById('formGraduasiTitle').innerText = 'Usulan Graduasi Mandiri KPM';
+                document.getElementById('btnSubmitGraduasi').innerText = 'Simpan Usulan Graduasi';
+                document.getElementById('btnCancelGraduasiEdit').classList.add('hidden');
+                showToast('Berhasil', editId ? 'Usulan graduasi berhasil diperbarui dan disimpan ke server.' : 'Usulan graduasi berhasil disimpan ke server.', 'success');
+            } catch (err) {
+                console.error('SIP-PKH simpan graduasi gagal:', err);
+                alert('Graduasi belum berhasil disimpan: ' + (err.message || err));
+            } finally {
+                if (submit) { submit.disabled = false; submit.innerText = submit.dataset.oldText || 'Simpan Usulan Graduasi'; }
+            }
         }
 
         function renderKetuaGraduasiTable() {
@@ -3944,9 +4359,9 @@
                     `<span class="bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full font-bold text-[10px]">Disetujui</span>` :
                     `<span class="bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full font-bold text-[10px]">Menunggu</span>`;
 
-                let fotoKpmBtn = item.fotoKpm ? `<button onclick="openImageViewer('${item.fotoKpm}')" class="text-blue-700 underline font-semibold text-[10px]">Foto KPM</button>` : '-';
-                let fotoRumahBtn = item.fotoRumah ? `<button onclick="openImageViewer('${item.fotoRumah}')" class="text-blue-700 underline font-semibold text-[10px]">Foto Rumah</button>` : '-';
-                let fotoSuratBtn = item.fotoSurat ? `<button onclick="openImageViewer('${item.fotoSurat}')" class="text-blue-700 underline font-semibold text-[10px]">Foto Surat</button>` : '-';
+                let fotoKpmBtn = item.fotoKpm ? `<button onclick="openImageViewer('${photoViewerRef(item.fotoKpm)}'${photoDownloadArgs(item.namaKpm, item.nik, 'FOTO-KPM', item.kpmId)})" class="text-blue-700 underline font-semibold text-[10px]">Foto KPM</button>` : '-';
+                let fotoRumahBtn = item.fotoRumah ? `<button onclick="openImageViewer('${photoViewerRef(item.fotoRumah)}'${photoDownloadArgs(item.namaKpm, item.nik, 'FOTO-RUMAH', item.kpmId)})" class="text-blue-700 underline font-semibold text-[10px]">Foto Rumah</button>` : '-';
+                let fotoSuratBtn = item.fotoSurat ? `<button onclick="openImageViewer('${photoViewerRef(item.fotoSurat)}'${photoDownloadArgs(item.namaKpm, item.nik, 'FOTO-SURAT', item.kpmId)})" class="text-blue-700 underline font-semibold text-[10px]">Foto Surat</button>` : '-';
 
                 tbody.innerHTML += `
                     <tr>
@@ -3959,6 +4374,7 @@
                         <td class="p-3">${fotoRumahBtn}</td>
                         <td class="p-3">${fotoSuratBtn}</td>
                         <td class="p-3">${badgeStatus}</td>
+                        <td class="p-3 text-[10px] font-mono whitespace-nowrap">${sipFormatDateTime(item.updatedAt || item.createdAt)}</td>
                         <td class="p-3 text-center space-x-1">
                             <button onclick="editGraduasi('${item.id}')" class="bg-amber-500 text-white px-2 py-1 rounded text-xs font-bold">Edit</button>
                             <button onclick="deleteGraduasi('${item.id}')" class="bg-red-600 text-white px-2 py-1 rounded text-xs font-bold">Hapus</button>
@@ -3991,13 +4407,157 @@
             document.getElementById('btnCancelGraduasiEdit').classList.add('hidden');
         }
 
-        function deleteGraduasi(id) {
-            if (confirm("Hapus usulan graduasi ini?")) {
-                appState.graduasiList = appState.graduasiList.filter(i => i.id !== id);
-                saveState();
-                renderKetuaAllTables();
-                showToast("Berhasil", "Usulan graduasi dihapus.", "success");
+        async function deleteGraduasi(id) {
+            if (!confirm("Hapus usulan graduasi ini secara permanen?")) return;
+            try {
+                await commitGraduasiListMutation(list => {
+                    const before = list.length;
+                    const next = list.filter(item => !(String(item.id) === String(id) && item.kelompok === currentUser.kelompok));
+                    if (next.length === before) throw new Error('Riwayat tidak ditemukan atau bukan milik kelompok Anda.');
+                    return next;
+                });
+                showToast("Berhasil", "Riwayat graduasi telah dihapus dari server.", "success");
+            } catch (err) {
+                console.error('SIP-PKH hapus graduasi gagal:', err);
+                alert('Riwayat belum berhasil dihapus: ' + (err.message || err));
             }
+        }
+
+        // Bersihkan hanya laporan yatim P2K2, Rekonsiliasi, PPSE, dan Graduasi
+        // pada kelompok binaan Pendamping ini. Komitmen Layanan sengaja tidak disentuh.
+        async function cleanupOrphanedKpmReports() {
+            if (!currentUser || currentUser.role !== 'pendamping') {
+                alert('Fitur ini hanya dapat digunakan oleh akun Pendamping.');
+                return;
+            }
+            const myGroups = appState.ketuaUsers
+                .filter(k => k.pendampingId === currentUser.id && k.status === 'VERIFIED')
+                .map(k => k.kelompok);
+            if (!myGroups.length) {
+                alert('Belum ada kelompok binaan terverifikasi. Tidak ada data yang dihapus.');
+                return;
+            }
+
+            const hasActiveKpm = item => !!item.kpmId &&
+                appState.kpmList.some(k => String(k.id) === String(item.kpmId));
+            const targets = [
+                { key: 'p2k2List', label: 'P2K2' },
+                { key: 'rekonsiliasiList', label: 'Rekonsiliasi' },
+                { key: 'ppseList', label: 'PPSE' },
+                { key: 'graduasiList', label: 'Graduasi' }
+            ];
+            const counts = {};
+            let total = 0;
+            targets.forEach(target => {
+                const list = Array.isArray(appState[target.key]) ? appState[target.key] : [];
+                const count = list.filter(item => myGroups.includes(item.kelompok) && !hasActiveKpm(item)).length;
+                counts[target.key] = count;
+                total += count;
+            });
+
+            if (!total) {
+                showToast('Data Bersih', 'Tidak ditemukan laporan yatim pada P2K2, Rekonsiliasi, PPSE, atau Graduasi di kelompok binaan Anda. Komitmen Layanan tidak diperiksa atau diubah.', 'success');
+                return;
+            }
+
+            const detail = targets.filter(t => counts[t.key] > 0)
+                .map(t => `${t.label}: ${counts[t.key]}`).join('\n');
+            const ok = confirm(`Ditemukan ${total} laporan yang KPM induknya sudah tidak ada pada kelompok binaan Anda:\n${detail}\n\nHapus hanya laporan tersebut? Data yang masih terhubung dengan KPM aktif dan seluruh data Komitmen Layanan TIDAK akan dihapus.`);
+            if (!ok) return;
+
+            const previous = {};
+            targets.forEach(target => {
+                previous[target.key] = appState[target.key];
+                appState[target.key] = (Array.isArray(appState[target.key]) ? appState[target.key] : [])
+                    .filter(item => !(myGroups.includes(item.kelompok) && !hasActiveKpm(item)));
+            });
+
+            let saved = false;
+            try {
+                if (!db) throw new Error('Koneksi database belum tersedia.');
+                const ref = db.collection("pkh_database").doc("main_state");
+                const snapshot = JSON.parse(JSON.stringify(appState));
+                sipSaveQueue = sipSaveQueue.then(() => db.runTransaction(async tx => {
+                    const snap = await tx.get(ref);
+                    const remote = snap.exists ? (snap.data() || {}) : {};
+                    const remoteGraduasi = Array.isArray(remote.graduasiList) ? remote.graduasiList : [];
+                    const cleanGraduasi = remoteGraduasi.filter(item =>
+                        !(myGroups.includes(item.kelompok) && !hasActiveKpm(item))
+                    );
+                    tx.set(ref, { ...snapshot, graduasiList: cleanGraduasi });
+                    return cleanGraduasi;
+                })).then(cleanGraduasi => {
+                    appState.graduasiList = cleanGraduasi;
+                    try { localStorage.setItem('SIP_PKH_STATE_V6', JSON.stringify(appState)); } catch (e) {}
+                    return true;
+                });
+                saved = await sipSaveQueue;
+            } catch (err) {
+                console.error('Pembersihan laporan yatim gagal:', err);
+                saved = false;
+            }
+            if (!saved) {
+                targets.forEach(target => { appState[target.key] = previous[target.key]; });
+                try { localStorage.setItem('SIP_PKH_STATE_V6', JSON.stringify(appState)); } catch (e) {}
+                alert('Penghapusan belum tersinkron ke server. Data lokal dikembalikan; silakan periksa koneksi lalu coba lagi.');
+                return;
+            }
+
+            renderPendampingVerifikasiTable();
+            updatePendampingNotifications();
+            openPrintModal(window.currentPrintType || 'p2k2');
+            showToast('Berhasil', `${total} laporan yatim berhasil dibersihkan. Komitmen Layanan tetap utuh.`, 'success');
+        }
+
+        // Pengaturan kolom per jenis laporan; pilihan hanya memengaruhi tampilan/cetakan.
+        function togglePrintColumnPanel() {
+            document.getElementById('printColumnPanel')?.classList.toggle('hidden');
+        }
+        function getPrintColumnKey() { return 'SIP_PKH_PRINT_COLUMNS_' + (window.currentPrintType || 'default'); }
+        function applyPrintColumnVisibility() {
+            const table = document.querySelector('#printDocTableContainer table');
+            const options = document.getElementById('printColumnOptions');
+            if (!table || !options) return;
+            const headers = Array.from(table.querySelectorAll('thead tr:first-child th'));
+            let selected;
+            try { selected = JSON.parse(localStorage.getItem(getPrintColumnKey()) || 'null'); } catch (e) { selected = null; }
+            if (!Array.isArray(selected)) selected = headers.map((_, i) => i);
+            selected = selected.filter(i => Number.isInteger(i) && i >= 0 && i < headers.length);
+            if (selected.length === 0) selected = headers.map((_, i) => i);
+            options.innerHTML = headers.map((th, i) => {
+                const label = (th.innerText || ('Kolom ' + (i + 1))).trim();
+                return `<label class="inline-flex items-center gap-1.5 bg-white border border-blue-100 rounded-lg px-2 py-1 cursor-pointer"><input type="checkbox" ${selected.includes(i) ? 'checked' : ''} onchange="setPrintColumnVisibility(${i}, this.checked)" class="accent-blue-700"><span>${label}</span></label>`;
+            }).join('');
+            const rows = Array.from(table.querySelectorAll('tr'));
+            rows.forEach(row => {
+                const cells = Array.from(row.children);
+                // Sembunyikan kolom yang tidak dipilih pada setiap baris data.
+                cells.forEach((cell, i) => {
+                    if (cell.hasAttribute('colspan')) {
+                        // Baris pesan kosong harus mengikuti jumlah kolom yang sedang tampil.
+                        cell.colSpan = selected.length;
+                        cell.style.display = '';
+                    } else {
+                        cell.style.display = selected.includes(i) ? '' : 'none';
+                    }
+                });
+            });
+            try { localStorage.setItem(getPrintColumnKey(), JSON.stringify(selected)); } catch (e) {}
+        }
+        function setPrintColumnVisibility(index, checked) {
+            const table = document.querySelector('#printDocTableContainer table');
+            if (!table) return;
+            let selected;
+            try { selected = JSON.parse(localStorage.getItem(getPrintColumnKey()) || 'null'); } catch (e) { selected = null; }
+            if (!Array.isArray(selected)) selected = Array.from(table.querySelectorAll('thead th')).map((_, i) => i);
+            selected = checked ? Array.from(new Set([...selected, index])).sort((a,b) => a-b) : selected.filter(i => i !== index);
+            if (selected.length === 0) { alert('Pilih minimal satu kolom.'); selected = [index]; }
+            try { localStorage.setItem(getPrintColumnKey(), JSON.stringify(selected)); } catch (e) {}
+            applyPrintColumnVisibility();
+        }
+        function resetPrintColumns() {
+            const table = document.querySelector('#printDocTableContainer table');
+            if (table) { try { localStorage.removeItem(getPrintColumnKey()); } catch (e) {} applyPrintColumnVisibility(); }
         }
 
         // Cetak PDF / Pratinjau Dokumen
@@ -4018,17 +4578,23 @@
             modal.classList.remove('hidden');
 
             const kop = appState.kopConfig;
-            let logoHtml = kop.logoBase64 ? `<img src="${kop.logoBase64}" alt="Logo" style="width: 60px; height: 60px; object-fit: contain;">` : `<div style="width: 60px; height: 60px; border: 2px solid #000; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 10px;">LOGO</div>`;
+            // Slot logo dibuat tetap dan proporsional; ukuran file asli tidak memengaruhi tinggi/lebar kop.
+            // object-fit: contain menjaga rasio gambar (portrait, landscape, atau persegi) tanpa terpotong.
+            const logoSlotStyle = "width: 68px; min-width: 68px; height: 68px; display: flex; align-items: center; justify-content: center; overflow: hidden;";
+            let logoHtml = kop.logoBase64
+                ? `<img src="${kop.logoBase64}" alt="Logo" style="display: block; max-width: 100%; max-height: 100%; width: auto; height: auto; object-fit: contain;">`
+                : `<div style="width: 100%; height: 100%; border: 1px dashed #999; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 10px; color: #777;">LOGO</div>`;
 
             let headerHtml = `
-                <div style="display: flex; align-items: center; border-bottom: 3px double #000; padding-bottom: 10px; margin-bottom: 15px;">
-                    <div style="margin-right: 15px;">${logoHtml}</div>
-                    <div style="text-align: center; width: 100%;">
+                <div style="display: flex; align-items: center; border-bottom: 3px double #000; padding: 0 0 10px 0; margin-bottom: 15px; gap: 8px;">
+                    <div style="${logoSlotStyle}">${logoHtml}</div>
+                    <div style="text-align: center; flex: 1; min-width: 0;">
                         <h3 style="font-size: 11pt; font-weight: bold; margin: 0; text-transform: uppercase;">${kop.baris1}</h3>
                         <h4 style="font-size: 10pt; font-weight: bold; margin: 2px 0; text-transform: uppercase;">${kop.baris2}</h4>
                         <h5 style="font-size: 9pt; font-weight: normal; margin: 0; text-transform: uppercase;">${kop.baris3}</h5>
                         <p style="font-size: 7.5pt; margin: 4px 0 0 0; color: #333;">${kop.alamat}</p>
                     </div>
+                    <div style="${logoSlotStyle}; visibility: hidden;" aria-hidden="true"></div>
                 </div>
             `;
 
@@ -4040,10 +4606,12 @@
             if (type === 'p2k2') {
                 titleText = "REKAPITULASI PRESENSI PERTEMUAN PENINGKATAN KEMAMPUAN KELUARGA (P2K2)";
                 let items = appState.p2k2List.filter(i => {
-                    if (myKlpNames.length > 0 && !myKlpNames.includes(i.kelompok)) return;
+                    // Batasi laporan pada kelompok binaan Pendamping yang terverifikasi.
+                    if (!myKlpNames.includes(i.kelompok)) return false;
                     if (filterKelompok !== 'ALL' && i.kelompok !== filterKelompok) return false;
                     if (filterBulan && !(i.date || '').startsWith(filterBulan)) return false;
-                    return true;
+                    // Riwayat tanpa KPM aktif adalah data yatim/test dan tidak dicetak.
+                    return !!i.kpmId && appState.kpmList.some(k => String(k.id) === String(i.kpmId));
                 });
 
                 htmlTable = `
@@ -4063,12 +4631,14 @@
                                 <th>Modul P2K2</th>
                                 <th>Kehadiran</th>
                                 <th>Verifikasi</th>
+                                <th>Waktu Input</th>
+                                <th>TTD</th>
                             </tr>
                         </thead>
                         <tbody>
                 `;
                 if (items.length === 0) {
-                    htmlTable += `<tr><td colspan="8" style="text-align: center; padding: 10px;">Tidak ada data laporan.</td></tr>`;
+                    htmlTable += `<tr><td colspan="10" style="text-align: center; padding: 10px;">Tidak ada data laporan.</td></tr>`;
                 } else {
                     items.forEach((item, idx) => {
                         const kpm = appState.kpmList.find(k => k.id === item.kpmId);
@@ -4082,6 +4652,8 @@
                                 <td>${item.modul}</td>
                                 <td>${item.statusKehadiran}</td>
                                 <td>${item.statusVerifikasi || 'PENDING'}</td>
+                                <td>${sipFormatDateTime(item.updatedAt || item.createdAt)}</td>
+                                <td style="min-width:90px; height:34px;"></td>
                             </tr>
                         `;
                     });
@@ -4113,12 +4685,14 @@
                                 <th>Jenis Layanan / Komponen</th>
                                 <th>Status Kepatuhan</th>
                                 <th>Verifikasi</th>
+                                <th>Waktu Input</th>
+                                <th>TTD</th>
                             </tr>
                         </thead>
                         <tbody>
                 `;
                 if (items.length === 0) {
-                    htmlTable += `<tr><td colspan="8" style="text-align: center; padding: 10px;">Tidak ada data laporan.</td></tr>`;
+                    htmlTable += `<tr><td colspan="10" style="text-align: center; padding: 10px;">Tidak ada data laporan.</td></tr>`;
                 } else {
                     items.forEach((item, idx) => {
                         const kpm = appState.kpmList.find(k => k.id === item.kpmId);
@@ -4132,6 +4706,8 @@
                                 <td>${item.jenisLayanan || '-'}</td>
                                 <td>${item.statusKepatuhan || '-'}</td>
                                 <td>${item.statusVerifikasi || 'PENDING'}</td>
+                                <td>${sipFormatDateTime(item.updatedAt || item.createdAt)}</td>
+                                <td style="min-width:90px; height:34px;"></td>
                             </tr>
                         `;
                     });
@@ -4140,10 +4716,10 @@
             } else if (type === 'rekonsiliasi') {
                 titleText = "REKAPITULASI REKONSILIASI PENCAIRAN DANA BANSOS PKH";
                 let items = appState.rekonsiliasiList.filter(i => {
-                    if (myKlpNames.length > 0 && !myKlpNames.includes(i.kelompok)) return;
+                    if (!myKlpNames.includes(i.kelompok)) return false;
                     if (filterKelompok !== 'ALL' && i.kelompok !== filterKelompok) return false;
                     if (filterBulan && !(i.date || '').startsWith(filterBulan)) return false;
-                    return true;
+                    return !!i.kpmId && appState.kpmList.some(k => String(k.id) === String(i.kpmId));
                 });
 
                 htmlTable = `
@@ -4163,12 +4739,14 @@
                                 <th>Tahap</th>
                                 <th>Nominal (Rp)</th>
                                 <th>Verifikasi</th>
+                                <th>Waktu Input</th>
+                                <th>TTD</th>
                             </tr>
                         </thead>
                         <tbody>
                 `;
                 if (items.length === 0) {
-                    htmlTable += `<tr><td colspan="8" style="text-align: center; padding: 10px;">Tidak ada data laporan.</td></tr>`;
+                    htmlTable += `<tr><td colspan="10" style="text-align: center; padding: 10px;">Tidak ada data laporan.</td></tr>`;
                 } else {
                     items.forEach((item, idx) => {
                         const kpm = appState.kpmList.find(k => k.id === item.kpmId);
@@ -4182,6 +4760,8 @@
                                 <td>${item.tahap}</td>
                                 <td>Rp ${parseInt(item.nominal || 0).toLocaleString('id-ID')}</td>
                                 <td>${item.statusVerifikasi || 'PENDING'}</td>
+                                <td>${sipFormatDateTime(item.updatedAt || item.createdAt)}</td>
+                                <td style="min-width:90px; height:34px;"></td>
                             </tr>
                         `;
                     });
@@ -4190,10 +4770,10 @@
             } else if (type === 'ppse') {
                 titleText = "REKAPITULASI USULAN PEMBERDAYAAN EKONOMI (PPSE)";
                 let items = appState.ppseList.filter(i => {
-                    if (myKlpNames.length > 0 && !myKlpNames.includes(i.kelompok)) return;
+                    if (!myKlpNames.includes(i.kelompok)) return false;
                     if (filterKelompok !== 'ALL' && i.kelompok !== filterKelompok) return false;
                     if (filterBulan && !(i.date || '').startsWith(filterBulan)) return false;
-                    return true;
+                    return !!i.kpmId && appState.kpmList.some(k => String(k.id) === String(i.kpmId));
                 });
 
                 htmlTable = `
@@ -4213,12 +4793,14 @@
                                 <th>Usaha Ajuan</th>
                                 <th>Sisa Keuangan</th>
                                 <th>Status</th>
+                                <th>Waktu Input</th>
+                                <th>TTD</th>
                             </tr>
                         </thead>
                         <tbody>
                 `;
                 if (items.length === 0) {
-                    htmlTable += `<tr><td colspan="8" style="text-align: center; padding: 10px;">Tidak ada data usulan PPSE.</td></tr>`;
+                    htmlTable += `<tr><td colspan="10" style="text-align: center; padding: 10px;">Tidak ada data usulan PPSE.</td></tr>`;
                 } else {
                     items.forEach((item, idx) => {
                         htmlTable += `
@@ -4231,6 +4813,8 @@
                                 <td>${item.usahaAjuan}</td>
                                 <td>Rp ${parseInt(item.sisa || 0).toLocaleString('id-ID')}</td>
                                 <td>${item.statusVerifikasi || 'PENDING'}</td>
+                                <td>${sipFormatDateTime(item.updatedAt || item.createdAt)}</td>
+                                <td style="min-width:90px; height:34px;"></td>
                             </tr>
                         `;
                     });
@@ -4239,10 +4823,10 @@
             } else if (type === 'graduasi') {
                 titleText = "REKAPITULASI USULAN GRADUASI MANDIRI SEJAHTERA KPM";
                 let items = appState.graduasiList.filter(i => {
-                    if (myKlpNames.length > 0 && !myKlpNames.includes(i.kelompok)) return;
+                    if (!myKlpNames.includes(i.kelompok)) return false;
                     if (filterKelompok !== 'ALL' && i.kelompok !== filterKelompok) return false;
                     if (filterBulan && !(i.date || '').startsWith(filterBulan)) return false;
-                    return true;
+                    return !!i.kpmId && appState.kpmList.some(k => String(k.id) === String(i.kpmId));
                 });
 
                 htmlTable = `
@@ -4261,12 +4845,14 @@
                                 <th>Kohor</th>
                                 <th>Alasan Graduasi Mandiri</th>
                                 <th>Status</th>
+                                <th>Waktu Input</th>
+                                <th>TTD</th>
                             </tr>
                         </thead>
                         <tbody>
                 `;
                 if (items.length === 0) {
-                    htmlTable += `<tr><td colspan="7" style="text-align: center; padding: 10px;">Tidak ada data usulan graduasi.</td></tr>`;
+                    htmlTable += `<tr><td colspan="9" style="text-align: center; padding: 10px;">Tidak ada data usulan graduasi.</td></tr>`;
                 } else {
                     items.forEach((item, idx) => {
                         htmlTable += `
@@ -4278,6 +4864,8 @@
                                 <td>${item.kohor}</td>
                                 <td>${item.alasan}</td>
                                 <td>${item.statusVerifikasi || 'PENDING'}</td>
+                                <td>${sipFormatDateTime(item.updatedAt || item.createdAt)}</td>
+                                <td style="min-width:90px; height:34px;"></td>
                             </tr>
                         `;
                     });
@@ -4286,6 +4874,7 @@
             }
 
             if (tableContainer) tableContainer.innerHTML = htmlTable;
+            applyPrintColumnVisibility();
 
             const ttdNama = document.getElementById('printPendampingTtdNama');
             const ttdNip = document.getElementById('printPendampingTtdNip');
@@ -4307,35 +4896,129 @@
             window.print();
         }
 
+        // Ambil NIK KPM dari data induk. Nama tidak dipakai dalam nama file.
+        function resolvePhotoKpmNik(nik, kpmId = '', nama = '') {
+            const list = Array.isArray(appState && appState.kpmList) ? appState.kpmList : [];
+            const digits = value => String(value || '').replace(/\D/g, '');
+            const normalizeName = value => String(value || '')
+                .trim()
+                .normalize('NFKD')
+                .replace(/[\u0300-\u036f]/g, '')
+                .toLowerCase()
+                .replace(/[^a-z0-9]+/g, ' ')
+                .trim();
+
+            let kpm = null;
+            if (kpmId) {
+                kpm = list.find(k => String(k.id || '').trim() === String(kpmId).trim());
+            }
+            if (!kpm && digits(nik)) {
+                const targetNik = digits(nik);
+                kpm = list.find(k => digits(k.nik) === targetNik);
+            }
+            if (!kpm && nama) {
+                const targetName = normalizeName(nama);
+                kpm = list.find(k => normalizeName(k.nama || k.namaKpm || k.namaKPM) === targetName);
+            }
+            return digits((kpm && kpm.nik) || nik);
+        }
+
+        // Tetap menerima parameter lama dari tombol pemanggil, tetapi hanya meneruskan NIK.
+        function photoDownloadArgs(nama, nik, jenisBukti = 'BUKTI-FOTO', kpmId = '') {
+            const nikFinal = resolvePhotoKpmNik(nik, kpmId, nama) || 'NIK-TIDAK-DITEMUKAN';
+            const enc = value => encodeURIComponent(String(value || ''));
+            const jenisFinal = String(jenisBukti || 'BUKTI-FOTO').replace(/['\\]/g, '');
+            return `,'',decodeURIComponent('${enc(nikFinal)}'),'${jenisFinal}'`;
+        }
+
+        function sanitizePhotoFilePart(value, fallback) {
+            const clean = String(value || '')
+                .normalize('NFKD')
+                .replace(/[\u0300-\u036f]/g, '')
+                .replace(/[^a-zA-Z0-9_-]+/g, '_')
+                .replace(/^_+|_+$/g, '')
+                .slice(0, 70);
+            return clean || fallback;
+        }
+
+        function getPhotoFileExtension(src) {
+            let mime = sipPhotoMimeCache.get(src) || '';
+            if (!mime && typeof src === 'string') {
+                const match = src.match(/^data:(image\/[a-z0-9.+-]+)/i);
+                if (match) mime = match[1].toLowerCase();
+            }
+            if (mime.includes('png')) return 'png';
+            if (mime.includes('webp')) return 'webp';
+            return 'jpg';
+        }
+
         // Image Viewer Modal
-        function openImageViewer(base64) {
+        let sipImageViewerRequestId = 0;
+        async function openImageViewer(photo, namaKpm = '', nik = '', jenisBukti = 'BUKTI-FOTO') {
             const modal = document.getElementById('modalImageViewer');
             const imgTarget = document.getElementById('modalImagePreviewTarget');
             const dlBtn = document.getElementById('modalImageDownloadBtn');
-
-            if (!base64) {
-                alert("Foto atau bukti tidak tersedia.");
-                return;
-            }
-
-            if (imgTarget) {
-                imgTarget.src = base64;
-            }
-            if (dlBtn) {
-                dlBtn.href = base64;
-            }
-            if (modal) {
-                modal.classList.remove('hidden');
+            const loading = document.getElementById('modalImageLoading');
+            const errorBox = document.getElementById('modalImageError');
+            const requestId = ++sipImageViewerRequestId;
+            if (!photo) { alert("Foto atau bukti tidak tersedia."); return; }
+            if (imgTarget) { imgTarget.removeAttribute('src'); imgTarget.classList.add('hidden'); imgTarget.alt = 'Memuat foto bukti...'; }
+            if (loading) loading.classList.remove('hidden');
+            if (errorBox) errorBox.classList.add('hidden');
+            if (dlBtn) { dlBtn.removeAttribute('href'); dlBtn.classList.add('hidden'); }
+            if (modal) modal.classList.remove('hidden');
+            try {
+                let src = photo;
+                if (String(photo).startsWith('DRIVE:')) src = await loadDrivePhoto(String(photo).slice(6));
+                if (requestId !== sipImageViewerRequestId) return;
+                if (imgTarget) {
+                    imgTarget.onload = () => {
+                        if (requestId !== sipImageViewerRequestId) return;
+                        imgTarget.alt = 'Pratinjau Bukti';
+                        imgTarget.classList.remove('hidden');
+                        if (loading) loading.classList.add('hidden');
+                        if (dlBtn) {
+                            const nikFile = sanitizePhotoFilePart(nik, 'NIK-TIDAK-DITEMUKAN');
+                            const jenisFile = sanitizePhotoFilePart(jenisBukti, 'BUKTI-FOTO');
+                            const ekstensi = getPhotoFileExtension(src);
+                            dlBtn.href = src;
+                            dlBtn.download = `${nikFile}_${jenisFile}.${ekstensi}`;
+                            dlBtn.removeAttribute('target');
+                            dlBtn.onclick = (ev) => {
+                                ev.preventDefault();
+                                const a = document.createElement('a');
+                                a.href = src;
+                                a.download = `${nikFile}_${jenisFile}.${ekstensi}`;
+                                a.style.display = 'none';
+                                document.body.appendChild(a);
+                                a.click();
+                                a.remove();
+                            };
+                            dlBtn.classList.remove('hidden');
+                        }
+                    };
+                    imgTarget.onerror = () => {
+                        if (requestId !== sipImageViewerRequestId) return;
+                        if (loading) loading.classList.add('hidden');
+                        if (errorBox) errorBox.classList.remove('hidden');
+                        imgTarget.alt = 'Gambar tidak dapat dibaca';
+                        console.error('SIP-PKH: browser gagal mendekode gambar bukti', { photoRef: String(photo).slice(0,80) });
+                    };
+                    imgTarget.src = src;
+                    if (imgTarget.complete && imgTarget.naturalWidth > 0) imgTarget.onload();
+                }
+            } catch (err) {
+                if (requestId !== sipImageViewerRequestId) return;
+                if (loading) loading.classList.add('hidden');
+                if (errorBox) { errorBox.textContent = 'Foto gagal dimuat: ' + (err.message || err); errorBox.classList.remove('hidden'); }
+                console.error('SIP-PKH: gagal mengambil foto bukti', err);
             }
         }
 
         function closeImageViewerModal() {
+            sipImageViewerRequestId++;
             const modal = document.getElementById('modalImageViewer');
             if (modal) modal.classList.add('hidden');
-        }
-
-        function closeImageViewerModal() {
-            document.getElementById('modalImageViewer').classList.add('hidden');
         }
 
         // Edit Pendamping & Ketua Profile
@@ -4549,57 +5232,123 @@
             }, 3500);
         }
 
+        function getPendampingNotifReadStorageKey() {
+            const userId = currentUser && currentUser.id ? currentUser.id : 'pendamping';
+            return 'SIP_PKH_NOTIF_READ_' + userId;
+        }
+
+        function getPendampingNotifReadSet() {
+            try {
+                const raw = JSON.parse(localStorage.getItem(getPendampingNotifReadStorageKey()) || '[]');
+                return new Set(Array.isArray(raw) ? raw : []);
+            } catch (e) {
+                return new Set();
+            }
+        }
+
+        function getPendampingNotifItemKey(type, item) {
+            return `${type}:${item && item.id != null ? item.id : [item && item.kelompok, item && item.kpmId, item && item.date].join('|')}`;
+        }
+
+        function markPendampingNotificationRead(type, item) {
+            if (!item) return;
+            const readSet = getPendampingNotifReadSet();
+            readSet.add(getPendampingNotifItemKey(type, item));
+            try {
+                localStorage.setItem(getPendampingNotifReadStorageKey(), JSON.stringify(Array.from(readSet)));
+            } catch (e) {}
+        }
+
+        function closePendampingNotificationDropdown() {
+            const dropdown = document.getElementById('pendampingNotifDropdown');
+            if (dropdown) dropdown.classList.add('hidden');
+        }
+
         function togglePendampingNotificationDropdown() {
             const dropdown = document.getElementById('pendampingNotifDropdown');
-            if (dropdown) dropdown.classList.toggle('hidden');
+            if (!dropdown) return;
+            dropdown.classList.toggle('hidden');
+        }
+
+        // Tutup panel jika pengguna menyentuh area di luar panel atau menekan Escape.
+        if (!window.__sipNotifDismissBound) {
+            window.__sipNotifDismissBound = true;
+            document.addEventListener('click', function(event) {
+                const container = document.getElementById('pendampingNotificationContainer');
+                const dropdown = document.getElementById('pendampingNotifDropdown');
+                if (dropdown && container && !container.contains(event.target) && !dropdown.contains(event.target)) {
+                    closePendampingNotificationDropdown();
+                }
+            });
+            document.addEventListener('keydown', function(event) {
+                if (event.key === 'Escape') closePendampingNotificationDropdown();
+            });
+        }
+
+        function openPendampingNotification(type, itemKey) {
+            const sourceMap = {
+                P2K2: appState.p2k2List,
+                Komitmen: appState.komitmenList,
+                Rekonsiliasi: appState.rekonsiliasiList
+            };
+            const item = (sourceMap[type] || []).find(row => getPendampingNotifItemKey(type, row) === itemKey);
+            if (item) markPendampingNotificationRead(type, item);
+            updatePendampingNotifications();
+            closePendampingNotificationDropdown();
+            switchPendampingTab('verifikasi');
         }
 
         function updatePendampingNotifications() {
             const badge = document.getElementById('pendampingNotifBadge');
             const countLabel = document.getElementById('pendampingNotifCount');
             const list = document.getElementById('pendampingNotifList');
-            if (!badge || !list) return;
+            if (!badge || !list || !currentUser || currentUser.role !== 'pendamping') return;
 
-            // Kumpulkan laporan pending dari kelompok binaan
-            const myKlpNames = appState.ketuaUsers.filter(k => k.pendampingId === currentUser.id && k.status === 'VERIFIED').map(k => k.kelompok);
-            let pendingItems = [];
+            const myKlpNames = appState.ketuaUsers
+                .filter(k => k.pendampingId === currentUser.id && k.status === 'VERIFIED')
+                .map(k => k.kelompok);
+            const readSet = getPendampingNotifReadSet();
+            const allPendingItems = [];
 
-            appState.p2k2List.forEach(i => {
-                if (myKlpNames.includes(i.kelompok) && i.statusVerifikasi === 'PENDING') {
-                    pendingItems.push({ text: `Presensi P2K2 baru (${i.kelompok})`, date: i.date });
-                }
-            });
-            appState.komitmenList.forEach(i => {
-                if (myKlpNames.includes(i.kelompok) && i.statusVerifikasi === 'PENDING') {
-                    pendingItems.push({ text: `Komitmen layanan baru (${i.kelompok})`, date: i.date });
-                }
-            });
-            appState.rekonsiliasiList.forEach(i => {
-                if (myKlpNames.includes(i.kelompok) && i.statusVerifikasi === 'PENDING') {
-                    pendingItems.push({ text: `Rekonsiliasi pencairan baru (${i.kelompok})`, date: i.date });
-                }
-            });
-
-            if (pendingItems.length > 0) {
-                badge.innerText = pendingItems.length;
-                badge.classList.remove('hidden');
-                if (countLabel) countLabel.innerText = `${pendingItems.length} baru`;
-
-                list.innerHTML = '';
-                pendingItems.forEach(item => {
-                    list.innerHTML += `
-                        <div onclick="switchPendampingTab('verifikasi'); togglePendampingNotificationDropdown();" class="p-3 hover:bg-slate-50 cursor-pointer transition">
-                            <p class="font-bold text-slate-900">${item.text}</p>
-                            <p class="text-[10px] text-slate-400 font-mono">${item.date || '-'}</p>
-                        </div>
-                    `;
+            [
+                { type: 'P2K2', rows: appState.p2k2List, label: 'Presensi P2K2 baru' },
+                { type: 'Komitmen', rows: appState.komitmenList, label: 'Komitmen layanan baru' },
+                { type: 'Rekonsiliasi', rows: appState.rekonsiliasiList, label: 'Rekonsiliasi pencairan baru' }
+            ].forEach(group => {
+                (group.rows || []).forEach(item => {
+                    if (myKlpNames.includes(item.kelompok) && item.statusVerifikasi === 'PENDING') {
+                        const key = getPendampingNotifItemKey(group.type, item);
+                        allPendingItems.push({
+                            type: group.type,
+                            key,
+                            text: `${group.label} (${item.kelompok})`,
+                            date: item.date || '-',
+                            unread: !readSet.has(key)
+                        });
+                    }
                 });
+            });
+
+            const unreadItems = allPendingItems.filter(item => item.unread);
+            badge.innerText = unreadItems.length;
+            badge.classList.toggle('hidden', unreadItems.length === 0);
+            if (countLabel) countLabel.innerText = `${unreadItems.length} baru`;
+
+            if (unreadItems.length > 0) {
+                list.innerHTML = unreadItems.map(item => `
+                    <button type="button"
+                        onclick="openPendampingNotification('${item.type}', decodeURIComponent('${encodeURIComponent(item.key)}'))"
+                        class="w-full text-left p-3 hover:bg-slate-50 active:bg-slate-100 cursor-pointer transition border-b border-slate-100">
+                        <p class="font-bold text-slate-900">${item.text}</p>
+                        <p class="text-[10px] text-slate-400 font-mono">${item.date}</p>
+                        <p class="text-[10px] text-blue-700 mt-1">Ketuk untuk membuka verifikasi</p>
+                    </button>
+                `).join('');
             } else {
-                badge.classList.add('hidden');
-                if (countLabel) countLabel.innerText = `0 baru`;
                 list.innerHTML = `<div class="p-4 text-center text-slate-400">Tidak ada notifikasi baru.</div>`;
             }
         }
+
     </script>
 </body>
 </html>
