@@ -112,7 +112,7 @@
                 <div>
                     <h1 class="font-bold text-sm md:text-base tracking-wide">SIP-PKH</h1>
                     <p class="text-[10px] text-blue-200">Sistem Informasi Pelaksanaan Program Keluarga Harapan</p>
-                    <span id="appVersionLabel" class="block mt-0.5 text-[9px] md:text-[10px] font-medium tracking-wide text-blue-200/75">v15.2</span>
+                    <span id="appVersionLabel" class="block mt-0.5 text-[9px] md:text-[10px] font-medium tracking-wide text-blue-200/75">v28</span>
                 </div>
             </div>
             
@@ -306,7 +306,7 @@
                     <button onclick="openEditAdminWaModal()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2.5 rounded-xl font-bold text-xs shadow-lg flex items-center space-x-2 transition cursor-pointer">
                         <i class="fas fa-phone-alt"></i><span>Edit WA Admin</span>
                     </button>
-                    <a id="superAdminWaLink" href="https://wa.me/6281321312304?text=Halo%20Admin%20Pusat,%20saya%20ingin%20mengirimkan%20saran%20atau%20meminta%20bantuan%20sistem%20SIP-PKH." target="_blank" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2.5 rounded-xl font-bold text-xs shadow-lg flex items-center space-x-2 transition cursor-pointer">
+                    <a id="superAdminWaLink" href="https://wa.me/6281321312304?text=Halo%20Admin%20Pusat%20SIP-PKH,%20saya%20ingin%20menghubungi%20terkait%20aplikasi.%20Mohon%20arahan%20untuk%20menentukan%20keperluan%20saya." target="_blank" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2.5 rounded-xl font-bold text-xs shadow-lg flex items-center space-x-2 transition cursor-pointer">
                         <i class="fab fa-whatsapp"></i><span>WA Pusat</span>
                     </a>
                 </div>
@@ -337,6 +337,18 @@
                 <div class="bg-white rounded-2xl p-4 border border-blue-100 shadow-sm"><div class="text-[11px] font-semibold text-slate-500">KPM BPNT</div><div id="adminStatBpnt" class="text-2xl font-extrabold text-blue-700 mt-1">0</div></div>
                 <div class="bg-white rounded-2xl p-4 border border-violet-100 shadow-sm"><div class="text-[11px] font-semibold text-slate-500">KPM PKH + BPNT</div><div id="adminStatPkhBpnt" class="text-2xl font-extrabold text-violet-700 mt-1">0</div></div>
             </section>
+
+            <!-- PENCARIAN TERPADU ADMIN PUSAT -->
+            <div class="bg-white rounded-2xl shadow-xl border border-blue-100 p-4 space-y-3">
+                <div>
+                    <h3 class="font-bold text-slate-800 text-sm">Pencarian Data Pengguna</h3>
+                    <p class="text-[11px] text-slate-500">Cari KPM berdasarkan nama/NIK, Ketua berdasarkan nama/nomor HP, atau Pendamping berdasarkan nama/NIP.</p>
+                </div>
+                <input type="search" id="adminGlobalSearch" oninput="renderAdminGlobalSearch()" placeholder="Ketik nama, NIK, nomor HP, atau NIP..." class="w-full p-3 bg-slate-50 border border-slate-300 rounded-xl text-sm">
+                <div id="adminGlobalSearchResults" class="space-y-2 text-xs">
+                    <p class="text-slate-400">Hasil pencarian akan tampil di sini.</p>
+                </div>
+            </div>
 
             <!-- TABEL DAFTAR PENDAMPING -->
             <div class="bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden">
@@ -985,8 +997,7 @@
                                     <th class="p-3">Waktu Transaksi</th>
                                     <th class="p-3 text-center">Aksi</th>
                                 </tr>
-                            </thead>
-                            <tbody id="tbodyKetuaP2k2" class="divide-y divide-slate-100">
+                            </thead>                            <tbody id="tbodyKetuaP2k2" class="divide-y divide-slate-100">
                                 <!-- Populated dynamically -->
                             </tbody>
                         </table>
@@ -1308,7 +1319,7 @@
     <!-- FOOTER -->
     <footer class="bg-white border-t border-slate-200 py-4 mt-8 text-center text-xs text-slate-500 space-y-1">
         <p>SIP-PKH © 2026 | Sistem Informasi Pelaksanaan Program Keluarga Harapan</p>
-        <p class="text-[11px] text-slate-600 font-semibold">Butuh Saran atau Lupa PIN? Hubungi Admin Pusat WhatsApp: <a id="footerAdminWaText" href="https://wa.me/6281321312304?text=Halo%20Admin%20Pusat,%20saya%20ingin%20mengirimkan%20saran%20atau%20meminta%20bantuan%20PIN%20SIP-PKH." target="_blank" class="text-blue-700 underline font-bold">081321312304</a></p>
+        <p class="text-[11px] text-slate-600 font-semibold">Butuh Saran atau Lupa PIN? Hubungi Admin Pusat WhatsApp: <a id="footerAdminWaText" href="#" onclick="openLupaPinModal(); return false;" class="text-blue-700 underline font-bold">081321312304</a></p>
         <p class="text-[10px] text-slate-400">Pengembang: Encep Yuyus Syamsul Firdaus, S.Sos.I (ASN PPPK KEMENSOS)</p>
     </footer>
 
@@ -1455,24 +1466,45 @@
             </div>
             <div class="space-y-3 text-xs">
                 <div>
-                    <label class="block font-bold text-slate-700 mb-1">Nama Lengkap / Akun</label>
-                    <input type="text" id="lupaNama" placeholder="Nama Anda..." class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl font-semibold">
+                    <label class="block font-bold text-slate-700 mb-1">Keperluan Menghubungi Admin</label>
+                    <select id="lupaJenisBantuan" onchange="updateJenisBantuanForm()" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl font-semibold">
+                        <option value="" selected>-- Pilih kategori keperluan --</option>
+                        <option value="lupa_pin">Lupa PIN / meminta reset PIN</option>
+                        <option value="saran">Menyampaikan saran untuk aplikasi</option>
+                        <option value="kendala">Meminta bantuan lainnya / melaporkan kendala</option>
+                    </select>
+                </div>
+                <div id="detailBantuanFields" class="hidden space-y-3">
+                <div id="identitasBantuanFields">
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1">Nama Lengkap Terdaftar</label>
+                    <input type="text" id="lupaNama" required placeholder="Nama sesuai akun..." class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl font-semibold">
                 </div>
                 <div>
-                    <label class="block font-bold text-slate-700 mb-1">No. WhatsApp / NIP Terdaftar</label>
-                    <input type="text" id="lupaHp" placeholder="08123456789..." class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl font-semibold">
+                    <label class="block font-bold text-slate-700 mb-1">Nomor HP Terdaftar</label>
+                    <input type="tel" id="lupaHp" required placeholder="08xxxxxxxxxx" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl font-semibold">
                 </div>
                 <div>
-                    <label class="block font-bold text-slate-700 mb-1">Pesan Saran atau Permintaan Lupa PIN</label>
-                    <textarea id="lupaPesan" rows="3" placeholder="Tuliskan saran atau kendala lupa PIN Anda di sini..." class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl font-semibold"></textarea>
+                    <label class="block font-bold text-slate-700 mb-1">NIP (khusus Pendamping, jika ada)</label>
+                    <input type="text" id="lupaNip" placeholder="Isi NIP jika akun Pendamping..." class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl font-semibold">
+                </div>
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1">Nama Pendamping (wajib untuk Ketua Kelompok)</label>
+                    <input type="text" id="lupaPendamping" placeholder="Nama Pendamping pembina..." class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl font-semibold">
+                </div>
+                </div>
+                <div>
+                    <label id="lupaPesanLabel" class="block font-bold text-slate-700 mb-1">Keterangan</label>
+                    <textarea id="lupaPesan" rows="3" placeholder="Tuliskan keterangan tambahan..." class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl font-semibold"></textarea>
                 </div>
                 <div class="bg-blue-50 p-3 rounded-xl border border-blue-200 text-blue-900 text-[11px]">
                     <p class="font-bold mb-0.5">Kontak Resmi Admin Pusat (081321312304):</p>
-                    <p>Tombol di bawah akan mengarahkan langsung ke WhatsApp Admin Pusat dengan menyertakan detail nama dan pesan Anda secara otomatis.</p>
+                    <p>Setelah memilih kategori dan mengisi keterangan yang diperlukan, tekan tombol kirim untuk menghubungi Admin Pusat melalui WhatsApp.</p>
+                </div>
                 </div>
             </div>
             <div class="flex space-x-2 pt-2">
-                <button type="button" onclick="sendWhatsAppAdminPusat()" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white py-2.5 rounded-xl font-bold shadow flex items-center justify-center space-x-2 cursor-pointer">
+                <button id="btnKirimBantuanWa" type="button" onclick="sendWhatsAppAdminPusat()" class="hidden flex-1 bg-emerald-600 hover:bg-emerald-500 text-white py-2.5 rounded-xl font-bold shadow flex items-center justify-center space-x-2 cursor-pointer">
                     <i class="fab fa-whatsapp text-base"></i><span>Kirim ke WA Admin Pusat</span>
                 </button>
                 <button type="button" onclick="closeLupaPinModal()" class="bg-slate-300 hover:bg-slate-400 text-slate-800 px-4 py-2.5 rounded-xl font-bold cursor-pointer">Tutup</button>
@@ -1482,7 +1514,7 @@
 
     <!-- MODAL ABOUT APLIKASI -->
     <div id="modalAbout" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl overflow-hidden p-6 space-y-4">
+        <div class="bg-white w-full max-w-md max-h-[90vh] overflow-y-auto rounded-2xl shadow-2xl p-6 space-y-4">
             <div class="flex justify-between items-center pb-3 border-b border-slate-100">
                 <h3 class="font-bold text-slate-800 text-sm flex items-center space-x-2">
                     <i class="fas fa-hands-holding-child text-amber-500 text-lg"></i><span>Tentang SIP-PKH</span>
@@ -1491,6 +1523,25 @@
             </div>
             <div class="space-y-3 text-xs text-slate-700 leading-relaxed">
                 <p><strong>SIP-PKH (Sistem Informasi Pelaksanaan Program Keluarga Harapan)</strong> adalah platform digital terpadu yang dirancang khusus untuk mendukung kinerja pendamping sosial dalam memaksimalkan pendampingan, pengelolaan, dan evaluasi komitmen KPM PKH terhadap program Pemerintah.</p>
+                <div class="bg-blue-50 p-3 rounded-xl border border-blue-200 space-y-2">
+                    <div class="flex items-center justify-between gap-2">
+                        <p class="font-bold text-blue-900">Informasi Versi Aplikasi</p>
+                        <span id="aboutAppVersion" class="bg-blue-900 text-white px-2.5 py-1 rounded-full text-[11px] font-extrabold">v28</span>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2 text-[10px]">
+                        <div><p class="text-slate-500">Deployment Apps Script</p><p id="aboutDeploymentVersion" class="font-bold text-slate-800">Deploy #28</p></div>
+                        <div><p class="text-slate-500">Tanggal rilis</p><p id="aboutReleaseDate" class="font-bold text-slate-800">9 November 2026</p></div>
+                    </div>
+                    <div class="border-t border-blue-200 pt-2">
+                        <p id="aboutReleaseTitle" class="font-bold text-blue-900 mb-1">Pembaruan pencatatan versi dan penyempurnaan layanan</p>
+                        <p class="font-bold text-slate-700 mb-1">Catatan perubahan:</p>
+                        <ul id="aboutReleaseChanges" class="list-disc pl-4 space-y-1 text-[10px] text-slate-700">
+                            <li>Penyeragaman alur bantuan Admin Pusat.</li>
+                            <li>Pencarian terpadu dan penerbitan PIN sementara.</li>
+                            <li>Pemilihan foto melalui pemilih file bawaan browser.</li>
+                        </ul>
+                    </div>
+                </div>
                 <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-1">
                     <p class="font-bold text-blue-900">Pengembang &amp; Inovator:</p>
                     <p class="font-semibold">Encep Yuyus Syamsul Firdaus, S.Sos.I</p>
@@ -1501,7 +1552,7 @@
                     <p class="font-mono font-bold text-emerald-800">BSI: 7211585298 (a.n. Encep Yuyus)</p>
                     <p class="text-[10px] text-emerald-700 mt-1">Mari bantu dukung pengembangan fitur lanjutan aplikasi ini agar terus optimal dalam mempermudah pendataan dan pelayanan kesejahteraan sosial bagi masyarakat.</p>
                 </div>
-                <p class="text-[11px] text-slate-500">Butuh bantuan PIN atau saran? Hubungi Admin Pusat via WhatsApp di <a href="https://wa.me/6281321312304?text=Halo%20Admin%20Pusat,%20saya%20ingin%20memberikan%20saran%20atau%20meminta%20bantuan%20PIN%20SIP-PKH." target="_blank" class="text-blue-700 font-bold underline">081321312304</a>.</p>
+                <p class="text-[11px] text-slate-500">Butuh bantuan PIN atau saran? Hubungi Admin Pusat via WhatsApp di <a href="#" onclick="closeAboutModal(); openLupaPinModal(); return false;" class="text-blue-700 font-bold underline">081321312304</a>.</p>
             </div>
             <div class="pt-2">
                 <button type="button" onclick="closeAboutModal()" class="w-full bg-blue-900 hover:bg-blue-800 text-white py-2.5 rounded-xl font-bold shadow cursor-pointer">Tutup</button>
@@ -1749,6 +1800,51 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 
     <script>
+        // SUMBER TUNGGAL INFORMASI RILIS SIP-PKH.
+        // Setiap rilis berikutnya cukup memperbarui objek ini; label header
+        // dan riwayat pada menu Tentang akan mengikuti secara otomatis.
+        const SIP_RELEASE_INFO = Object.freeze({
+            appVersion: '28',
+            appsScriptDeployment: '28',
+            releaseDate: '9 November 2026',
+            releaseTitle: 'Pembaruan pencatatan versi dan penyempurnaan layanan',
+            changes: [
+                'Penyeragaman alur bantuan Admin Pusat: lupa PIN, menyampaikan saran, dan bantuan lainnya.',
+                'Tautan bantuan pada footer dan menu Tentang diarahkan ke formulir kategori bantuan yang sama.',
+                'Pencarian terpadu Admin Pusat untuk KPM, Ketua Kelompok, dan Pendamping.',
+                'Alur penerbitan PIN sementara oleh Admin Pusat setelah verifikasi identitas.',
+                'Pemilihan foto menggunakan pemilih file bawaan browser agar pengguna dapat memilih sumber foto yang tersedia di perangkat.'
+            ]
+        });
+
+        function renderSipReleaseInfo() {
+            const info = SIP_RELEASE_INFO;
+            const label = document.getElementById('appVersionLabel');
+            if (label) label.textContent = 'v' + info.appVersion;
+
+            const version = document.getElementById('aboutAppVersion');
+            if (version) version.textContent = 'v' + info.appVersion;
+
+            const deployment = document.getElementById('aboutDeploymentVersion');
+            if (deployment) deployment.textContent = 'Apps Script Deploy #' + info.appsScriptDeployment;
+
+            const date = document.getElementById('aboutReleaseDate');
+            if (date) date.textContent = info.releaseDate;
+
+            const title = document.getElementById('aboutReleaseTitle');
+            if (title) title.textContent = info.releaseTitle;
+
+            const list = document.getElementById('aboutReleaseChanges');
+            if (list) {
+                list.replaceChildren();
+                info.changes.forEach(change => {
+                    const item = document.createElement('li');
+                    item.textContent = change;
+                    list.appendChild(item);
+                });
+            }
+        }
+
         const firebaseConfig = {
             apiKey: "AIzaSyDEKeXD6pyw5IAEYMtL24SOsuixn9uvLXw",
             authDomain: "sip-pkh.firebaseapp.com",
@@ -1900,8 +1996,7 @@
         // Global Navigation & UI Helper Functions
         function switchMainTab(tab) {
             const formLogin = document.getElementById('formLogin');
-            const regContainer = document.getElementById('formRegisterContainer');
-            const btnLogin = document.getElementById('mainTabLogin');
+            const regContainer = document.getElementById('formRegisterContainer');            const btnLogin = document.getElementById('mainTabLogin');
             const btnReg = document.getElementById('mainTabRegister');
 
             if (tab === 'login') {
@@ -1953,6 +2048,7 @@
         }
 
         document.addEventListener('DOMContentLoaded', () => {
+            renderSipReleaseInfo();
             loadLocalStorageData();
             initRealtimeSync();
             checkUrlInviteParams();
@@ -1967,12 +2063,12 @@
             
             const saLink = document.getElementById('superAdminWaLink');
             if (saLink) {
-                saLink.href = `https://wa.me/${waNum}?text=Halo%20Admin%20Pusat,%20saya%20ingin%20mengirimkan%20saran%20atau%20meminta%20bantuan%20sistem%20SIP-PKH.`;
+                saLink.href = `https://wa.me/${waNum}?text=Halo%20Admin%20Pusat%20SIP-PKH,%20saya%20ingin%20menghubungi%20terkait%20aplikasi.%20Mohon%20arahan%20untuk%20menentukan%20keperluan%20saya.`;
             }
 
             const footerWa = document.getElementById('footerAdminWaText');
             if (footerWa) {
-                footerWa.href = `https://wa.me/${waNum}?text=Halo%20Admin%20Pusat,%20saya%20ingin%20mengirimkan%20saran%20atau%20meminta%20bantuan%20PIN%20SIP-PKH.`;
+                footerWa.href = '#';
                 footerWa.innerText = formattedWaDisplay;
             }
         }
@@ -2899,7 +2995,6 @@
             const bulanFilter = document.getElementById('pFilterBulanPpse').value;
 
             const myKlpNames = appState.ketuaUsers.filter(k => k.pendampingId === currentUser.id && k.status === 'VERIFIED').map(k => k.kelompok);
-
             let filtered = appState.ppseList.filter(item => {
                 if (myKlpNames.length > 0 && !myKlpNames.includes(item.kelompok)) return;
                 if (kelompokFilter !== 'ALL' && item.kelompok !== kelompokFilter) return false;
@@ -3899,8 +3994,7 @@
                         id: "KOM-" + Date.now() + "-" + index,
                         kelompok: currentUser.kelompok,
                         kpmId,
-                        jenisLayanan: entry.komponen || "Komponen Umum",
-                        statusKepatuhan,
+                        jenisLayanan: entry.komponen || "Komponen Umum",                        statusKepatuhan,
                         foto: entry.meta,
                         statusVerifikasi: "PENDING",
                         date: new Date().toISOString().split('T')[0],
@@ -4899,8 +4993,7 @@
         // Ambil NIK KPM dari data induk. Nama tidak dipakai dalam nama file.
         function resolvePhotoKpmNik(nik, kpmId = '', nama = '') {
             const list = Array.isArray(appState && appState.kpmList) ? appState.kpmList : [];
-            const digits = value => String(value || '').replace(/\D/g, '');
-            const normalizeName = value => String(value || '')
+            const digits = value => String(value || '').replace(/\D/g, '');            const normalizeName = value => String(value || '')
                 .trim()
                 .normalize('NFKD')
                 .replace(/[\u0300-\u036f]/g, '')
@@ -5185,7 +5278,33 @@
 
         // Lupa PIN Modal & WhatsApp Admin Pusat
         function openLupaPinModal() {
-            document.getElementById('modalLupaPin').classList.remove('hidden');
+            const modal = document.getElementById('modalLupaPin');
+            const pilihan = document.getElementById('lupaJenisBantuan');
+            if (pilihan) pilihan.value = '';
+            ['lupaNama','lupaHp','lupaNip','lupaPendamping','lupaPesan'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.value = '';
+            });
+            modal.classList.remove('hidden');
+            updateJenisBantuanForm();
+        }
+
+        function updateJenisBantuanForm() {
+            const jenis = document.getElementById('lupaJenisBantuan')?.value || '';
+            const detail = document.getElementById('detailBantuanFields');
+            const identitas = document.getElementById('identitasBantuanFields');
+            const label = document.getElementById('lupaPesanLabel');
+            const pesan = document.getElementById('lupaPesan');
+            const tombol = document.getElementById('btnKirimBantuanWa');
+            const tombolText = tombol?.querySelector('span');
+            const dipilih = Boolean(jenis);
+            const perluIdentitas = jenis === 'lupa_pin';
+            if (detail) detail.classList.toggle('hidden', !dipilih);
+            if (identitas) identitas.classList.toggle('hidden', !perluIdentitas);
+            if (tombol) tombol.classList.toggle('hidden', !dipilih);
+            if (label) label.textContent = jenis === 'saran' ? 'Isi Saran' : (jenis === 'kendala' ? 'Jelaskan Bantuan atau Kendala yang Diperlukan' : 'Keterangan Tambahan (opsional)');
+            if (pesan) pesan.placeholder = jenis === 'saran' ? 'Tuliskan saran atau usulan perbaikan aplikasi...' : (jenis === 'kendala' ? 'Jelaskan bantuan yang diperlukan atau kendala yang dialami...' : 'Tuliskan keterangan tambahan jika diperlukan...');
+            if (tombolText) tombolText.textContent = jenis === 'saran' ? 'Kirim Saran ke Admin' : (jenis === 'kendala' ? 'Kirim Permintaan Bantuan' : 'Kirim Permintaan Reset PIN');
         }
 
         function closeLupaPinModal() {
@@ -5195,12 +5314,102 @@
         function sendWhatsAppAdminPusat() {
             const nama = document.getElementById('lupaNama').value.trim();
             const hp = document.getElementById('lupaHp').value.trim();
+            const nip = document.getElementById('lupaNip').value.trim();
+            const pendamping = document.getElementById('lupaPendamping').value.trim();
             const pesan = document.getElementById('lupaPesan').value.trim();
+            const jenis = document.getElementById('lupaJenisBantuan')?.value || '';
+            if (!jenis) { alert('Silakan pilih kategori keperluan terlebih dahulu.'); return; }
+            if (jenis === 'lupa_pin' && (!nama || !hp)) { alert('Untuk permohonan lupa PIN, nama lengkap dan nomor HP wajib diisi.'); return; }
 
             const adminWa = appState.adminWaNumber || "6281321312304";
-            const text = encodeURIComponent(`Halo Admin Pusat SIP-PKH,\n\nNama: ${nama || '-'}\nNo. HP/NIP: ${hp || '-'}\nPesan / Permintaan Bantuan Lupa PIN: ${pesan || 'Mohon bantuan reset PIN akun saya.'}`);
+            let isiPesan = '';
+            if (jenis === 'lupa_pin') {
+                isiPesan = `PERMOHONAN BANTUAN LUPA / RESET PIN\nMohon verifikasi identitas saya sebelum reset PIN.\nNama: ${nama}\nNomor HP: ${hp}\nNIP (jika Pendamping): ${nip || '-'}\nNama Pendamping Pembina (jika Ketua): ${pendamping || '-'}\nKeterangan: ${pesan || '-'}\nSaya memahami PIN sementara hanya diberikan setelah identitas diverifikasi.`;
+            } else if (jenis === 'saran') {
+                if (!pesan) { alert('Silakan tuliskan saran yang ingin disampaikan.'); return; }
+                isiPesan = `PENYAMPAIAN SARAN APLIKASI SIP-PKH\nSaran saya: ${pesan}`;
+            } else {
+                if (!pesan) { alert('Silakan jelaskan kendala atau bantuan yang diperlukan.'); return; }
+                isiPesan = `PERMINTAAN BANTUAN / LAPORAN KENDALA SIP-PKH\nKendala yang saya alami: ${pesan}`;
+            }
+            const text = encodeURIComponent(`Halo Admin Pusat SIP-PKH,\n\n${isiPesan}\n\nTerima kasih.`);
             window.open(`https://wa.me/${adminWa}?text=${text}`, '_blank');
             closeLupaPinModal();
+        }
+
+        // Pencarian lintas KPM, Ketua Kelompok, dan Pendamping untuk Admin Pusat.
+        function renderAdminGlobalSearch() {
+            const input = document.getElementById('adminGlobalSearch');
+            const output = document.getElementById('adminGlobalSearchResults');
+            if (!input || !output) return;
+            const q = input.value.trim().toLowerCase();
+            output.innerHTML = '';
+            if (!q) {
+                output.innerHTML = '<p class="text-slate-400">Ketik nama, NIK, nomor HP, atau NIP untuk mencari.</p>';
+                return;
+            }
+            const matches = [];
+            (appState.kpmList || []).forEach(x => {
+                if ([x.nama, x.nik, x.kelompok].some(v => String(v || '').toLowerCase().includes(q)))
+                    matches.push({type:'KPM', name:x.nama, detail:'NIK: '+(x.nik||'-')+' | Kelompok: '+(x.kelompok||'-')});
+            });
+            (appState.ketuaUsers || []).forEach(x => {
+                if ([x.nama, x.hp, x.kelompok].some(v => String(v || '').toLowerCase().includes(q)))
+                    matches.push({type:'Ketua Kelompok', id:x.id, name:x.nama, detail:'HP: '+(x.hp||'-')+' | Kelompok: '+(x.kelompok||'-')+' | Pendamping: '+((appState.pendampingProfiles.find(p=>p.id===x.pendampingId)||{}).nama||'-')});
+            });
+            (appState.pendampingProfiles || []).forEach(x => {
+                if ([x.nama, x.nip, x.hp, x.kecamatan].some(v => String(v || '').toLowerCase().includes(q)))
+                    matches.push({type:'Pendamping', id:x.id, name:x.nama, detail:'NIP: '+(x.nip||'-')+' | HP: '+(x.hp||'Belum tercatat')+' | Kecamatan: '+(x.kecamatan||'-')});
+            });
+            if (!matches.length) {
+                output.innerHTML = '<p class="text-amber-700">Data tidak ditemukan.</p>';
+                return;
+            }
+            matches.slice(0,100).forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'border border-slate-200 rounded-lg p-3 flex flex-wrap justify-between gap-2';
+                const info = document.createElement('div');
+                const title = document.createElement('div'); title.className='font-bold text-slate-800'; title.textContent=item.type+' — '+item.name;
+                const detail = document.createElement('div'); detail.className='text-slate-500 mt-1'; detail.textContent=item.detail;
+                info.append(title,detail); card.appendChild(info);
+                if (item.id && (item.type === 'Ketua Kelompok' || item.type === 'Pendamping')) {
+                    const reset = document.createElement('button');
+                    reset.type = 'button';
+                    reset.className = 'bg-amber-500 hover:bg-amber-600 text-white px-3 py-2 rounded-lg font-bold';
+                    reset.textContent = 'Buat PIN sementara';
+                    reset.addEventListener('click', () => adminIssueTemporaryPin(item.type, item.id));
+                    card.appendChild(reset);
+                }
+                output.appendChild(card);
+            });
+            if (matches.length > 100) {
+                const more=document.createElement('p'); more.className='text-slate-500'; more.textContent='Menampilkan 100 dari '+matches.length+' hasil.'; output.appendChild(more);
+            }
+        }
+
+        function adminIssueTemporaryPin(type, id) {
+            if (!currentUser || currentUser.role !== 'superadmin') {
+                alert('Hanya Admin Pusat yang dapat membuat PIN sementara.');
+                return;
+            }
+            const account = type === 'Ketua Kelompok'
+                ? (appState.ketuaUsers || []).find(x => x.id === id)
+                : (appState.pendampingProfiles || []).find(x => x.id === id);
+            if (!account) { alert('Akun tidak ditemukan. Muat ulang data lalu coba kembali.'); return; }
+            const identity = type === 'Ketua Kelompok'
+                ? `Nama: ${account.nama}\\nHP: ${account.hp || '-'}\\nKelompok: ${account.kelompok || '-'}`
+                : `Nama: ${account.nama}\\nNIP: ${account.nip || '-'}\\nHP: ${account.hp || 'Belum tercatat'}`;
+            if (!confirm(`Pastikan permohonan dan identitas sudah diverifikasi melalui kontak terdaftar.\\n\\n${identity}\\n\\nBuat PIN sementara untuk akun ini?`)) return;
+            const values = new Uint32Array(1);
+            if (window.crypto && crypto.getRandomValues) crypto.getRandomValues(values);
+            else values[0] = Math.floor(Math.random() * 1000000);
+            const temporaryPin = String(values[0] % 1000000).padStart(6, '0');
+            account.pin = temporaryPin;
+            account.pinTemporary = true;
+            account.pinResetAt = sipNowIso();
+            saveState();
+            renderSuperAdminDashboard();
+            alert(`PIN sementara untuk ${account.nama}: ${temporaryPin}\\n\\nSampaikan PIN ini secara pribadi setelah verifikasi. Minta pengguna menggantinya setelah berhasil masuk.`);
         }
 
         // Health Check & Toast
