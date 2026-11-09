@@ -1087,6 +1087,7 @@
                 <div class="bg-white rounded-2xl shadow-xl border border-slate-100 p-6 space-y-4">
                     <h3 class="font-bold text-slate-800 text-sm">Rekonsiliasi Pencairan Dana Bansos</h3>
                     <form id="formRekonsiliasi" onsubmit="handleSaveRekonsiliasi(event)" class="space-y-4 text-xs">
+                        <input type="hidden" id="editRekonsiliasiId" value="">
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                             <div>
                                 <label class="block font-bold text-slate-700 mb-1">Pilih Anggota KPM</label>
@@ -1115,7 +1116,7 @@
                             </div>
                             <div class="space-y-2"><input type="file" id="rekonFoto" accept="image/*" class="sr-only" aria-label="Pilih foto" style="position:absolute; width:1px; height:1px; opacity:0.01; overflow:hidden;" tabindex="-1"><div class="grid grid-cols-2 gap-2"><button type="button" onclick="openSipPhotoPicker('rekonFoto', 'camera')" class="min-h-[44px] px-3 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold shadow-sm touch-manipulation"><i class="fas fa-camera mr-1"></i> Ambil Foto</button><button type="button" onclick="openSipPhotoPicker('rekonFoto', 'gallery')" class="min-h-[44px] px-3 py-2 rounded-xl bg-blue-700 hover:bg-blue-800 text-white text-xs font-bold shadow-sm touch-manipulation"><i class="fas fa-images mr-1"></i> Pilih dari Galeri</button></div><p id="rekonFotoName" class="text-[11px] text-slate-500">Belum ada foto dipilih.</p></div>
                         </div>
-                        <button type="submit" class="bg-emerald-700 hover:bg-emerald-800 text-white px-6 py-3 rounded-xl font-bold shadow cursor-pointer">Simpan Rekonsiliasi</button>
+                        <div class="flex flex-wrap gap-2"><button id="btnSubmitRekonsiliasi" type="submit" class="bg-emerald-700 hover:bg-emerald-800 text-white px-6 py-3 rounded-xl font-bold shadow cursor-pointer">Simpan Rekonsiliasi</button><button id="btnCancelRekonsiliasiEdit" type="button" onclick="cancelRekonsiliasiEdit()" class="hidden bg-slate-500 text-white px-6 py-3 rounded-xl font-bold">Batal Edit</button></div>
                     </form>
                 </div>
 
@@ -1821,16 +1822,17 @@
         // Setiap rilis berikutnya cukup memperbarui objek ini; label header
         // dan riwayat pada menu Tentang akan mengikuti secara otomatis.
         const SIP_RELEASE_INFO = Object.freeze({
-            appVersion: '28',
+            appVersion: '29',
             appsScriptDeployment: '29',
             releaseDate: '9 November 2026',
-            releaseTitle: 'Penyempurnaan pemilihan foto kamera dan galeri lintas browser',
+            releaseTitle: 'Keterangan penolakan dan perbaikan ulang laporan Ketua Kelompok',
             changes: [
                 'Penyeragaman alur bantuan Admin Pusat: lupa PIN, menyampaikan saran, dan bantuan lainnya.',
                 'Tautan bantuan pada footer dan menu Tentang diarahkan ke formulir kategori bantuan yang sama.',
                 'Pencarian terpadu Admin Pusat untuk KPM, Ketua Kelompok, dan Pendamping.',
                 'Alur penerbitan PIN sementara oleh Admin Pusat setelah verifikasi identitas.',
-                'Pemilihan foto menggunakan pemilih file bawaan browser agar pengguna dapat memilih sumber foto yang tersedia di perangkat.',
+                'Pemilihan foto menggunakan pemilih file bawaan browser agar pengguna dapat memilih sumber foto yang tersedia di perangkat.'
+                , 'Pendamping wajib memberi keterangan saat menolak laporan; Ketua dapat melihat alasan, memperbaiki, dan mengirim ulang laporan P2K2, Komitmen, dan Rekonsiliasi.',
                 'Tombol Ambil Foto dan Pilih dari Galeri dipisahkan agar lebih mudah digunakan pada berbagai browser HP.',
             ]
         });
@@ -3047,7 +3049,7 @@
                         <td class="p-3 font-semibold">${rep.type}</td>
                         <td class="p-3">
                             <div class="font-bold text-slate-900">${rep.namaKpm}</div>
-                            <div class="text-[10px] text-slate-500">${rep.keterangan}</div>
+                            <div class="text-[10px] text-slate-500">${rep.keterangan}</div>${rep.originalObj && rep.originalObj.catatanPenolakan ? `<div class="mt-1 text-[10px] text-red-700 font-semibold">Catatan penolakan: ${rep.originalObj.catatanPenolakan}</div>` : ''}
                         </td>
                         <td class="p-3 font-mono font-bold text-slate-700">${rep.nik}</td>
                         <td class="p-3 font-semibold">${rep.jenisBantuan || 'PKH'}</td>
@@ -3060,20 +3062,39 @@
         }
 
         function pendampingToggleVerifikasi(type, id, newStatus) {
-            if (type === 'P2K2') {
-                const item = appState.p2k2List.find(i => i.id === id);
-                if (item) { markPendampingNotificationRead(type, item); item.statusVerifikasi = newStatus; }
-            } else if (type === 'Komitmen') {
-                const item = appState.komitmenList.find(i => i.id === id);
-                if (item) { markPendampingNotificationRead(type, item); item.statusVerifikasi = newStatus; }
-            } else if (type === 'Rekonsiliasi') {
-                const item = appState.rekonsiliasiList.find(i => i.id === id);
-                if (item) { markPendampingNotificationRead(type, item); item.statusVerifikasi = newStatus; }
+            const list = type === 'P2K2' ? appState.p2k2List :
+                (type === 'Komitmen' ? appState.komitmenList :
+                (type === 'Rekonsiliasi' ? appState.rekonsiliasiList : null));
+            const item = list ? list.find(i => String(i.id) === String(id)) : null;
+            if (!item) return;
+
+            let alasan = '';
+            if (newStatus === 'REJECTED') {
+                alasan = prompt('Tuliskan keterangan/alasan penolakan agar Ketua Kelompok dapat memperbaiki laporan ini:');
+                if (alasan === null) return;
+                alasan = alasan.trim();
+                if (!alasan) {
+                    alert('Keterangan penolakan wajib diisi.');
+                    return;
+                }
             }
+
+            markPendampingNotificationRead(type, item);
+            item.statusVerifikasi = newStatus;
+            if (newStatus === 'REJECTED') {
+                item.catatanPenolakan = alasan;
+                item.tanggalPenolakan = sipNowIso();
+            } else if (newStatus === 'VERIFIED') {
+                item.catatanPenolakan = '';
+                item.tanggalPenolakan = '';
+                item.catatanPerbaikan = '';
+            }
+            item.updatedAt = sipNowIso();
+
             saveState();
             renderPendampingVerifikasiTable();
             updatePendampingNotifications();
-            showToast("Berhasil", "Status verifikasi laporan diperbarui.", "success");
+            showToast("Berhasil", newStatus === 'REJECTED' ? "Laporan ditolak dan keterangan dikirim kepada Ketua Kelompok." : "Status verifikasi laporan diperbarui.", "success");
         }
 
         function pendampingDeleteLaporan(type, id) {
@@ -3928,6 +3949,7 @@
                         item.modul = modul;
                         item.statusKehadiran = statusKehadiran;
                         if (compressedBase64) item.foto = compressedBase64;
+                        if (item.statusVerifikasi === 'REJECTED') { item.statusVerifikasi = 'PENDING'; item.catatanPerbaikan = 'Laporan diperbaiki dan dikirim ulang.'; item.catatanPenolakanSebelumnya = item.catatanPenolakan || ''; item.catatanPenolakan = ''; }
                         item.updatedAt = sipNowIso();
                     }
                     showToast("Berhasil", "Presensi P2K2 diperbarui.", "success");
@@ -3969,7 +3991,8 @@
                 const kpm = appState.kpmList.find(k => k.id === item.kpmId);
                 let badgeStatus = item.statusVerifikasi === 'VERIFIED' ?
                     `<span class="bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full font-bold text-[10px]">Terverifikasi</span>` :
-                    `<span class="bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full font-bold text-[10px]">Menunggu</span>`;
+                    (item.statusVerifikasi === 'REJECTED' ? `<span class="bg-red-100 text-red-800 px-2 py-0.5 rounded-full font-bold text-[10px]">Ditolak</span>` :
+                    `<span class="bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full font-bold text-[10px]">Menunggu</span>`);
 
                 let fotoBtn = item.foto ?
                     `<button onclick="openImageViewer('${photoViewerRef(item.foto)}'${photoDownloadArgs(kpm ? kpm.nama : '', kpm ? kpm.nik : '', 'BUKTI-P2K2', item.kpmId)})" class="bg-blue-50 text-blue-800 px-2 py-1 rounded text-[11px] font-bold"><i class="fas fa-image"></i> Lihat</button>` :
@@ -3982,7 +4005,7 @@
                         <td class="p-3 font-mono">${kpm ? kpm.nik : '-'}</td>
                         <td class="p-3">${item.modul}</td>
                         <td class="p-3 font-semibold">${item.statusKehadiran}</td>
-                        <td class="p-3">${badgeStatus}</td>
+                        <td class="p-3">${badgeStatus}${item.catatanPenolakan ? `<div class="mt-1 max-w-[220px] whitespace-normal text-[10px] text-red-700">Perbaiki: ${item.catatanPenolakan}</div>` : ''} </td>
                         <td class="p-3">${fotoBtn}</td>
                         <td class="p-3 text-[10px] font-mono whitespace-nowrap">${sipFormatDateTime(item.updatedAt || item.createdAt)}</td>
                         <td class="p-3 text-center space-x-1">
@@ -4083,6 +4106,7 @@
                         item.kpmId = kpmId;
                         item.statusKepatuhan = statusKepatuhan;
                         if (uploads.length) item.foto = uploads[0].meta;
+                        if (item.statusVerifikasi === 'REJECTED') { item.statusVerifikasi = 'PENDING'; item.catatanPerbaikan = 'Laporan diperbaiki dan dikirim ulang.'; item.catatanPenolakanSebelumnya = item.catatanPenolakan || ''; item.catatanPenolakan = ''; }
                         item.updatedAt = sipNowIso();
                     }
                     saveState();
@@ -4179,7 +4203,7 @@
                         <td class="p-3 font-semibold text-blue-900">${item.jenisLayanan || '-'}</td>
                         <td class="p-3">${fotoBtn}</td>
                         <td class="p-3 font-medium">${item.statusKepatuhan || '-'}</td>
-                        <td class="p-3">${badgeStatus}</td>
+                        <td class="p-3">${badgeStatus}${item.catatanPenolakan ? `<div class="mt-1 max-w-[220px] whitespace-normal text-[10px] text-red-700">Perbaiki: ${item.catatanPenolakan}</div>` : ''} </td>
                         <td class="p-3 text-[10px] font-mono whitespace-nowrap">${sipFormatDateTime(item.updatedAt || item.createdAt)}</td>
                         <td class="p-3 text-center space-x-1">
                             <button onclick="editKomitmen('${item.id}')" class="bg-amber-500 text-white px-2 py-1 rounded text-xs font-bold">Edit</button>
@@ -4202,26 +4226,65 @@
         // Rekonsiliasi Ketua
         function handleSaveRekonsiliasi(e) {
             e.preventDefault();
+            const editId = document.getElementById('editRekonsiliasiId').value;
             const kpmId = document.getElementById('rekonKpmSelect').value;
             const tahap = document.getElementById('rekonTahap').value;
             const nominal = document.getElementById('rekonNominal').value;
             const fotoFile = document.getElementById('rekonFoto').files[0];
 
             compressImage(fotoFile, function(compressedBase64) {
-                appState.rekonsiliasiList.push({
-                    id: "REK-" + Date.now(),
-                    kelompok: currentUser.kelompok,
-                    kpmId, tahap, nominal,
-                    foto: compressedBase64 || '',
-                    statusVerifikasi: "PENDING",
-                    date: new Date().toISOString().split('T')[0],
-                    createdAt: sipNowIso(), updatedAt: sipNowIso()
-                });
+                if (editId) {
+                    const item = appState.rekonsiliasiList.find(i => i.id === editId);
+                    if (item) {
+                        item.kpmId = kpmId;
+                        item.tahap = tahap;
+                        item.nominal = nominal;
+                        if (compressedBase64) item.foto = compressedBase64;
+                        if (item.statusVerifikasi === 'REJECTED') {
+                            item.statusVerifikasi = 'PENDING';
+                            item.catatanPerbaikan = 'Laporan diperbaiki dan dikirim ulang.';
+                            item.catatanPenolakanSebelumnya = item.catatanPenolakan || '';
+                            item.catatanPenolakan = '';
+                        }
+                        item.updatedAt = sipNowIso();
+                    }
+                    showToast("Berhasil", "Rekonsiliasi diperbaiki dan dikirim kembali.", "success");
+                } else {
+                    appState.rekonsiliasiList.push({
+                        id: "REK-" + Date.now(), kelompok: currentUser.kelompok,
+                        kpmId, tahap, nominal, foto: compressedBase64 || '',
+                        statusVerifikasi: "PENDING",
+                        date: new Date().toISOString().split('T')[0],
+                        createdAt: sipNowIso(), updatedAt: sipNowIso()
+                    });
+                    showToast("Berhasil", "Rekonsiliasi pencairan disimpan.", "success");
+                }
                 saveState();
                 document.getElementById('formRekonsiliasi').reset();
+                cancelRekonsiliasiEdit();
                 renderKetuaAllTables();
-                showToast("Berhasil", "Rekonsiliasi pencairan disimpan.", "success");
             });
+        }
+
+        function editRekonsiliasi(id) {
+            const item = appState.rekonsiliasiList.find(i => i.id === id);
+            if (!item) return;
+            document.getElementById('editRekonsiliasiId').value = item.id;
+            document.getElementById('rekonKpmSelect').value = item.kpmId;
+            document.getElementById('rekonTahap').value = item.tahap;
+            document.getElementById('rekonNominal').value = item.nominal;
+            document.getElementById('btnSubmitRekonsiliasi').innerText = 'Perbarui Rekonsiliasi';
+            document.getElementById('btnCancelRekonsiliasiEdit').classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function cancelRekonsiliasiEdit() {
+            const id = document.getElementById('editRekonsiliasiId');
+            if (id) id.value = '';
+            const btn = document.getElementById('btnSubmitRekonsiliasi');
+            if (btn) btn.innerText = 'Simpan Rekonsiliasi';
+            const cancel = document.getElementById('btnCancelRekonsiliasiEdit');
+            if (cancel) cancel.classList.add('hidden');
         }
 
         function renderKetuaRekonsiliasiTable() {
@@ -4239,7 +4302,8 @@
                 const kpm = appState.kpmList.find(k => k.id === item.kpmId);
                 let badgeStatus = item.statusVerifikasi === 'VERIFIED' ?
                     `<span class="bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full font-bold text-[10px]">Terverifikasi</span>` :
-                    `<span class="bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full font-bold text-[10px]">Menunggu</span>`;
+                    (item.statusVerifikasi === 'REJECTED' ? `<span class="bg-red-100 text-red-800 px-2 py-0.5 rounded-full font-bold text-[10px]">Ditolak</span>` :
+                    `<span class="bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full font-bold text-[10px]">Menunggu</span>`);
 
                 let fotoBtn = item.foto ?
                     `<button onclick="openImageViewer('${photoViewerRef(item.foto)}'${photoDownloadArgs(kpm ? kpm.nama : '', kpm ? kpm.nik : '', 'BUKTI-REKONSILIASI', item.kpmId)})" class="bg-blue-50 text-blue-800 px-2 py-1 rounded text-[11px] font-bold"><i class="fas fa-image"></i> Lihat</button>` :
@@ -4252,10 +4316,11 @@
                         <td class="p-3 font-mono">${kpm ? kpm.nik : '-'}</td>
                         <td class="p-3 font-semibold">${item.tahap}</td>
                         <td class="p-3 font-mono font-bold text-emerald-800">Rp ${parseInt(item.nominal || 0).toLocaleString('id-ID')}</td>
-                        <td class="p-3">${badgeStatus}</td>
+                        <td class="p-3">${badgeStatus}${item.catatanPenolakan ? `<div class="mt-1 max-w-[220px] whitespace-normal text-[10px] text-red-700">Perbaiki: ${item.catatanPenolakan}</div>` : ''} </td>
                         <td class="p-3">${fotoBtn}</td>
                         <td class="p-3 text-[10px] font-mono whitespace-nowrap">${sipFormatDateTime(item.updatedAt || item.createdAt)}</td>
                         <td class="p-3 text-center">
+                            <button onclick="editRekonsiliasi('${item.id}')" class="bg-amber-500 text-white px-2 py-1 rounded text-xs font-bold">Edit</button>
                             <button onclick="deleteRekonsiliasi('${item.id}')" class="bg-red-600 text-white px-2 py-1 rounded text-xs font-bold">Hapus</button>
                         </td>
                     </tr>
