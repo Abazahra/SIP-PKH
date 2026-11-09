@@ -991,7 +991,7 @@
                                 <label class="block font-bold text-slate-700">Bukti Foto Kegiatan P2K2 (Kamera / Galeri)</label>
                                 <span class="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded-full"><i class="fas fa-shield-alt"></i> Kompresi Otomatis Aktif (Max 800px / &lt;150KB)</span>
                             </div>
-                            <input type="file" id="p2k2Foto" accept="image/*" class="w-full p-2 bg-slate-50 border border-slate-300 rounded-xl file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-emerald-50 file:text-emerald-800">
+                            <div class="space-y-2"><input type="file" id="p2k2Foto" accept="image/*" class="sr-only" aria-label="Pilih foto" style="position:absolute; width:1px; height:1px; opacity:0.01; overflow:hidden;" tabindex="-1"><div class="grid grid-cols-2 gap-2"><button type="button" onclick="openSipPhotoPicker('p2k2Foto', 'camera')" class="min-h-[44px] px-3 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold shadow-sm touch-manipulation"><i class="fas fa-camera mr-1"></i> Ambil Foto</button><button type="button" onclick="openSipPhotoPicker('p2k2Foto', 'gallery')" class="min-h-[44px] px-3 py-2 rounded-xl bg-blue-700 hover:bg-blue-800 text-white text-xs font-bold shadow-sm touch-manipulation"><i class="fas fa-images mr-1"></i> Pilih dari Galeri</button></div><p id="p2k2FotoName" class="text-[11px] text-slate-500">Belum ada foto dipilih.</p></div>
                         </div>
                         <button type="submit" id="btnSubmitP2k2" class="bg-emerald-700 hover:bg-emerald-800 text-white px-6 py-3 rounded-xl font-bold shadow cursor-pointer">Simpan Presensi P2K2</button>
                     </form>
@@ -1113,7 +1113,7 @@
                                 <label class="block font-bold text-slate-700">Bukti Struk ATM / KKS (Kamera / Galeri)</label>
                                 <span class="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded-full"><i class="fas fa-shield-alt"></i> Kompresi Otomatis Aktif</span>
                             </div>
-                            <input type="file" id="rekonFoto" accept="image/*" class="w-full p-2 bg-slate-50 border border-slate-300 rounded-xl file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-emerald-50 file:text-emerald-800">
+                            <div class="space-y-2"><input type="file" id="rekonFoto" accept="image/*" class="sr-only" aria-label="Pilih foto" style="position:absolute; width:1px; height:1px; opacity:0.01; overflow:hidden;" tabindex="-1"><div class="grid grid-cols-2 gap-2"><button type="button" onclick="openSipPhotoPicker('rekonFoto', 'camera')" class="min-h-[44px] px-3 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold shadow-sm touch-manipulation"><i class="fas fa-camera mr-1"></i> Ambil Foto</button><button type="button" onclick="openSipPhotoPicker('rekonFoto', 'gallery')" class="min-h-[44px] px-3 py-2 rounded-xl bg-blue-700 hover:bg-blue-800 text-white text-xs font-bold shadow-sm touch-manipulation"><i class="fas fa-images mr-1"></i> Pilih dari Galeri</button></div><p id="rekonFotoName" class="text-[11px] text-slate-500">Belum ada foto dipilih.</p></div>
                         </div>
                         <button type="submit" class="bg-emerald-700 hover:bg-emerald-800 text-white px-6 py-3 rounded-xl font-bold shadow cursor-pointer">Simpan Rekonsiliasi</button>
                     </form>
@@ -1217,7 +1217,7 @@
                         </div>
                         <div>
                             <label class="block font-bold text-slate-700 mb-1">Foto Bukti Usaha / Tempat Usaha</label>
-                            <input type="file" id="ppseFoto" accept="image/*" class="w-full p-2 bg-slate-50 border border-slate-300 rounded-xl file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-emerald-50 file:text-emerald-800">
+                            <div class="space-y-2"><input type="file" id="ppseFoto" accept="image/*" class="sr-only" aria-label="Pilih foto" style="position:absolute; width:1px; height:1px; opacity:0.01; overflow:hidden;" tabindex="-1"><div class="grid grid-cols-2 gap-2"><button type="button" onclick="openSipPhotoPicker('ppseFoto', 'camera')" class="min-h-[44px] px-3 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold shadow-sm touch-manipulation"><i class="fas fa-camera mr-1"></i> Ambil Foto</button><button type="button" onclick="openSipPhotoPicker('ppseFoto', 'gallery')" class="min-h-[44px] px-3 py-2 rounded-xl bg-blue-700 hover:bg-blue-800 text-white text-xs font-bold shadow-sm touch-manipulation"><i class="fas fa-images mr-1"></i> Pilih dari Galeri</button></div><p id="ppseFotoName" class="text-[11px] text-slate-500">Belum ada foto dipilih.</p></div>
                         </div>
                         <button type="submit" id="btnSubmitPpse" class="bg-emerald-700 hover:bg-emerald-800 text-white px-6 py-3 rounded-xl font-bold shadow cursor-pointer">Simpan Usulan PPSE</button>
                     </form>
@@ -1288,15 +1288,15 @@
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                             <div>
                                 <label class="block font-bold text-slate-700 mb-1">1. Foto KPM</label>
-                                <input type="file" id="graduasiFotoKpm" accept="image/*" class="w-full p-1 bg-slate-50 border border-slate-300 rounded-lg text-[10px]">
+                                <div class="space-y-2"><input type="file" id="graduasiFotoKpm" accept="image/*" class="sr-only" aria-label="Pilih foto" style="position:absolute; width:1px; height:1px; opacity:0.01; overflow:hidden;" tabindex="-1"><div class="grid grid-cols-2 gap-2"><button type="button" onclick="openSipPhotoPicker('graduasiFotoKpm', 'camera')" class="min-h-[44px] px-3 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold shadow-sm touch-manipulation"><i class="fas fa-camera mr-1"></i> Ambil Foto</button><button type="button" onclick="openSipPhotoPicker('graduasiFotoKpm', 'gallery')" class="min-h-[44px] px-3 py-2 rounded-xl bg-blue-700 hover:bg-blue-800 text-white text-xs font-bold shadow-sm touch-manipulation"><i class="fas fa-images mr-1"></i> Pilih dari Galeri</button></div><p id="graduasiFotoKpmName" class="text-[11px] text-slate-500">Belum ada foto dipilih.</p></div>
                             </div>
                             <div>
                                 <label class="block font-bold text-slate-700 mb-1">2. Foto Rumah Layak</label>
-                                <input type="file" id="graduasiFotoRumah" accept="image/*" class="w-full p-1 bg-slate-50 border border-slate-300 rounded-lg text-[10px]">
+                                <div class="space-y-2"><input type="file" id="graduasiFotoRumah" accept="image/*" class="sr-only" aria-label="Pilih foto" style="position:absolute; width:1px; height:1px; opacity:0.01; overflow:hidden;" tabindex="-1"><div class="grid grid-cols-2 gap-2"><button type="button" onclick="openSipPhotoPicker('graduasiFotoRumah', 'camera')" class="min-h-[44px] px-3 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold shadow-sm touch-manipulation"><i class="fas fa-camera mr-1"></i> Ambil Foto</button><button type="button" onclick="openSipPhotoPicker('graduasiFotoRumah', 'gallery')" class="min-h-[44px] px-3 py-2 rounded-xl bg-blue-700 hover:bg-blue-800 text-white text-xs font-bold shadow-sm touch-manipulation"><i class="fas fa-images mr-1"></i> Pilih dari Galeri</button></div><p id="graduasiFotoRumahName" class="text-[11px] text-slate-500">Belum ada foto dipilih.</p></div>
                             </div>
                             <div>
                                 <label class="block font-bold text-slate-700 mb-1">3. Foto Surat Pernyataan Graduasi</label>
-                                <input type="file" id="graduasiFotoSurat" accept="image/*" class="w-full p-1 bg-slate-50 border border-slate-300 rounded-lg text-[10px]">
+                                <div class="space-y-2"><input type="file" id="graduasiFotoSurat" accept="image/*" class="sr-only" aria-label="Pilih foto" style="position:absolute; width:1px; height:1px; opacity:0.01; overflow:hidden;" tabindex="-1"><div class="grid grid-cols-2 gap-2"><button type="button" onclick="openSipPhotoPicker('graduasiFotoSurat', 'camera')" class="min-h-[44px] px-3 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold shadow-sm touch-manipulation"><i class="fas fa-camera mr-1"></i> Ambil Foto</button><button type="button" onclick="openSipPhotoPicker('graduasiFotoSurat', 'gallery')" class="min-h-[44px] px-3 py-2 rounded-xl bg-blue-700 hover:bg-blue-800 text-white text-xs font-bold shadow-sm touch-manipulation"><i class="fas fa-images mr-1"></i> Pilih dari Galeri</button></div><p id="graduasiFotoSuratName" class="text-[11px] text-slate-500">Belum ada foto dipilih.</p></div>
                             </div>
                         </div>
                         <button type="submit" id="btnSubmitGraduasi" class="bg-emerald-700 hover:bg-emerald-800 text-white px-6 py-3 rounded-xl font-bold shadow cursor-pointer">Simpan Usulan Graduasi</button>
@@ -1384,7 +1384,7 @@
                 <div>
                     <label class="block font-bold text-slate-700 mb-1">Logo Kop Surat (Upload / Tempel / Drag & Drop)</label>
                     <div id="dropZoneKop" class="border-2 border-dashed border-slate-300 rounded-xl p-4 text-center bg-slate-50 hover:bg-slate-100 transition cursor-pointer relative" ondragover="allowDrop(event)" ondragleave="leaveDrop(event)" ondrop="dropLogoFile(event)">
-                        <input type="file" id="kopLogoFile" accept="image/png, image/jpeg, image/jpg" onchange="handleLogoFileInput(this)" class="absolute inset-0 opacity-0 cursor-pointer w-full h-full">
+                        <input type="file" id="kopLogoFile" accept="image/png, image/jpeg, image/jpg" onchange="handleLogoFileInput(this)" class="absolute inset-0 opacity-0 cursor-pointer w-full h-full" style="display:block; width:100%; min-height:44px; padding:10px; touch-action:manipulation; pointer-events:auto; position:relative; z-index:1;">
                         <div id="kopLogoPreviewContainer" class="flex flex-col items-center justify-center space-y-2">
                             <i class="fas fa-cloud-upload-alt text-2xl text-blue-900"></i>
                             <p class="text-xs font-semibold text-slate-700">Klik untuk memilih file logo atau seret ke sini</p>
@@ -1824,13 +1824,14 @@
             appVersion: '28',
             appsScriptDeployment: '29',
             releaseDate: '9 November 2026',
-            releaseTitle: 'Pembaruan pencatatan versi dan penyempurnaan layanan',
+            releaseTitle: 'Penyempurnaan pemilihan foto kamera dan galeri lintas browser',
             changes: [
                 'Penyeragaman alur bantuan Admin Pusat: lupa PIN, menyampaikan saran, dan bantuan lainnya.',
                 'Tautan bantuan pada footer dan menu Tentang diarahkan ke formulir kategori bantuan yang sama.',
                 'Pencarian terpadu Admin Pusat untuk KPM, Ketua Kelompok, dan Pendamping.',
                 'Alur penerbitan PIN sementara oleh Admin Pusat setelah verifikasi identitas.',
                 'Pemilihan foto menggunakan pemilih file bawaan browser agar pengguna dapat memilih sumber foto yang tersedia di perangkat.',
+                'Tombol Ambil Foto dan Pilih dari Galeri dipisahkan agar lebih mudah digunakan pada berbagai browser HP.',
             ]
         });
 
@@ -1899,20 +1900,45 @@
         // Backend foto SIP-PKH (Google Drive). Endpoint Apps Script yang sudah diuji.
         const SIP_FOTO_BACKEND_URL = "https://script.google.com/macros/s/AKfycbycK3JKNvWket2N8qE5pWcj-0WmBanxrkaR-SzlOFfqpLp-U6427PXcvpYP41SyhX3e/exec";
 
-        async function createPhotoSession(role, identifier, pin) {
-            try {
-                const response = await fetch(SIP_FOTO_BACKEND_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                    body: JSON.stringify({ action: 'legacyLogin', role, identifier, pin })
-                });
-                const result = await response.json();
-                if (result && result.ok && result.sessionToken) return result.sessionToken;
-                console.warn('Sesi foto belum tersedia:', result && result.error);
-            } catch (err) {
-                console.warn('Backend foto belum dapat dijangkau:', err);
+        async function createPhotoSession(role, identifier, pin, maxAttempts = 3) {
+            // Retry ringan untuk jaringan seluler/browser yang lambat saat login.
+            for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+                try {
+                    const controller = (typeof AbortController !== 'undefined') ? new AbortController() : null;
+                    const timeout = controller ? setTimeout(() => controller.abort(), 15000) : null;
+                    const response = await fetch(SIP_FOTO_BACKEND_URL, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                        body: JSON.stringify({ action: 'legacyLogin', role, identifier, pin }),
+                        signal: controller ? controller.signal : undefined,
+                        cache: 'no-store'
+                    });
+                    if (timeout) clearTimeout(timeout);
+                    if (!response.ok) throw new Error('Server foto merespons HTTP ' + response.status);
+                    const result = await response.json();
+                    if (result && result.ok && result.sessionToken) return result.sessionToken;
+                    console.warn('Sesi foto belum tersedia:', result && result.error);
+                } catch (err) {
+                    console.warn('Percobaan sesi foto ' + attempt + ' gagal:', err);
+                }
+                if (attempt < maxAttempts) await new Promise(resolve => setTimeout(resolve, 700 * attempt));
             }
             return '';
+        }
+
+        async function ensurePhotoSession() {
+            if (currentUser && currentUser.photoSessionToken) return currentUser.photoSessionToken;
+            if (!currentUser) throw new Error('Sesi login tidak tersedia. Silakan login kembali.');
+            const role = currentUser.role === 'ketua' ? 'ketua' : (currentUser.role === 'pendamping' ? 'pendamping' : '');
+            if (!role) throw new Error('Peran akun tidak mendukung unggah foto.');
+            const identifier = currentUser.photoLoginIdentifier || currentUser.nip || currentUser.hp || currentUser.noHp || currentUser.nama || '';
+            const pin = currentUser.pin || '';
+            if (!identifier || !pin) throw new Error('Sesi unggah foto belum tersedia. Silakan keluar dan login kembali agar sesi foto dibuat ulang.');
+            const token = await createPhotoSession(role, identifier, pin, 3);
+            if (!token) throw new Error('Server foto belum memberikan sesi unggah. Periksa koneksi internet, lalu coba login kembali.');
+            currentUser.photoSessionToken = token;
+            try { localStorage.setItem('SIP_PKH_CURRENT_USER', JSON.stringify(currentUser)); } catch (_) {}
+            return token;
         }
 
         function photoViewerRef(photo) {
@@ -1965,7 +1991,8 @@
         });
 
         async function uploadPhotoToDrive(dataUrl, fileName, sessionToken) {
-            if (!sessionToken) throw new Error('Sesi unggah foto belum tersedia. Keluar lalu login kembali, kemudian coba lagi.');
+            // Jika sesi tidak tersedia/terputus, coba buat ulang sebelum menggagalkan laporan.
+            sessionToken = sessionToken || await ensurePhotoSession();
             const parts = String(dataUrl || '').split(',');
             if (parts.length !== 2) throw new Error('Format foto tidak valid.');
             const mimeMatch = parts[0].match(/data:([^;]+);base64/i);
@@ -1979,6 +2006,38 @@
             if (!result || !result.ok || !result.fileId) throw new Error((result && result.error) || 'Unggah foto ke Google Drive gagal.');
             return { fileId: result.fileId, fileName: result.fileName, mimeType: result.mimeType, size: result.size, driveUrl: result.driveUrl, storage: 'google_drive' };
         }
+
+        // Pemilih foto lintas-browser: tombol kamera dan galeri dipisahkan.
+        // Pemanggilan input.click() dilakukan langsung dalam event tombol pengguna.
+        function openSipPhotoPicker(inputId, source) {
+            const input = document.getElementById(inputId);
+            if (!input) {
+                alert('Kolom foto tidak ditemukan. Muat ulang halaman, lalu coba kembali.');
+                return;
+            }
+            input.value = '';
+            input.setAttribute('accept', 'image/*');
+            if (source === 'camera') {
+                input.setAttribute('capture', 'environment');
+            } else {
+                input.removeAttribute('capture');
+            }
+            try {
+                input.click();
+            } catch (err) {
+                console.error('Pemilih foto tidak dapat dibuka:', err);
+                alert('Browser tidak dapat membuka pemilih foto. Coba gunakan browser bawaan HP atau Chrome terbaru.');
+            }
+        }
+
+        document.addEventListener('change', function(event) {
+            const input = event.target;
+            if (!input || input.type !== 'file' || input.id === 'kopLogoFile') return;
+            const label = document.getElementById(input.id + 'Name');
+            if (label) label.textContent = input.files && input.files[0]
+                ? 'Foto dipilih: ' + input.files[0].name
+                : 'Belum ada foto dipilih.';
+        });
 
         function compressImageAsync(file) {
             return new Promise(resolve => compressImage(file, resolve));
@@ -2351,7 +2410,7 @@
                         return;
                     }
                     const photoSessionToken = await createPhotoSession('pendamping', identifier, pin);
-                    currentUser = { role: 'pendamping', ...pendamping, photoSessionToken };
+                    currentUser = { role: 'pendamping', ...pendamping, photoLoginIdentifier: identifier, photoSessionToken };
                     localStorage.setItem('SIP_PKH_CURRENT_USER', JSON.stringify(currentUser));
                     showToast("Login Berhasil", "Selamat datang " + pendamping.nama, "success");
                     renderUI();
@@ -2378,7 +2437,7 @@
                         return;
                     }
                     const photoSessionToken = await createPhotoSession('ketua', identifier, pin);
-                    currentUser = { role: 'ketua', ...ketua, photoSessionToken };
+                    currentUser = { role: 'ketua', ...ketua, photoLoginIdentifier: identifier, photoSessionToken };
                     localStorage.setItem('SIP_PKH_CURRENT_USER', JSON.stringify(currentUser));
                     showToast("Login Berhasil", "Selamat datang Ketua " + ketua.nama, "success");
                     renderUI();
@@ -3605,8 +3664,10 @@
                 return;
             }
             const reader = new FileReader();
+            reader.onerror = function () { callback(""); };
             reader.onload = function (e) {
                 const img = new Image();
+                img.onerror = function () { callback(""); };
                 img.onload = function () {
                     const canvas = document.createElement('canvas');
                     let width = img.width;
@@ -3989,7 +4050,7 @@
                 container.innerHTML += `
                     <div class="bg-white p-3 rounded-xl border border-slate-200 space-y-1.5">
                         <label class="block font-bold text-slate-800 text-xs"><i class="fas fa-check-circle text-emerald-600"></i> Komponen: ${comp}</label>
-                        <input type="file" id="komitmenFoto_${idx}" data-komponen="${comp}" accept="image/*" class="w-full p-1.5 bg-slate-50 border border-slate-300 rounded-lg text-xs file:py-1 file:px-3 file:rounded file:border-0 file:bg-emerald-50 file:text-emerald-800 file:font-bold">
+                        <div class="space-y-2"><input type="file" id="komitmenFoto_${idx}" data-komponen="${comp}" accept="image/*" class="sr-only" aria-label="Pilih foto" style="position:absolute; width:1px; height:1px; opacity:0.01; overflow:hidden;" tabindex="-1"><div class="grid grid-cols-2 gap-2"><button type="button" onclick="openSipPhotoPicker('komitmenFoto_${idx}', 'camera')" class="min-h-[44px] px-3 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold shadow-sm touch-manipulation"><i class="fas fa-camera mr-1"></i> Ambil Foto</button><button type="button" onclick="openSipPhotoPicker('komitmenFoto_${idx}', 'gallery')" class="min-h-[44px] px-3 py-2 rounded-xl bg-blue-700 hover:bg-blue-800 text-white text-xs font-bold shadow-sm touch-manipulation"><i class="fas fa-images mr-1"></i> Pilih dari Galeri</button></div><p id="komitmenFoto_${idx}Name" class="text-[11px] text-slate-500">Belum ada foto dipilih.</p></div>
                     </div>
                 `;
             });
