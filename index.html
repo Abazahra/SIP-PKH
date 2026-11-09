@@ -487,6 +487,21 @@
                                     <option value="Rekonsiliasi">Rekonsiliasi Pencairan</option>
                                 </select>
                             </div>
+                            <div class="relative">
+                                <label class="block text-[10px] font-bold text-slate-500 mb-1">Filter Jenis Bantuan</label>
+                                <details class="relative">
+                                    <summary id="pFilterJenisBantuanLabel" class="list-none cursor-pointer min-w-44 p-2 bg-slate-50 border border-slate-300 rounded-xl text-xs font-semibold text-slate-700 flex items-center justify-between gap-3">
+                                        <span>Semua Jenis Bantuan</span><i class="fas fa-chevron-down text-[10px]"></i>
+                                    </summary>
+                                    <div class="absolute z-30 mt-1 left-0 min-w-48 bg-white border border-slate-200 rounded-xl shadow-xl p-3 space-y-2">
+                                        <label class="flex items-center gap-2 text-xs font-semibold text-slate-700 cursor-pointer"><input type="checkbox" id="pBantuanAll" checked onchange="handlePendampingBantuanFilter('ALL', this.checked)" class="rounded border-slate-300"> Semua Jenis Bantuan</label>
+                                        <div class="border-t border-slate-100"></div>
+                                        <label class="flex items-center gap-2 text-xs text-slate-700 cursor-pointer"><input type="checkbox" class="pBantuanOption rounded border-slate-300" value="PKH" onchange="handlePendampingBantuanFilter('PKH', this.checked)"> PKH</label>
+                                        <label class="flex items-center gap-2 text-xs text-slate-700 cursor-pointer"><input type="checkbox" class="pBantuanOption rounded border-slate-300" value="BPNT" onchange="handlePendampingBantuanFilter('BPNT', this.checked)"> BPNT</label>
+                                        <label class="flex items-center gap-2 text-xs text-slate-700 cursor-pointer"><input type="checkbox" class="pBantuanOption rounded border-slate-300" value="PKH_BPNT" onchange="handlePendampingBantuanFilter('PKH_BPNT', this.checked)"> PKH + BPNT</label>
+                                    </div>
+                                </details>
+                            </div>
                             <div>
                                 <label class="block text-[10px] font-bold text-slate-500 mb-1">Filter Bulan</label>
                                 <input type="month" id="pFilterBulanVerifikasi" onchange="renderPendampingVerifikasiTable()" class="p-2 bg-slate-50 border border-slate-300 rounded-xl text-xs font-semibold">
@@ -502,6 +517,7 @@
                                     <th class="p-3">Jenis Laporan</th>
                                     <th class="p-3">KPM & Keterangan</th>
                                     <th class="p-3">NIK KPM</th>
+                                    <th class="p-3">Jenis Bantuan</th>
                                     <th class="p-3">Bukti Foto / Struk</th>
                                     <th class="p-3">Status</th>
                                     <th class="p-3 text-center">Aksi Verifikasi</th>
@@ -997,7 +1013,8 @@
                                     <th class="p-3">Waktu Transaksi</th>
                                     <th class="p-3 text-center">Aksi</th>
                                 </tr>
-                            </thead>                            <tbody id="tbodyKetuaP2k2" class="divide-y divide-slate-100">
+                            </thead>
+                            <tbody id="tbodyKetuaP2k2" class="divide-y divide-slate-100">
                                 <!-- Populated dynamically -->
                             </tbody>
                         </table>
@@ -1805,7 +1822,7 @@
         // dan riwayat pada menu Tentang akan mengikuti secara otomatis.
         const SIP_RELEASE_INFO = Object.freeze({
             appVersion: '28',
-            appsScriptDeployment: '28',
+            appsScriptDeployment: '29',
             releaseDate: '9 November 2026',
             releaseTitle: 'Pembaruan pencatatan versi dan penyempurnaan layanan',
             changes: [
@@ -1813,7 +1830,7 @@
                 'Tautan bantuan pada footer dan menu Tentang diarahkan ke formulir kategori bantuan yang sama.',
                 'Pencarian terpadu Admin Pusat untuk KPM, Ketua Kelompok, dan Pendamping.',
                 'Alur penerbitan PIN sementara oleh Admin Pusat setelah verifikasi identitas.',
-                'Pemilihan foto menggunakan pemilih file bawaan browser agar pengguna dapat memilih sumber foto yang tersedia di perangkat.'
+                'Pemilihan foto menggunakan pemilih file bawaan browser agar pengguna dapat memilih sumber foto yang tersedia di perangkat.',
             ]
         });
 
@@ -1996,7 +2013,8 @@
         // Global Navigation & UI Helper Functions
         function switchMainTab(tab) {
             const formLogin = document.getElementById('formLogin');
-            const regContainer = document.getElementById('formRegisterContainer');            const btnLogin = document.getElementById('mainTabLogin');
+            const regContainer = document.getElementById('formRegisterContainer');
+            const btnLogin = document.getElementById('mainTabLogin');
             const btnReg = document.getElementById('mainTabRegister');
 
             if (tab === 'login') {
@@ -2813,6 +2831,24 @@
             });
         }
 
+        function handlePendampingBantuanFilter(kategori, checked) {
+            const allBox = document.getElementById('pBantuanAll');
+            const options = Array.from(document.querySelectorAll('.pBantuanOption'));
+            if (kategori === 'ALL' && checked) {
+                options.forEach(el => el.checked = false);
+            } else {
+                allBox.checked = false;
+                if (!options.some(el => el.checked)) allBox.checked = true;
+            }
+            const selected = options.filter(el => el.checked).map(el => el.value);
+            const label = document.querySelector('#pFilterJenisBantuanLabel span');
+            if (label) {
+                label.textContent = allBox.checked ? 'Semua Jenis Bantuan' :
+                    (selected.length === 1 ? ({PKH:'PKH', BPNT:'BPNT', PKH_BPNT:'PKH + BPNT'}[selected[0]]) : selected.length + ' kategori dipilih');
+            }
+            renderPendampingVerifikasiTable();
+        }
+
         function renderPendampingVerifikasiTable() {
             const tbody = document.getElementById('tbodyPendampingVerifikasi');
             if (!tbody) return;
@@ -2820,6 +2856,7 @@
             const nikFilter = document.getElementById('pSearchNik').value.trim();
             const kelompokFilter = document.getElementById('pFilterKelompokVerifikasi').value;
             const jenisFilter = document.getElementById('pFilterJenisVerifikasi').value;
+            const bantuanFilter = Array.from(document.querySelectorAll('.pBantuanOption:checked')).map(el => el.value);
             const bulanFilter = document.getElementById('pFilterBulanVerifikasi').value;
 
             // Kumpulkan semua laporan dari ketua kelompok yang terhubung dengan pendamping ini
@@ -2843,6 +2880,7 @@
                     kelompok: item.kelompok || '-',
                     namaKpm: namaKpm,
                     nik: nik,
+                    jenisBantuan: kpmObj.jenisBantuan || 'PKH',
                     keterangan: `Modul: ${item.modul} | Kehadiran: ${item.statusKehadiran}`,
                     foto: item.foto || '',
                     statusVerifikasi: item.statusVerifikasi || 'PENDING',
@@ -2863,6 +2901,7 @@
                     kelompok: item.kelompok || '-',
                     namaKpm: namaKpm,
                     nik: nik,
+                    jenisBantuan: (kpmObj && kpmObj.jenisBantuan) || item.jenisBantuan || 'PKH',
                     keterangan: `Layanan: ${item.jenisLayanan || item.komponen || '-'} | Status: ${item.statusKepatuhan || '-'}`,
                     foto: item.foto || '',
                     statusVerifikasi: item.statusVerifikasi || 'PENDING',
@@ -2883,6 +2922,7 @@
                     kelompok: item.kelompok || '-',
                     namaKpm: namaKpm,
                     nik: nik,
+                    jenisBantuan: (kpmObj && kpmObj.jenisBantuan) || item.jenisBantuan || 'PKH',
                     keterangan: `Tahap: ${item.tahap} | Nominal: Rp ${parseInt(item.nominal || 0).toLocaleString('id-ID')}`,
                     foto: item.foto || '',
                     statusVerifikasi: item.statusVerifikasi || 'PENDING',
@@ -2894,6 +2934,10 @@
             let filtered = allReports.filter(rep => {
                 if (kelompokFilter !== 'ALL' && rep.kelompok !== kelompokFilter) return false;
                 if (jenisFilter !== 'ALL' && rep.type !== jenisFilter) return false;
+                const bantuan = String(rep.jenisBantuan || 'PKH').toUpperCase().replace(/\\s+/g, '').replace(/&AMP;/g, '&');
+                const kategoriBantuan = bantuan.includes('PKH') && bantuan.includes('BPNT') ? 'PKH_BPNT' :
+                    (bantuan.includes('BPNT') ? 'BPNT' : 'PKH');
+                if (bantuanFilter.length > 0 && !bantuanFilter.includes(kategoriBantuan)) return false;
                 if (nikFilter && !rep.nik.includes(nikFilter)) return false;
                 if (bulanFilter && !rep.date.startsWith(bulanFilter)) return false;
                 return true;
@@ -2901,7 +2945,7 @@
 
             tbody.innerHTML = '';
             if (filtered.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="8" class="text-center p-6 text-slate-400">Belum ada laporan yang sesuai dengan filter pencarian.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="9" class="text-center p-6 text-slate-400">Belum ada laporan yang sesuai dengan filter pencarian.</td></tr>`;
                 return;
             }
 
@@ -2947,6 +2991,7 @@
                             <div class="text-[10px] text-slate-500">${rep.keterangan}</div>
                         </td>
                         <td class="p-3 font-mono font-bold text-slate-700">${rep.nik}</td>
+                        <td class="p-3 font-semibold">${rep.jenisBantuan || 'PKH'}</td>
                         <td class="p-3">${fotoBtn}</td>
                         <td class="p-3">${badgeStatus}</td>
                         <td class="p-3 text-center whitespace-nowrap space-x-1">${actionBtn}</td>
@@ -2995,6 +3040,7 @@
             const bulanFilter = document.getElementById('pFilterBulanPpse').value;
 
             const myKlpNames = appState.ketuaUsers.filter(k => k.pendampingId === currentUser.id && k.status === 'VERIFIED').map(k => k.kelompok);
+
             let filtered = appState.ppseList.filter(item => {
                 if (myKlpNames.length > 0 && !myKlpNames.includes(item.kelompok)) return;
                 if (kelompokFilter !== 'ALL' && item.kelompok !== kelompokFilter) return false;
@@ -3994,7 +4040,8 @@
                         id: "KOM-" + Date.now() + "-" + index,
                         kelompok: currentUser.kelompok,
                         kpmId,
-                        jenisLayanan: entry.komponen || "Komponen Umum",                        statusKepatuhan,
+                        jenisLayanan: entry.komponen || "Komponen Umum",
+                        statusKepatuhan,
                         foto: entry.meta,
                         statusVerifikasi: "PENDING",
                         date: new Date().toISOString().split('T')[0],
@@ -4993,7 +5040,8 @@
         // Ambil NIK KPM dari data induk. Nama tidak dipakai dalam nama file.
         function resolvePhotoKpmNik(nik, kpmId = '', nama = '') {
             const list = Array.isArray(appState && appState.kpmList) ? appState.kpmList : [];
-            const digits = value => String(value || '').replace(/\D/g, '');            const normalizeName = value => String(value || '')
+            const digits = value => String(value || '').replace(/\D/g, '');
+            const normalizeName = value => String(value || '')
                 .trim()
                 .normalize('NFKD')
                 .replace(/[\u0300-\u036f]/g, '')
