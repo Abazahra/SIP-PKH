@@ -112,7 +112,7 @@
                 <div>
                     <h1 class="font-bold text-sm md:text-base tracking-wide">SIP-PKH</h1>
                     <p class="text-[10px] text-blue-200">Sistem Informasi Pelaksanaan Program Keluarga Harapan</p>
-                    <span id="appVersionLabel" class="block mt-0.5 text-[9px] md:text-[10px] font-medium tracking-wide text-blue-200/75">v33</span>
+                    <span id="appVersionLabel" class="block mt-0.5 text-[9px] md:text-[10px] font-medium tracking-wide text-blue-200/75">v35</span>
                 </div>
             </div>
             
@@ -477,18 +477,17 @@
                             </div>
                             <div>
                                 <label class="block text-[10px] font-bold text-slate-500 mb-1">Filter Kelompok</label>
-                                <select id="pFilterKelompokVerifikasi" onchange="renderPendampingVerifikasiTable()" class="p-2 bg-slate-50 border border-slate-300 rounded-xl text-xs font-semibold">
-                                    <option value="ALL">-- Semua Kelompok --</option>
-                                </select>
+                                <details class="relative">
+                                    <summary id="pFilterKelompokVerifikasiLabel" class="list-none cursor-pointer min-w-44 p-2 bg-slate-50 border border-slate-300 rounded-xl text-xs font-semibold text-slate-700 flex items-center justify-between gap-3"><span>Semua Kelompok</span><i class="fas fa-chevron-down text-[10px]"></i></summary>
+                                    <div id="pFilterKelompokVerifikasiOptions" class="absolute z-40 mt-1 left-0 min-w-48 max-h-60 overflow-y-auto bg-white border border-slate-200 rounded-xl shadow-xl p-3 space-y-2"></div>
+                                </details>
                             </div>
                             <div>
                                 <label class="block text-[10px] font-bold text-slate-500 mb-1">Jenis Laporan</label>
-                                <select id="pFilterJenisVerifikasi" onchange="renderPendampingVerifikasiTable()" class="p-2 bg-slate-50 border border-slate-300 rounded-xl text-xs font-semibold">
-                                    <option value="ALL">-- Semua Jenis --</option>
-                                    <option value="P2K2">Presensi P2K2</option>
-                                    <option value="Komitmen">Komitmen Layanan</option>
-                                    <option value="Rekonsiliasi">Rekonsiliasi Pencairan</option>
-                                </select>
+                                <details class="relative">
+                                    <summary id="pFilterJenisVerifikasiLabel" class="list-none cursor-pointer min-w-44 p-2 bg-slate-50 border border-slate-300 rounded-xl text-xs font-semibold text-slate-700 flex items-center justify-between gap-3"><span>Semua Jenis Laporan</span><i class="fas fa-chevron-down text-[10px]"></i></summary>
+                                    <div id="pFilterJenisVerifikasiOptions" class="absolute z-40 mt-1 left-0 min-w-48 max-h-60 overflow-y-auto bg-white border border-slate-200 rounded-xl shadow-xl p-3 space-y-2"></div>
+                                </details>
                             </div>
                             <div class="relative">
                                 <label class="block text-[10px] font-bold text-slate-500 mb-1">Filter Jenis Bantuan</label>
@@ -599,9 +598,10 @@
                     <div class="flex flex-wrap gap-4 items-center justify-between pb-4 border-b border-slate-100">
                         <h3 class="font-bold text-slate-800 text-sm">Verifikasi Usulan Pemberdayaan Ekonomi (PPSE)</h3>
                         <div class="flex flex-wrap items-center gap-3">
-                            <select id="pFilterKelompokPpse" onchange="renderPendampingPpseTable()" class="p-2 bg-slate-50 border border-slate-300 rounded-xl text-xs font-semibold">
-                                <option value="ALL">-- Semua Kelompok --</option>
-                            </select>
+                            <details class="relative">
+                                    <summary id="pFilterKelompokPpseLabel" class="list-none cursor-pointer min-w-44 p-2 bg-slate-50 border border-slate-300 rounded-xl text-xs font-semibold text-slate-700 flex items-center justify-between gap-3"><span>Semua Kelompok</span><i class="fas fa-chevron-down text-[10px]"></i></summary>
+                                    <div id="pFilterKelompokPpseOptions" class="absolute z-40 mt-1 left-0 min-w-48 max-h-60 overflow-y-auto bg-white border border-slate-200 rounded-xl shadow-xl p-3 space-y-2"></div>
+                                </details>
                             <input type="month" id="pFilterBulanPpse" onchange="renderPendampingPpseTable()" class="p-2 bg-slate-50 border border-slate-300 rounded-xl text-xs font-semibold">
                         </div>
                     </div>
@@ -634,9 +634,10 @@
                     <div class="flex flex-wrap gap-4 items-center justify-between pb-4 border-b border-slate-100">
                         <h3 class="font-bold text-slate-800 text-sm">Verifikasi Usulan Graduasi Mandiri KPM</h3>
                         <div class="flex flex-wrap items-center gap-3">
-                            <select id="pFilterKelompokGraduasi" onchange="renderPendampingGraduasiTable()" class="p-2 bg-slate-50 border border-slate-300 rounded-xl text-xs font-semibold">
-                                <option value="ALL">-- Semua Kelompok --</option>
-                            </select>
+                            <details class="relative">
+                                    <summary id="pFilterKelompokGraduasiLabel" class="list-none cursor-pointer min-w-44 p-2 bg-slate-50 border border-slate-300 rounded-xl text-xs font-semibold text-slate-700 flex items-center justify-between gap-3"><span>Semua Kelompok</span><i class="fas fa-chevron-down text-[10px]"></i></summary>
+                                    <div id="pFilterKelompokGraduasiOptions" class="absolute z-40 mt-1 left-0 min-w-48 max-h-60 overflow-y-auto bg-white border border-slate-200 rounded-xl shadow-xl p-3 space-y-2"></div>
+                                </details>
                             <input type="month" id="pFilterBulanGraduasi" onchange="renderPendampingGraduasiTable()" class="p-2 bg-slate-50 border border-slate-300 rounded-xl text-xs font-semibold">
                         </div>
                     </div>
@@ -668,9 +669,10 @@
                     <div class="flex flex-wrap gap-4 items-center justify-between pb-4 border-b border-slate-100">
                         <h3 class="font-bold text-slate-800 text-sm">Manajemen Kelompok Binaan & Ketua</h3>
                         <div class="flex items-center space-x-3">
-                            <select id="pFilterKelompokManajemen" onchange="renderPendampingKelompokManajemen()" class="p-2 bg-slate-50 border border-slate-300 rounded-xl text-xs font-semibold">
-                                <option value="ALL">-- Semua Kelompok --</option>
-                            </select>
+                            <details class="relative">
+                                    <summary id="pFilterKelompokManajemenLabel" class="list-none cursor-pointer min-w-44 p-2 bg-slate-50 border border-slate-300 rounded-xl text-xs font-semibold text-slate-700 flex items-center justify-between gap-3"><span>Semua Kelompok</span><i class="fas fa-chevron-down text-[10px]"></i></summary>
+                                    <div id="pFilterKelompokManajemenOptions" class="absolute z-40 mt-1 left-0 min-w-48 max-h-60 overflow-y-auto bg-white border border-slate-200 rounded-xl shadow-xl p-3 space-y-2"></div>
+                                </details>
                             <button onclick="openTambahKetuaManualModal()" class="bg-blue-900 hover:bg-blue-800 text-white px-3.5 py-2 rounded-xl text-xs font-bold shadow flex items-center space-x-1.5 cursor-pointer">
                                 <i class="fas fa-plus"></i><span>Tambah Kelompok Manual</span>
                             </button>
@@ -995,9 +997,9 @@
                         <button type="submit" id="btnSubmitKpm" class="bg-emerald-700 hover:bg-emerald-800 text-white px-6 py-3 rounded-xl font-bold shadow transition cursor-pointer">Simpan Anggota KPM</button>
                     </form>
                 </div>
-
                 <!-- TABEL KPM -->
-                <div class="bg-white rounded-2xl shadow-xl border border-slate-100 p-6 space-y-4">                    <h3 class="font-bold text-slate-800 text-sm">Daftar Anggota KPM Kelompok Binaan</h3>
+                <div class="bg-white rounded-2xl shadow-xl border border-slate-100 p-6 space-y-4">
+                    <h3 class="font-bold text-slate-800 text-sm">Daftar Anggota KPM Kelompok Binaan</h3>
                     <div class="overflow-x-auto">
                         <table class="w-full text-left border-collapse text-xs">
                             <thead>
@@ -1771,18 +1773,21 @@
             <div class="bg-slate-100 p-3 border-b border-slate-200 flex flex-wrap items-center gap-3 text-xs no-print">
                 <div>
                     <label class="font-bold text-slate-700 mr-1">Filter Kelompok:</label>
-                    <select id="printFilterKelompok" onchange="openPrintModal(window.currentPrintType)" class="p-1.5 bg-white border border-slate-300 rounded-lg font-semibold">
-                        <option value="ALL">-- Semua Kelompok --</option>
-                    </select>
+                    <details class="relative inline-block">
+                        <summary id="printFilterKelompokLabel" class="list-none cursor-pointer min-w-40 p-1.5 bg-white border border-slate-300 rounded-lg font-semibold flex items-center justify-between gap-2"><span>Semua Kelompok</span><i class="fas fa-chevron-down text-[10px]"></i></summary>
+                        <div id="printFilterKelompokOptions" class="absolute z-50 mt-1 left-0 min-w-48 max-h-60 overflow-y-auto bg-white border border-slate-200 rounded-xl shadow-xl p-3 space-y-2"></div>
+                    </details>
                 </div>
                 <div id="printJenisBantuanContainer" class="hidden">
                     <label class="font-bold text-slate-700 mr-1">Filter Jenis Bantuan:</label>
-                    <select id="printFilterJenisBantuan" onchange="openPrintModal(window.currentPrintType)" class="p-1.5 bg-white border border-slate-300 rounded-lg font-semibold">
-                        <option value="ALL">-- Semua Bantuan --</option>
-                        <option value="PKH">PKH Murni</option>
-                        <option value="BPNT">BPNT Murni</option>
-                        <option value="PKH & BPNT">PKH & BPNT</option>
-                    </select>
+                    <details class="relative inline-block">
+                        <summary id="printFilterJenisBantuanLabel" class="list-none cursor-pointer min-w-40 p-1.5 bg-white border border-slate-300 rounded-lg font-semibold flex items-center justify-between gap-2"><span>Semua Bantuan</span><i class="fas fa-chevron-down text-[10px]"></i></summary>
+                        <div id="printFilterJenisBantuanOptions" class="absolute z-50 mt-1 left-0 min-w-48 bg-white border border-slate-200 rounded-xl shadow-xl p-3 space-y-2">
+                            <label class="flex items-center gap-2 text-xs"><input type="checkbox" class="printFilterJenisBantuanCheck" value="PKH" onchange="onPrintBantuanFilterChanged()"> PKH Murni</label>
+                            <label class="flex items-center gap-2 text-xs"><input type="checkbox" class="printFilterJenisBantuanCheck" value="BPNT" onchange="onPrintBantuanFilterChanged()"> BPNT Murni</label>
+                            <label class="flex items-center gap-2 text-xs"><input type="checkbox" class="printFilterJenisBantuanCheck" value="PKH_BPNT" onchange="onPrintBantuanFilterChanged()"> PKH + BPNT</label>
+                        </div>
+                    </details>
                 </div>
                 <div>
                     <label class="font-bold text-slate-700 mr-1">Filter Bulan:</label>
@@ -1893,7 +1898,7 @@
         // Setiap rilis berikutnya cukup memperbarui objek ini; label header
         // dan riwayat pada menu Tentang akan mengikuti secara otomatis.
         const SIP_RELEASE_INFO = Object.freeze({
-            appVersion: '33',
+            appVersion: '35',
             appsScriptDeployment: '29',
             photoFilenameFormat: 'Nama_NIK_Kelompok_JenisBukti',
             releaseDate: '9 November 2026',
@@ -1991,12 +1996,12 @@
                     if (timeout) clearTimeout(timeout);
                     if (!response.ok) throw new Error('Server foto merespons HTTP ' + response.status);
                     const result = await response.json();
-                    if (result && result.ok && result.sessionToken) return result.sessionToken;
-                    console.warn('Sesi foto belum tersedia:', result && result.error);
+                    if (result && result.ok && result.sessionToken) return result.sessionToken;                    console.warn('Sesi foto belum tersedia:', result && result.error);
                 } catch (err) {
                     console.warn('Percobaan sesi foto ' + attempt + ' gagal:', err);
                 }
-                if (attempt < maxAttempts) await new Promise(resolve => setTimeout(resolve, 700 * attempt));            }
+                if (attempt < maxAttempts) await new Promise(resolve => setTimeout(resolve, 700 * attempt));
+            }
             return '';
         }
 
@@ -2949,21 +2954,73 @@
             if (tab === 'undangan') renderPendampingKetuaManagement();
         }
 
+        // Filter dropdown jamak: pilihan kosong berarti semua data ditampilkan.
+        function getMultiFilterValues(className) {
+            return Array.from(document.querySelectorAll('.' + className + ':checked')).map(el => el.value);
+        }
+        function updateMultiFilterLabel(summaryId, selected, allLabel, optionLabels) {
+            const summary = document.getElementById(summaryId);
+            if (!summary) return;
+            const span = summary.querySelector('span');
+            if (!span) return;
+            span.textContent = !selected.length ? allLabel : (selected.length === 1 ? (optionLabels[selected[0]] || selected[0]) : selected.length + ' pilihan dipilih');
+        }
+        function renderMultiFilterOptions(optionsId, className, options, selected, summaryId, allLabel, onChange) {
+            const box = document.getElementById(optionsId);
+            if (!box) return;
+            const safe = value => escapeHtml(String(value));
+            box.innerHTML = options.map(opt => {
+                const value = typeof opt === 'string' ? opt : opt.value;
+                const label = typeof opt === 'string' ? opt : opt.label;
+                return `<label class="flex items-center gap-2 text-xs text-slate-700 cursor-pointer"><input type="checkbox" class="${className} rounded border-slate-300" value="${safe(value)}" ${selected.includes(value) ? 'checked' : ''} onchange="${onChange}"> ${safe(label)}</label>`;
+            }).join('') || '<span class="text-xs text-slate-400">Tidak ada pilihan.</span>';
+            const labels = {};
+            options.forEach(opt => { const value = typeof opt === 'string' ? opt : opt.value; labels[value] = typeof opt === 'string' ? opt : opt.label; });
+            updateMultiFilterLabel(summaryId, selected, allLabel, labels);
+        }
+        function refreshPendampingGroupFilterLabels() {
+            const defs = [
+                ['pFilterKelompokVerifikasiCheck','pFilterKelompokVerifikasiLabel','Semua Kelompok'],
+                ['pFilterKelompokPpseCheck','pFilterKelompokPpseLabel','Semua Kelompok'],
+                ['pFilterKelompokGraduasiCheck','pFilterKelompokGraduasiLabel','Semua Kelompok'],
+                ['pFilterKelompokManajemenCheck','pFilterKelompokManajemenLabel','Semua Kelompok'],
+                ['printFilterKelompokCheck','printFilterKelompokLabel','Semua Kelompok']
+            ];
+            defs.forEach(([cls,id,label]) => updateMultiFilterLabel(id,getMultiFilterValues(cls),label,{}));
+        }
+        function onPendampingGroupFilterChanged(target) {
+            refreshPendampingGroupFilterLabels();
+            if (target === 'verifikasi') renderPendampingVerifikasiTable();
+            else if (target === 'ppse') renderPendampingPpseTable();
+            else if (target === 'graduasi') renderPendampingGraduasiTable();
+            else if (target === 'manajemen') renderPendampingKelompokManajemen();
+            else if (target === 'print') openPrintModal(window.currentPrintType);
+        }        function onJenisVerifikasiFilterChanged() {
+            updateMultiFilterLabel('pFilterJenisVerifikasiLabel',getMultiFilterValues('pFilterJenisVerifikasiCheck'),'Semua Jenis Laporan',{
+                P2K2:'Presensi P2K2',Komitmen:'Komitmen Layanan',Rekonsiliasi:'Rekonsiliasi Pencairan'
+            });
+            renderPendampingVerifikasiTable();
+        }
+
         function populatePendampingFilters() {
             const myKelompokList = appState.ketuaUsers.filter(k => k.pendampingId === currentUser.id && k.status === 'VERIFIED').map(k => k.kelompok);
-            const selectIds = ['pFilterKelompokVerifikasi', 'pFilterKelompokPpse', 'pFilterKelompokGraduasi', 'pFilterKelompokManajemen', 'printFilterKelompok'];
-            
-            selectIds.forEach(id => {
-                const el = document.getElementById(id);
-                if (el) {
-                    const currentVal = el.value;
-                    el.innerHTML = '<option value="ALL">-- Semua Kelompok --</option>';
-                    myKelompokList.forEach(klp => {
-                        el.innerHTML += `<option value="${klp}">${klp}</option>`;
-                    });
-                    el.value = currentVal;
-                }
+            const daftarKelompokFilter = Array.from(new Set(myKelompokList.map(x => String(x || '').trim()).filter(Boolean))).sort((a,b) => a.localeCompare(b, 'id'));
+            const groupDefs = [
+                ['pFilterKelompokVerifikasiOptions','pFilterKelompokVerifikasiCheck','pFilterKelompokVerifikasiLabel','verifikasi'],
+                ['pFilterKelompokPpseOptions','pFilterKelompokPpseCheck','pFilterKelompokPpseLabel','ppse'],
+                ['pFilterKelompokGraduasiOptions','pFilterKelompokGraduasiCheck','pFilterKelompokGraduasiLabel','graduasi'],
+                ['pFilterKelompokManajemenOptions','pFilterKelompokManajemenCheck','pFilterKelompokManajemenLabel','manajemen'],
+                ['printFilterKelompokOptions','printFilterKelompokCheck','printFilterKelompokLabel','print']
+            ];
+            groupDefs.forEach(([boxId,cls,labelId,target]) => {
+                const selected = getMultiFilterValues(cls);
+                renderMultiFilterOptions(boxId,cls,daftarKelompokFilter,selected,labelId,'Semua Kelompok',`onPendampingGroupFilterChanged('${target}')`);
             });
+            renderMultiFilterOptions('pFilterJenisVerifikasiOptions','pFilterJenisVerifikasiCheck',[
+                {value:'P2K2',label:'Presensi P2K2'},
+                {value:'Komitmen',label:'Komitmen Layanan'},
+                {value:'Rekonsiliasi',label:'Rekonsiliasi Pencairan'}
+            ],getMultiFilterValues('pFilterJenisVerifikasiCheck'),'pFilterJenisVerifikasiLabel','Semua Jenis Laporan','onJenisVerifikasiFilterChanged()');
             const daftarKelompok = Array.from(new Set(myKelompokList.map(x => String(x || '').trim()).filter(Boolean))).sort((a,b) => a.localeCompare(b, 'id'));
             const kelompokBox = document.getElementById('pDaftarKpmKelompokOptions');
             if (kelompokBox) {
@@ -2995,7 +3052,8 @@
             }
             const selected = options.filter(el => el.checked).map(el => el.value);
             const label = document.querySelector('#pFilterJenisBantuanLabel span');
-            if (label) {                label.textContent = allBox.checked ? 'Semua Jenis Bantuan' :
+            if (label) {
+                label.textContent = allBox.checked ? 'Semua Jenis Bantuan' :
                     (selected.length === 1 ? ({PKH:'PKH', BPNT:'BPNT', PKH_BPNT:'PKH + BPNT'}[selected[0]]) : selected.length + ' kategori dipilih');
             }
             renderPendampingVerifikasiTable();
@@ -3006,8 +3064,8 @@
             if (!tbody) return;
 
             const nikFilter = document.getElementById('pSearchNik').value.trim();
-            const kelompokFilter = document.getElementById('pFilterKelompokVerifikasi').value;
-            const jenisFilter = document.getElementById('pFilterJenisVerifikasi').value;
+            const kelompokFilter = getMultiFilterValues('pFilterKelompokVerifikasiCheck');
+            const jenisFilter = getMultiFilterValues('pFilterJenisVerifikasiCheck');
             const bantuanFilter = Array.from(document.querySelectorAll('.pBantuanOption:checked')).map(el => el.value);
             const bulanFilter = document.getElementById('pFilterBulanVerifikasi').value;
 
@@ -3084,8 +3142,8 @@
 
             // Filter
             let filtered = allReports.filter(rep => {
-                if (kelompokFilter !== 'ALL' && rep.kelompok !== kelompokFilter) return false;
-                if (jenisFilter !== 'ALL' && rep.type !== jenisFilter) return false;
+                if (kelompokFilter.length && !kelompokFilter.includes(rep.kelompok)) return false;
+                if (jenisFilter.length && !jenisFilter.includes(rep.type)) return false;
                 const bantuan = String(rep.jenisBantuan || 'PKH').toUpperCase().replace(/\\s+/g, '').replace(/&AMP;/g, '&');
                 const kategoriBantuan = bantuan.includes('PKH') && bantuan.includes('BPNT') ? 'PKH_BPNT' :
                     (bantuan.includes('BPNT') ? 'BPNT' : 'PKH');
@@ -3207,14 +3265,14 @@
         function renderPendampingPpseTable() {
             const tbody = document.getElementById('tbodyPendampingPpse');
             if (!tbody) return;
-            const kelompokFilter = document.getElementById('pFilterKelompokPpse').value;
+            const kelompokFilter = getMultiFilterValues('pFilterKelompokPpseCheck');
             const bulanFilter = document.getElementById('pFilterBulanPpse').value;
 
             const myKlpNames = appState.ketuaUsers.filter(k => k.pendampingId === currentUser.id && k.status === 'VERIFIED').map(k => k.kelompok);
 
             let filtered = appState.ppseList.filter(item => {
                 if (myKlpNames.length > 0 && !myKlpNames.includes(item.kelompok)) return;
-                if (kelompokFilter !== 'ALL' && item.kelompok !== kelompokFilter) return false;
+                if (kelompokFilter.length && !kelompokFilter.includes(item.kelompok)) return false;
                 if (bulanFilter && !(item.date || '').startsWith(bulanFilter)) return false;
                 return true;
             });
@@ -3273,14 +3331,14 @@
         function renderPendampingGraduasiTable() {
             const tbody = document.getElementById('tbodyPendampingGraduasi');
             if (!tbody) return;
-            const kelompokFilter = document.getElementById('pFilterKelompokGraduasi').value;
+            const kelompokFilter = getMultiFilterValues('pFilterKelompokGraduasiCheck');
             const bulanFilter = document.getElementById('pFilterBulanGraduasi').value;
 
             const myKlpNames = appState.ketuaUsers.filter(k => k.pendampingId === currentUser.id && k.status === 'VERIFIED').map(k => k.kelompok);
 
             let filtered = appState.graduasiList.filter(item => {
                 if (myKlpNames.length > 0 && !myKlpNames.includes(item.kelompok)) return;
-                if (kelompokFilter !== 'ALL' && item.kelompok !== kelompokFilter) return false;
+                if (kelompokFilter.length && !kelompokFilter.includes(item.kelompok)) return false;
                 if (bulanFilter && !(item.date || '').startsWith(bulanFilter)) return false;
                 return true;
             });
@@ -3434,11 +3492,11 @@
         function renderPendampingKelompokManajemen() {
             const tbody = document.getElementById('tbodyPendampingKelompokList');
             if (!tbody) return;
-            const kelompokFilter = document.getElementById('pFilterKelompokManajemen').value;
+            const kelompokFilter = getMultiFilterValues('pFilterKelompokManajemenCheck');
 
             let myKlp = appState.ketuaUsers.filter(k => k.pendampingId === currentUser.id && k.status === 'VERIFIED');
-            if (kelompokFilter !== 'ALL') {
-                myKlp = myKlp.filter(k => k.kelompok === kelompokFilter);
+            if (kelompokFilter.length) {
+                myKlp = myKlp.filter(k => kelompokFilter.includes(k.kelompok));
             }
 
             tbody.innerHTML = '';
@@ -3936,8 +3994,7 @@
             const alamat = document.getElementById('kpmAlamat').value.trim();
             const fotoFile = document.getElementById('kpmFoto')?.files?.[0] || null;
 
-            const checkboxes = document.querySelectorAll('input[name="kpmKomponen"]:checked');
-            let komponen = [];
+            const checkboxes = document.querySelectorAll('input[name="kpmKomponen"]:checked');            let komponen = [];
             checkboxes.forEach(cb => {
                 const qtyInput = document.getElementById(cb.dataset.qtyId || '');
                 const qty = qtyInput ? (qtyInput.value || 1) : 1;
@@ -3994,7 +4051,8 @@
                 document.getElementById('formKpm').reset();
                 document.querySelectorAll('input[name="kpmKomponen"]').forEach(cb => {
                     const qty = document.getElementById(cb.dataset.qtyId || '');
-                    if (qty) qty.disabled = true;                });
+                    if (qty) qty.disabled = true;
+                });
                 const nonWrap = document.getElementById('kpmNonKomponenWrap');
                 if (nonWrap) nonWrap.classList.add('hidden');
                 const fotoLabel = document.getElementById('kpmFotoName');
@@ -4132,47 +4190,126 @@
         }
 
         // P2K2 Ketua
-        function handleSaveP2k2(e) {
+        async function handleSaveP2k2(e) {
             e.preventDefault();
+            const submit = document.getElementById('btnSubmitP2k2');
+            if (submit && submit.disabled) return;
+
             const editId = document.getElementById('editP2k2Id').value;
             const kpmId = document.getElementById('p2k2KpmSelect').value;
             const modul = document.getElementById('p2k2Modul').value;
             const statusKehadiran = document.getElementById('p2k2Status').value;
-            const fotoFile = document.getElementById('p2k2Foto').files[0];
+            const fotoFile = document.getElementById('p2k2Foto')?.files?.[0] || null;
+            const kpm = appState.kpmList.find(k => String(k.id) === String(kpmId));
 
-            compressImage(fotoFile, function(compressedBase64) {
-                if (editId) {
-                    const item = appState.p2k2List.find(i => i.id === editId);
-                    if (item) {
-                        item.kpmId = kpmId;
-                        item.modul = modul;
-                        item.statusKehadiran = statusKehadiran;
-                        if (compressedBase64) item.foto = compressedBase64;
-                        if (item.statusVerifikasi === 'REJECTED') { item.statusVerifikasi = 'PENDING'; item.catatanPerbaikan = 'Laporan diperbaiki dan dikirim ulang.'; item.catatanPenolakanSebelumnya = item.catatanPenolakan || ''; item.catatanPenolakan = ''; }
-                        item.updatedAt = sipNowIso();
+            if (!kpm) {
+                alert('Pilih KPM terlebih dahulu.');
+                return;
+            }
+
+            const oldItem = editId ? appState.p2k2List.find(i => String(i.id) === String(editId)) : null;
+            if (editId && !oldItem) {
+                showToast('Data tidak ditemukan', 'Data presensi P2K2 yang diedit tidak ditemukan. Muat ulang halaman.', 'warning');
+                return;
+            }
+
+            if (submit) {
+                submit.disabled = true;
+                submit.dataset.oldText = submit.innerText;
+                submit.innerText = 'Menyiapkan foto dan menyimpan...';
+            }
+
+            try {
+                // Foto lama P2K2 versi sebelumnya tersimpan sebagai Base64 di Firestore.
+                // Pindahkan ke Drive agar dokumen main_state tidak melewati batas 1 MiB.
+                const legacyPhotoUpdates = [];
+                for (const record of (appState.p2k2List || [])) {
+                    if (typeof record.foto === 'string' && /^data:image\//i.test(record.foto)) {
+                        const legacyMeta = await uploadPhotoToDrive(
+                            record.foto,
+                            `p2k2-lama-${String(record.id || Date.now()).replace(/[^a-zA-Z0-9_-]/g, '-')}.jpg`,
+                            currentUser && currentUser.photoSessionToken
+                        );
+                        legacyPhotoUpdates.push({ record, meta: legacyMeta });
+                        if (submit) submit.innerText = `Memindahkan foto lama ${legacyPhotoUpdates.length}...`;
                     }
-                    showToast("Berhasil", "Presensi P2K2 diperbarui.", "success");
-                } else {
-                    appState.p2k2List.push({
-                        id: "P2K2-" + Date.now(),
-                        kelompok: currentUser.kelompok,
-                        kpmId, modul, statusKehadiran,
-                        foto: compressedBase64 || '',
-                        statusVerifikasi: "PENDING",
-                        date: new Date().toISOString().split('T')[0],
-                        createdAt: sipNowIso(), updatedAt: sipNowIso()
-                    });
-                    showToast("Berhasil", "Presensi P2K2 disimpan.", "success");
                 }
 
-                saveState();
+                let fotoMetaBaru = null;
+                if (fotoFile) {
+                    if (submit) submit.innerText = 'Mengunggah foto P2K2...';
+                    const compressed = await compressImageAsync(fotoFile);
+                    if (!compressed) throw new Error('Foto P2K2 gagal diproses.');
+                    fotoMetaBaru = await uploadPhotoToDrive(
+                        compressed,
+                        `p2k2-${String(kpm.nik || kpmId).replace(/[^0-9A-Za-z_-]/g, '')}-${Date.now()}.jpg`,
+                        currentUser && currentUser.photoSessionToken
+                    );
+                }
+
+                // Terapkan migrasi setelah semua unggahan berhasil agar foto lama tidak hilang
+                // jika salah satu proses unggah mengalami kegagalan.
+                legacyPhotoUpdates.forEach(entry => { entry.record.foto = entry.meta; });
+
+                const now = sipNowIso();
+                let recordId = editId;
+                if (editId) {
+                    Object.assign(oldItem, {
+                        kpmId,
+                        modul,
+                        statusKehadiran,
+                        updatedAt: now
+                    });
+                    if (fotoMetaBaru) oldItem.foto = fotoMetaBaru;
+                    if (oldItem.statusVerifikasi === 'REJECTED') {
+                        oldItem.statusVerifikasi = 'PENDING';
+                        oldItem.catatanPerbaikan = 'Laporan diperbaiki dan dikirim ulang.';
+                        oldItem.catatanPenolakanSebelumnya = oldItem.catatanPenolakan || '';
+                        oldItem.catatanPenolakan = '';
+                    }
+                } else {
+                    recordId = 'P2K2-' + Date.now();
+                    appState.p2k2List.push({
+                        id: recordId,
+                        kelompok: currentUser.kelompok,
+                        kpmId,
+                        modul,
+                        statusKehadiran,
+                        foto: fotoMetaBaru || '',
+                        statusVerifikasi: 'PENDING',
+                        date: new Date().toISOString().split('T')[0],
+                        createdAt: now,
+                        updatedAt: now
+                    });
+                }
+
+                if (submit) submit.innerText = 'Menyinkronkan ke server...';
+                const synced = await saveState();
+                if (!synced) {
+                    // Pertahankan ID agar tombol coba lagi tidak membuat baris duplikat.
+                    document.getElementById('editP2k2Id').value = recordId;
+                    showToast('Sinkronisasi belum berhasil', 'Data tetap tersimpan di perangkat. Periksa koneksi, lalu tekan Simpan Presensi P2K2 lagi untuk mencoba sinkronisasi.', 'warning');
+                    return;
+                }
+
                 document.getElementById('formP2k2').reset();
-                document.getElementById('editP2k2Id').value = "";
-                document.getElementById('formP2k2Title').innerText = "Input Presensi Pertemuan P2K2";
-                document.getElementById('btnSubmitP2k2').innerText = "Simpan Presensi P2K2";
+                document.getElementById('editP2k2Id').value = '';
+                document.getElementById('formP2k2Title').innerText = 'Input Presensi Pertemuan P2K2';
+                document.getElementById('btnSubmitP2k2').innerText = 'Simpan Presensi P2K2';
                 document.getElementById('btnCancelP2k2Edit').classList.add('hidden');
                 renderKetuaAllTables();
-            });
+                showToast('Berhasil', 'Presensi P2K2 dan foto berhasil disinkronkan ke server.', 'success');
+            } catch (err) {
+                console.error('Gagal menyimpan presensi P2K2:', err);
+                showToast('Gagal menyimpan P2K2', err && err.message ? err.message : 'Foto atau data P2K2 gagal disimpan. Silakan coba kembali.', 'error');
+            } finally {
+                if (submit) {
+                    submit.disabled = false;
+                    if (submit.innerText !== 'Simpan Presensi P2K2') {
+                        submit.innerText = submit.dataset.oldText || 'Simpan Presensi P2K2';
+                    }
+                }
+            }
         }
 
         function renderKetuaP2k2Table() {
@@ -4856,8 +4993,7 @@
             document.getElementById('editGraduasiId').value = item.id;
             document.getElementById('graduasiKpmSelect').value = item.kpmId;
             document.getElementById('graduasiNik').value = item.nik;
-            document.getElementById('graduasiKohor').value = item.kohor;
-            document.getElementById('graduasiAlasan').value = item.alasan;
+            document.getElementById('graduasiKohor').value = item.kohor;            document.getElementById('graduasiAlasan').value = item.alasan;
 
             document.getElementById('formGraduasiTitle').innerText = "Edit Usulan Graduasi Mandiri KPM";
             document.getElementById('btnSubmitGraduasi').innerText = "Perbarui Usulan Graduasi";
@@ -4993,7 +5129,8 @@
             options.innerHTML = headers.map((th, i) => {
                 const label = (th.innerText || ('Kolom ' + (i + 1))).trim();
                 return `<label class="inline-flex items-center gap-1.5 bg-white border border-blue-100 rounded-lg px-2 py-1 cursor-pointer"><input type="checkbox" ${selected.includes(i) ? 'checked' : ''} onchange="setPrintColumnVisibility(${i}, this.checked)" class="accent-blue-700"><span>${label}</span></label>`;
-            }).join('');            const rows = Array.from(table.querySelectorAll('tr'));
+            }).join('');
+            const rows = Array.from(table.querySelectorAll('tr'));
             rows.forEach(row => {
                 const cells = Array.from(row.children);
                 // Sembunyikan kolom yang tidak dipilih pada setiap baris data.
@@ -5025,15 +5162,29 @@
             if (table) { try { localStorage.removeItem(getPrintColumnKey()); } catch (e) {} applyPrintColumnVisibility(); }
         }
 
+        function onPrintBantuanFilterChanged() {
+            updateMultiFilterLabel('printFilterJenisBantuanLabel',getMultiFilterValues('printFilterJenisBantuanCheck'),'Semua Bantuan',{
+                PKH:'PKH Murni',BPNT:'BPNT Murni',PKH_BPNT:'PKH + BPNT'
+            });
+            openPrintModal(window.currentPrintType);
+        }
+
         // Cetak PDF / Pratinjau Dokumen
         function openPrintModal(type) {
             window.currentPrintType = type;
             const modal = document.getElementById('modalPrintViewer');
             const titleContainer = document.getElementById('printDocTitle');
             const tableContainer = document.getElementById('printDocTableContainer');
-            const filterKelompok = document.getElementById('printFilterKelompok').value;
-            const filterJenisBantuan = document.getElementById('printFilterJenisBantuan').value;
+            const filterKelompok = getMultiFilterValues('printFilterKelompokCheck');
+            const filterJenisBantuan = getMultiFilterValues('printFilterJenisBantuanCheck');
             const filterBulan = document.getElementById('printFilterBulan').value;
+            const cocokFilterBantuanCetak = item => {
+                if (!filterJenisBantuan.length) return true;
+                const kpm = appState.kpmList.find(k => String(k.id) === String(item.kpmId));
+                const raw = String((kpm && kpm.jenisBantuan) || item.jenisBantuan || 'PKH').toUpperCase().replace(/\s+/g, '');
+                const key = raw.includes('PKH') && raw.includes('BPNT') ? 'PKH_BPNT' : (raw.includes('BPNT') ? 'BPNT' : 'PKH');
+                return filterJenisBantuan.includes(key);
+            };
             const jenisBantuanContainer = document.getElementById('printJenisBantuanContainer');
 
             if (jenisBantuanContainer) {
@@ -5073,7 +5224,8 @@
                 let items = appState.p2k2List.filter(i => {
                     // Batasi laporan pada kelompok binaan Pendamping yang terverifikasi.
                     if (!myKlpNames.includes(i.kelompok)) return false;
-                    if (filterKelompok !== 'ALL' && i.kelompok !== filterKelompok) return false;
+                    if (filterKelompok.length && !filterKelompok.includes(i.kelompok)) return false;
+                    if (!cocokFilterBantuanCetak(i)) return false;
                     if (filterBulan && !(i.date || '').startsWith(filterBulan)) return false;
                     // Riwayat tanpa KPM aktif adalah data yatim/test dan tidak dicetak.
                     return !!i.kpmId && appState.kpmList.some(k => String(k.id) === String(i.kpmId));
@@ -5128,7 +5280,8 @@
                 titleText = "REKAPITULASI PEMENUHAN KOMITMEN LAYANAN KPM PKH";
                 let items = appState.komitmenList.filter(i => {
                     if (myKlpNames.length > 0 && !myKlpNames.includes(i.kelompok)) return;
-                    if (filterKelompok !== 'ALL' && i.kelompok !== filterKelompok) return false;
+                    if (filterKelompok.length && !filterKelompok.includes(i.kelompok)) return false;
+                    if (!cocokFilterBantuanCetak(i)) return false;
                     if (filterBulan && !(i.date || '').startsWith(filterBulan)) return false;
                     return true;
                 });
@@ -5182,7 +5335,8 @@
                 titleText = "REKAPITULASI REKONSILIASI PENCAIRAN DANA BANSOS PKH";
                 let items = appState.rekonsiliasiList.filter(i => {
                     if (!myKlpNames.includes(i.kelompok)) return false;
-                    if (filterKelompok !== 'ALL' && i.kelompok !== filterKelompok) return false;
+                    if (filterKelompok.length && !filterKelompok.includes(i.kelompok)) return false;
+                    if (!cocokFilterBantuanCetak(i)) return false;
                     if (filterBulan && !(i.date || '').startsWith(filterBulan)) return false;
                     return !!i.kpmId && appState.kpmList.some(k => String(k.id) === String(i.kpmId));
                 });
@@ -5236,7 +5390,7 @@
                 titleText = "REKAPITULASI USULAN PEMBERDAYAAN EKONOMI (PPSE)";
                 let items = appState.ppseList.filter(i => {
                     if (!myKlpNames.includes(i.kelompok)) return false;
-                    if (filterKelompok !== 'ALL' && i.kelompok !== filterKelompok) return false;
+                    if (filterKelompok.length && !filterKelompok.includes(i.kelompok)) return false;
                     if (filterBulan && !(i.date || '').startsWith(filterBulan)) return false;
                     return !!i.kpmId && appState.kpmList.some(k => String(k.id) === String(i.kpmId));
                 });
@@ -5289,7 +5443,7 @@
                 titleText = "REKAPITULASI USULAN GRADUASI MANDIRI SEJAHTERA KPM";
                 let items = appState.graduasiList.filter(i => {
                     if (!myKlpNames.includes(i.kelompok)) return false;
-                    if (filterKelompok !== 'ALL' && i.kelompok !== filterKelompok) return false;
+                    if (filterKelompok.length && !filterKelompok.includes(i.kelompok)) return false;
                     if (filterBulan && !(i.date || '').startsWith(filterBulan)) return false;
                     return !!i.kpmId && appState.kpmList.some(k => String(k.id) === String(i.kpmId));
                 });
@@ -5838,8 +5992,7 @@
         }
 
         function getPendampingNotifReadSet() {
-            try {
-                const raw = JSON.parse(localStorage.getItem(getPendampingNotifReadStorageKey()) || '[]');
+            try {                const raw = JSON.parse(localStorage.getItem(getPendampingNotifReadStorageKey()) || '[]');
                 return new Set(Array.isArray(raw) ? raw : []);
             } catch (e) {
                 return new Set();
