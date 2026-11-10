@@ -634,7 +634,7 @@
                             <thead><tr class="bg-slate-100 text-slate-700 font-bold border-b border-slate-200">
                                 <th class="p-3 w-12 text-center">No</th><th class="p-3 w-24 text-center">Foto</th><th class="p-3">Nama KPM</th><th class="p-3">NIK</th><th class="p-3">Kelompok</th><th class="p-3">Kohor</th><th class="p-3">Jenis Bantuan</th><th class="p-3">Komponen</th><th class="p-3">Komitmen Layanan</th><th class="p-3">Alamat</th>
                             </tr></thead>
-                            <tbody id="tbodyPendampingDaftarKpm" class="divide-y divide-slate-100"><tr><td colspan="9" class="p-6 text-center text-slate-400">Memuat daftar KPM...</td></tr></tbody>
+                            <tbody id="tbodyPendampingDaftarKpm" class="divide-y divide-slate-100"><tr><td colspan="10" class="p-6 text-center text-slate-400">Memuat daftar KPM...</td></tr></tbody>
                         </table>
                     </div>
                 </div>
@@ -3537,7 +3537,7 @@
             rows.forEach((m, idx) => {
                 const kompArray = Array.isArray(m.komponen) ? m.komponen : (m.komponen ? [m.komponen] : []);
                 const compStr = kompArray.map(c => `<span class="inline-block bg-blue-50 text-blue-800 px-1.5 py-0.5 rounded text-[10px] font-semibold mr-1 mb-1">${c}</span>`).join(' ') || '<span class="text-slate-400">-</span>';
-                const komitmenStatus = getPendampingKpmKomitmenStatus(kpm);
+                const komitmenStatus = getPendampingKpmKomitmenStatus(m);
                 const komitmenBadge = komitmenStatus === 'SUDAH' ? '<span class="inline-block bg-emerald-100 text-emerald-800 px-2 py-1 rounded-lg text-[10px] font-bold">Sudah</span>' : komitmenStatus === 'SEBAGIAN' ? '<span class="inline-block bg-amber-100 text-amber-800 px-2 py-1 rounded-lg text-[10px] font-bold">Sebagian</span>' : komitmenStatus === 'BELUM' ? '<span class="inline-block bg-red-100 text-red-700 px-2 py-1 rounded-lg text-[10px] font-bold">Belum</span>' : '<span class="text-slate-400 text-[10px]">Tanpa komponen</span>';
                 const fotoRef = photoViewerRef(m.fotoKpm);
                 const fotoCell = fotoRef
