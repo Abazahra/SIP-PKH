@@ -1996,7 +1996,8 @@
         try { auth = firebase.auth(); } catch (e) { console.warn("Firebase Auth initialization warning:", e); }
         try { 
             db = firebase.firestore(); 
-            // Suppress offline connection timeout logs in console            if (db && typeof db.settings === 'function') {
+            // Suppress offline connection timeout logs in console
+            if (db && typeof db.settings === 'function') {
                 db.settings({ experimentalForceLongPolling: true });
             }
             db.enablePersistence({ synchronizeTabs: true }).catch((err) => {
