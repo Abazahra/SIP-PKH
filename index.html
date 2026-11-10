@@ -541,8 +541,19 @@
                                     </div>
                                 </details>
                             </div>
+                            <div class="relative">
+                                <label class="block text-[10px] font-bold text-slate-500 mb-1">Filter Status Komitmen</label>
+                                <details class="relative">
+                                    <summary id="pFilterStatusKomitmenVerifikasiLabel" class="list-none cursor-pointer min-w-44 p-2 bg-slate-50 border border-slate-300 rounded-xl text-xs font-semibold text-slate-700 flex items-center justify-between gap-3"><span>Semua Status</span><i class="fas fa-chevron-down text-[10px]"></i></summary>
+                                    <div id="pFilterStatusKomitmenVerifikasiOptions" class="absolute z-40 mt-1 left-0 min-w-44 bg-white border border-slate-200 rounded-xl shadow-xl p-3 space-y-2">
+                                        <label class="flex items-center gap-2 text-xs text-slate-700 cursor-pointer"><input type="checkbox" class="pFilterStatusKomitmenVerifikasiCheck" value="SUDAH" onchange="updatePendampingStatusKomitmenFilterLabel(); renderPendampingVerifikasiTable()"> Sudah</label>
+                                        <label class="flex items-center gap-2 text-xs text-slate-700 cursor-pointer"><input type="checkbox" class="pFilterStatusKomitmenVerifikasiCheck" value="SEBAGIAN" onchange="updatePendampingStatusKomitmenFilterLabel(); renderPendampingVerifikasiTable()"> Sebagian</label>
+                                        <label class="flex items-center gap-2 text-xs text-slate-700 cursor-pointer"><input type="checkbox" class="pFilterStatusKomitmenVerifikasiCheck" value="BELUM" onchange="updatePendampingStatusKomitmenFilterLabel(); renderPendampingVerifikasiTable()"> Belum</label>
+                                    </div>
+                                </details>
+                            </div>
                             <div>
-                                <label class="block text-[10px] font-bold text-slate-500 mb-1">Filter Bulan</label>
+                                <label class="block text-[10px] font-bold text-slate-500 mb-1">Periode Bulan</label>
                                 <input type="month" id="pFilterBulanVerifikasi" onchange="renderPendampingVerifikasiTable()" class="p-2 bg-slate-50 border border-slate-300 rounded-xl text-xs font-semibold">
                             </div>
                         </div>
@@ -604,17 +615,6 @@
                                     <label class="flex items-center gap-2 text-xs font-semibold"><input type="checkbox" class="pDaftarKpmBantuanCheck" value="PKH" onchange="renderPendampingDaftarKpm()"> PKH</label>
                                     <label class="flex items-center gap-2 text-xs font-semibold"><input type="checkbox" class="pDaftarKpmBantuanCheck" value="BPNT" onchange="renderPendampingDaftarKpm()"> BPNT</label>
                                     <label class="flex items-center gap-2 text-xs font-semibold"><input type="checkbox" class="pDaftarKpmBantuanCheck" value="PKH_BPNT" onchange="renderPendampingDaftarKpm()"> PKH + BPNT</label>
-                                </div>
-                            </details>
-                        </div>
-                        <div class="relative">
-                            <label class="block text-[10px] font-bold text-slate-500 mb-1">Filter Komitmen Layanan</label>
-                            <details class="relative">
-                                <summary id="pDaftarKpmKomitmenLabel" class="list-none cursor-pointer w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs font-semibold flex items-center justify-between gap-2"><span>Semua Status Komitmen</span><i class="fas fa-chevron-down text-[10px]"></i></summary>
-                                <div id="pDaftarKpmKomitmenOptions" class="absolute z-40 mt-1 left-0 w-full min-w-48 bg-white border border-slate-200 rounded-xl shadow-xl p-3 space-y-2">
-                                    <label class="flex items-center gap-2 text-xs font-semibold"><input type="checkbox" class="pDaftarKpmKomitmenCheck" value="SUDAH" onchange="renderPendampingDaftarKpm()"> Sudah</label>
-                                    <label class="flex items-center gap-2 text-xs font-semibold"><input type="checkbox" class="pDaftarKpmKomitmenCheck" value="SEBAGIAN" onchange="renderPendampingDaftarKpm()"> Sebagian</label>
-                                    <label class="flex items-center gap-2 text-xs font-semibold"><input type="checkbox" class="pDaftarKpmKomitmenCheck" value="BELUM" onchange="renderPendampingDaftarKpm()"> Belum</label>
                                 </div>
                             </details>
                         </div>
@@ -3124,6 +3124,12 @@
             renderPendampingVerifikasiTable();
         }
 
+        function updatePendampingStatusKomitmenFilterLabel() {
+            const selected = Array.from(document.querySelectorAll('.pFilterStatusKomitmenVerifikasiCheck:checked')).map(el => el.value);
+            const label = document.querySelector('#pFilterStatusKomitmenVerifikasiLabel span');
+            if (label) label.textContent = selected.length ? `${selected.length} status dipilih` : 'Semua Status';
+        }
+
         function renderPendampingVerifikasiTable() {
             const tbody = document.getElementById('tbodyPendampingVerifikasi');
             if (!tbody) return;
@@ -3132,6 +3138,7 @@
             const kelompokFilter = getMultiFilterValues('pFilterKelompokVerifikasiCheck');
             const jenisFilter = getMultiFilterValues('pFilterJenisVerifikasiCheck');
             const bantuanFilter = Array.from(document.querySelectorAll('.pBantuanOption:checked')).map(el => el.value);
+            const statusKomitmenFilter = Array.from(document.querySelectorAll('.pFilterStatusKomitmenVerifikasiCheck:checked')).map(el => el.value);
             const bulanFilter = document.getElementById('pFilterBulanVerifikasi').value;
 
             // Kumpulkan semua laporan dari ketua kelompok yang terhubung dengan pendamping ini
@@ -3177,6 +3184,7 @@
                     namaKpm: namaKpm,
                     nik: nik,
                     jenisBantuan: (kpmObj && kpmObj.jenisBantuan) || item.jenisBantuan || 'PKH',
+                    statusKomitmenKpm: kpmObj ? getPendampingKpmKomitmenStatus(kpmObj) : 'BELUM',
                     keterangan: `Layanan: ${item.jenisLayanan || item.komponen || '-'} | Status: ${item.statusKepatuhan || '-'}`,
                     foto: item.foto || '',
                     statusVerifikasi: item.statusVerifikasi || 'PENDING',
@@ -3214,7 +3222,8 @@
                     (bantuan.includes('BPNT') ? 'BPNT' : 'PKH');
                 if (bantuanFilter.length > 0 && !bantuanFilter.includes(kategoriBantuan)) return false;
                 if (nikFilter && !rep.nik.includes(nikFilter)) return false;
-                if (bulanFilter && !rep.date.startsWith(bulanFilter)) return false;
+                if (bulanFilter && !String(rep.date || '').startsWith(bulanFilter)) return false;
+                if (rep.type === 'Komitmen' && statusKomitmenFilter.length && !statusKomitmenFilter.includes(rep.statusKomitmenKpm)) return false;
                 return true;
             });
 
@@ -3471,8 +3480,7 @@
             const configs = [
                 ['.pDaftarKpmKelompokCheck', 'pDaftarKpmKelompokLabel', 'Semua Kelompok', 'Kelompok dipilih'],
                 ['.pDaftarKpmBantuanCheck', 'pDaftarKpmBantuanLabel', 'Semua Jenis Bantuan', 'Jenis bantuan dipilih'],
-                ['.pDaftarKpmKomponenCheck', 'pDaftarKpmKomponenLabel', 'Semua Komponen', 'Komponen dipilih'],
-                ['.pDaftarKpmKomitmenCheck', 'pDaftarKpmKomitmenLabel', 'Semua Status Komitmen', 'status dipilih']
+                ['.pDaftarKpmKomponenCheck', 'pDaftarKpmKomponenLabel', 'Semua Komponen', 'Komponen dipilih']
             ];
             configs.forEach(([selector, labelId, allText, selectedText]) => {
                 const label = document.getElementById(labelId);
@@ -3509,7 +3517,6 @@
             const kelompokFilter = getCheckedValues('.pDaftarKpmKelompokCheck');
             const bantuanFilter = getCheckedValues('.pDaftarKpmBantuanCheck');
             const komponenFilter = getCheckedValues('.pDaftarKpmKomponenCheck');
-            const komitmenFilter = getCheckedValues('.pDaftarKpmKomitmenCheck');
             updateDaftarKpmFilterLabels();
             const allRows = getPendampingDaftarKpmRows();
             const bantuanKey = value => {
@@ -3524,7 +3531,6 @@
                 if (bantuanFilter.length && !bantuanFilter.includes(bantuanKey(kpm.jenisBantuan))) return false;
                 const comps = Array.isArray(kpm.komponen) ? kpm.komponen : (kpm.komponen ? [kpm.komponen] : []);
                 if (komponenFilter.length && !comps.some(c => komponenFilter.includes(String(c || '').trim()))) return false;
-                if (komitmenFilter.length && !komitmenFilter.includes(getPendampingKpmKomitmenStatus(kpm))) return false;
                 return true;
             }).sort((a,b) => String(a.nama || '').localeCompare(String(b.nama || ''), 'id'));
             const count = document.getElementById('pDaftarKpmCount');
@@ -3567,7 +3573,7 @@
 
         function resetPendampingDaftarKpmFilters() {
             ['pDaftarKpmSearchNama', 'pDaftarKpmSearchNik'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
-            document.querySelectorAll('.pDaftarKpmKelompokCheck, .pDaftarKpmBantuanCheck, .pDaftarKpmKomponenCheck, .pDaftarKpmKomitmenCheck').forEach(el => { el.checked = false; });
+            document.querySelectorAll('.pDaftarKpmKelompokCheck, .pDaftarKpmBantuanCheck, .pDaftarKpmKomponenCheck').forEach(el => { el.checked = false; });
             updateDaftarKpmFilterLabels();
             renderPendampingDaftarKpm();
         }
