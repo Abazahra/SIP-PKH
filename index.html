@@ -112,7 +112,7 @@
                 <div>
                     <h1 class="font-bold text-sm md:text-base tracking-wide">SIP-PKH</h1>
                     <p class="text-[10px] text-blue-200">Sistem Informasi Pelaksanaan Program Keluarga Harapan</p>
-                    <span id="appVersionLabel" class="block mt-0.5 text-[9px] md:text-[10px] font-medium tracking-wide text-blue-200/75">v35</span>
+                    <span id="appVersionLabel" class="block mt-0.5 text-[9px] md:text-[10px] font-medium tracking-wide text-blue-200/75">v36</span>
                 </div>
             </div>
             
@@ -435,6 +435,43 @@
                 <div class="bg-white rounded-2xl p-4 border border-emerald-100 shadow-sm"><div class="text-[11px] font-semibold text-slate-500">KPM PKH</div><div id="pendampingStatPkh" class="text-2xl font-extrabold text-emerald-700 mt-1">0</div></div>
                 <div class="bg-white rounded-2xl p-4 border border-blue-100 shadow-sm"><div class="text-[11px] font-semibold text-slate-500">KPM BPNT</div><div id="pendampingStatBpnt" class="text-2xl font-extrabold text-blue-700 mt-1">0</div></div>
                 <div class="bg-white rounded-2xl p-4 border border-violet-100 shadow-sm"><div class="text-[11px] font-semibold text-slate-500">KPM PKH + BPNT</div><div id="pendampingStatPkhBpnt" class="text-2xl font-extrabold text-violet-700 mt-1">0</div></div>
+            </section>
+
+            <!-- REKAP OTOMATIS PELAKSANAAN LAYANAN PENDAMPING -->
+            <section id="pendampingLayananSummary" class="bg-white rounded-2xl p-4 md:p-5 border border-slate-100 shadow-sm space-y-4" aria-label="Rekap pelaksanaan layanan KPM">
+                <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-3">
+                    <div>
+                        <h3 class="font-bold text-slate-800 text-sm">Rekap Pelaksanaan Layanan KPM</h3>
+                        <p class="text-[11px] text-slate-500">Status dihitung otomatis berdasarkan bukti foto yang tersimpan pada KPM binaan.</p>
+                    </div>
+                    <span id="pendampingLayananTotalKpm" class="text-xs font-bold bg-blue-50 text-blue-800 px-3 py-1.5 rounded-lg">0 KPM</span>
+                </div>
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-3">
+                    <div class="rounded-xl border border-emerald-100 bg-emerald-50/40 p-3 space-y-2">
+                        <div class="font-bold text-emerald-900 text-xs">Komitmen Layanan <span class="font-normal text-slate-500">(per komponen)</span></div>
+                        <div class="grid grid-cols-3 gap-2 text-center">
+                            <div class="bg-white rounded-lg p-2"><div id="pKomitmenTerpenuhi" class="text-xl font-extrabold text-emerald-700">0</div><div class="text-[10px] text-slate-500">Terpenuhi</div></div>
+                            <div class="bg-white rounded-lg p-2"><div id="pKomitmenSebagian" class="text-xl font-extrabold text-amber-600">0</div><div class="text-[10px] text-slate-500">Sebagian</div></div>
+                            <div class="bg-white rounded-lg p-2"><div id="pKomitmenBelum" class="text-xl font-extrabold text-red-600">0</div><div class="text-[10px] text-slate-500">Belum</div></div>
+                        </div>
+                        <p id="pKomitmenProgress" class="text-[10px] text-slate-500">0 dari 0 komponen memiliki bukti.</p>
+                    </div>
+                    <div class="rounded-xl border border-blue-100 bg-blue-50/40 p-3 space-y-2">
+                        <div class="font-bold text-blue-900 text-xs">Presensi P2K2 <span class="font-normal text-slate-500">(1 foto per KPM)</span></div>
+                        <div class="grid grid-cols-2 gap-2 text-center">
+                            <div class="bg-white rounded-lg p-2"><div id="pP2k2Terpenuhi" class="text-xl font-extrabold text-emerald-700">0</div><div class="text-[10px] text-slate-500">Terpenuhi</div></div>
+                            <div class="bg-white rounded-lg p-2"><div id="pP2k2Belum" class="text-xl font-extrabold text-red-600">0</div><div class="text-[10px] text-slate-500">Belum</div></div>
+                        </div>
+                    </div>
+                    <div class="rounded-xl border border-violet-100 bg-violet-50/40 p-3 space-y-2">
+                        <div class="font-bold text-violet-900 text-xs">Rekonsiliasi Pencairan <span class="font-normal text-slate-500">(1 foto per KPM)</span></div>
+                        <div class="grid grid-cols-2 gap-2 text-center">
+                            <div class="bg-white rounded-lg p-2"><div id="pRekonTerpenuhi" class="text-xl font-extrabold text-emerald-700">0</div><div class="text-[10px] text-slate-500">Terpenuhi</div></div>
+                            <div class="bg-white rounded-lg p-2"><div id="pRekonBelum" class="text-xl font-extrabold text-red-600">0</div><div class="text-[10px] text-slate-500">Belum</div></div>
+                        </div>
+                    </div>
+                </div>
+                <p class="text-[10px] text-slate-400">Catatan: laporan yang ditolak tidak dihitung sebagai bukti aktif. P2K2 dan Rekonsiliasi dihitung jika terdapat minimal satu foto bukti.</p>
             </section>
 
             <!-- TABS NAVIGATION PENDAMPING -->
@@ -960,8 +997,7 @@
                                 <div id="kpmNonKomponenWrap" class="hidden bg-amber-50 p-3 rounded-xl border border-amber-200 space-y-2">
                                     <label class="flex items-center space-x-2 font-bold text-amber-900">
                                         <input type="checkbox" id="kpmNonKomponen" onchange="pilihNonKomponenKpm()" class="rounded text-amber-700">
-                                        <span>Non-Komponen</span>
-                                    </label>
+                                        <span>Non-Komponen</span>                                    </label>
                                     <p class="text-[10px] text-amber-800">Untuk KPM BPNT yang tidak memiliki komponen PKH.</p>
                                 </div>
                                 <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-2">
@@ -997,6 +1033,7 @@
                         <button type="submit" id="btnSubmitKpm" class="bg-emerald-700 hover:bg-emerald-800 text-white px-6 py-3 rounded-xl font-bold shadow transition cursor-pointer">Simpan Anggota KPM</button>
                     </form>
                 </div>
+
                 <!-- TABEL KPM -->
                 <div class="bg-white rounded-2xl shadow-xl border border-slate-100 p-6 space-y-4">
                     <h3 class="font-bold text-slate-800 text-sm">Daftar Anggota KPM Kelompok Binaan</h3>
@@ -1112,12 +1149,9 @@
                                 </select>
                             </div>
                             <div>
-                                <label class="block font-bold text-slate-700 mb-1">Status Kepatuhan Umum</label>
-                                <select id="komitmenStatus" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl font-semibold">
-                                    <option value="Terpenuhi Rutin">Terpenuhi Rutin</option>
-                                    <option value="Terpenuhi Sebagian">Terpenuhi Sebagian</option>
-                                    <option value="Tidak Terpenuhi / Kendala">Tidak Terpenuhi / Kendala</option>
-                                </select>
+                                <label class="block font-bold text-slate-700 mb-1">Status Kepatuhan Umum (Otomatis)</label>
+                                <input id="komitmenStatus" type="text" value="Belum dinilai" readonly class="w-full p-2.5 bg-slate-100 border border-slate-300 rounded-xl font-bold text-slate-700" aria-live="polite">
+                                <p id="komitmenStatusDetail" class="mt-1 text-[10px] text-slate-500">Status dihitung dari jumlah komponen yang memiliki bukti foto.</p>
                             </div>
                         </div>
                         <div>
@@ -1898,7 +1932,7 @@
         // Setiap rilis berikutnya cukup memperbarui objek ini; label header
         // dan riwayat pada menu Tentang akan mengikuti secara otomatis.
         const SIP_RELEASE_INFO = Object.freeze({
-            appVersion: '35',
+            appVersion: '36',
             appsScriptDeployment: '29',
             photoFilenameFormat: 'Nama_NIK_Kelompok_JenisBukti',
             releaseDate: '9 November 2026',
@@ -1962,8 +1996,7 @@
         try { auth = firebase.auth(); } catch (e) { console.warn("Firebase Auth initialization warning:", e); }
         try { 
             db = firebase.firestore(); 
-            // Suppress offline connection timeout logs in console
-            if (db && typeof db.settings === 'function') {
+            // Suppress offline connection timeout logs in console            if (db && typeof db.settings === 'function') {
                 db.settings({ experimentalForceLongPolling: true });
             }
             db.enablePersistence({ synchronizeTabs: true }).catch((err) => {
@@ -1996,7 +2029,8 @@
                     if (timeout) clearTimeout(timeout);
                     if (!response.ok) throw new Error('Server foto merespons HTTP ' + response.status);
                     const result = await response.json();
-                    if (result && result.ok && result.sessionToken) return result.sessionToken;                    console.warn('Sesi foto belum tersedia:', result && result.error);
+                    if (result && result.ok && result.sessionToken) return result.sessionToken;
+                    console.warn('Sesi foto belum tersedia:', result && result.error);
                 } catch (err) {
                     console.warn('Percobaan sesi foto ' + attempt + ' gagal:', err);
                 }
@@ -2116,6 +2150,7 @@
             if (label) label.textContent = input.files && input.files[0]
                 ? 'Foto dipilih: ' + input.files[0].name
                 : 'Belum ada foto dipilih.';
+            if (input.id && input.id.indexOf('komitmenFoto_') === 0) updateKomitmenAutomaticStatus();
         });
 
         function compressImageAsync(file) {
@@ -2642,6 +2677,7 @@
 
                 populatePendampingFilters();
                 renderPendampingKpmSummary();
+                renderPendampingLayananSummary();
                 renderPendampingDaftarKpm();
                 renderPendampingVerifikasiTable();
                 renderPendampingPpseTable();
@@ -2946,7 +2982,7 @@
                 }
             });
 
-            if (tab === 'verifikasi') renderPendampingVerifikasiTable();
+            if (tab === 'verifikasi') { renderPendampingVerifikasiTable(); renderPendampingLayananSummary(); }
             if (tab === 'daftarKpm') renderPendampingDaftarKpm();
             if (tab === 'ppse') renderPendampingPpseTable();
             if (tab === 'graduasi') renderPendampingGraduasiTable();
@@ -2959,8 +2995,7 @@
             return Array.from(document.querySelectorAll('.' + className + ':checked')).map(el => el.value);
         }
         function updateMultiFilterLabel(summaryId, selected, allLabel, optionLabels) {
-            const summary = document.getElementById(summaryId);
-            if (!summary) return;
+            const summary = document.getElementById(summaryId);            if (!summary) return;
             const span = summary.querySelector('span');
             if (!span) return;
             span.textContent = !selected.length ? allLabel : (selected.length === 1 ? (optionLabels[selected[0]] || selected[0]) : selected.length + ' pilihan dipilih');
@@ -2995,7 +3030,8 @@
             else if (target === 'graduasi') renderPendampingGraduasiTable();
             else if (target === 'manajemen') renderPendampingKelompokManajemen();
             else if (target === 'print') openPrintModal(window.currentPrintType);
-        }        function onJenisVerifikasiFilterChanged() {
+        }
+        function onJenisVerifikasiFilterChanged() {
             updateMultiFilterLabel('pFilterJenisVerifikasiLabel',getMultiFilterValues('pFilterJenisVerifikasiCheck'),'Semua Jenis Laporan',{
                 P2K2:'Presensi P2K2',Komitmen:'Komitmen Layanan',Rekonsiliasi:'Rekonsiliasi Pencairan'
             });
@@ -3242,6 +3278,7 @@
 
             saveState();
             renderPendampingVerifikasiTable();
+            renderPendampingLayananSummary();
             updatePendampingNotifications();
             showToast("Berhasil", newStatus === 'REJECTED' ? "Laporan ditolak dan keterangan dikirim kepada Ketua Kelompok." : "Status verifikasi laporan diperbarui.", "success");
         }
@@ -3257,6 +3294,7 @@
                 }
                 saveState();
                 renderPendampingVerifikasiTable();
+                renderPendampingLayananSummary();
                 updatePendampingNotifications();
                 showToast("Berhasil", "Laporan berhasil dihapus.", "success");
             }
@@ -3816,6 +3854,65 @@
             isi('PkhBpnt', ringkasan.pkhBpnt);
         }
 
+        // Bukti aktif: foto tersimpan dan laporan tidak dalam status ditolak.
+        function sipHasActivePhoto(item) {
+            return !!(item && item.foto && item.statusVerifikasi !== 'REJECTED');
+        }
+
+        function sipGetKpmComponents(kpm) {
+            const raw = kpm && Array.isArray(kpm.komponen) ? kpm.komponen : (kpm && kpm.komponen ? [kpm.komponen] : []);
+            return Array.from(new Set(raw.map(v => String(v || '').trim()).filter(Boolean)));
+        }
+
+        function sipGetLatestKomitmenForComponent(kpmId, component) {
+            const records = (Array.isArray(appState.komitmenList) ? appState.komitmenList : [])
+                .filter(item => String(item.kpmId) === String(kpmId) && String(item.jenisLayanan || item.komponen || '').trim() === String(component).trim());
+            records.sort((a,b) => String(b.updatedAt || b.createdAt || b.date || '').localeCompare(String(a.updatedAt || a.createdAt || a.date || '')));
+            return records[0] || null;
+        }
+
+        function renderPendampingLayananSummary(daftarKpmOverride) {
+            if (!document.getElementById('pendampingLayananSummary')) return;
+            const kelompokBinaan = appState.ketuaUsers
+                .filter(k => k.pendampingId === currentUser.id && k.status === 'VERIFIED')
+                .map(k => String(k.kelompok || '').trim()).filter(Boolean);
+            const daftarKpm = Array.isArray(daftarKpmOverride) ? daftarKpmOverride : (Array.isArray(appState.kpmList) ? appState.kpmList.filter(k => kelompokBinaan.includes(String(k.kelompok || '').trim())) : []);
+            const ids = new Set(daftarKpm.map(k => String(k.id)));
+            const result = {
+                total: daftarKpm.length,
+                komitmen: {terpenuhi:0, sebagian:0, belum:0, tanpaKomponen:0, komponenBukti:0, komponenTotal:0},
+                p2k2: {terpenuhi:0, belum:0},
+                rekon: {terpenuhi:0, belum:0}
+            };
+            daftarKpm.forEach(kpm => {
+                const components = sipGetKpmComponents(kpm);
+                const evidenceCount = components.filter(comp => sipHasActivePhoto(sipGetLatestKomitmenForComponent(kpm.id, comp))).length;
+                result.komitmen.komponenBukti += evidenceCount;
+                result.komitmen.komponenTotal += components.length;
+                if (components.length) {
+                    if (evidenceCount === components.length) result.komitmen.terpenuhi++;
+                    else if (evidenceCount > 0) result.komitmen.sebagian++;
+                    else result.komitmen.belum++;
+                } else {
+                    result.komitmen.tanpaKomponen++;
+                }
+                const hasP2k2 = (appState.p2k2List || []).some(item => ids.has(String(item.kpmId)) && String(item.kpmId) === String(kpm.id) && sipHasActivePhoto(item));
+                if (hasP2k2) result.p2k2.terpenuhi++; else result.p2k2.belum++;
+                const hasRekon = (appState.rekonsiliasiList || []).some(item => String(item.kpmId) === String(kpm.id) && sipHasActivePhoto(item));
+                if (hasRekon) result.rekon.terpenuhi++; else result.rekon.belum++;
+            });
+            const set = (id, value) => { const el = document.getElementById(id); if (el) el.textContent = String(value); };
+            set('pendampingLayananTotalKpm', result.total + ' KPM');
+            set('pKomitmenTerpenuhi', result.komitmen.terpenuhi);
+            set('pKomitmenSebagian', result.komitmen.sebagian);
+            set('pKomitmenBelum', result.komitmen.belum);
+            set('pKomitmenProgress', result.komitmen.komponenBukti + ' dari ' + result.komitmen.komponenTotal + ' komponen memiliki bukti. KPM tanpa komponen: ' + result.komitmen.tanpaKomponen + ' (tidak dinilai).');
+            set('pP2k2Terpenuhi', result.p2k2.terpenuhi);
+            set('pP2k2Belum', result.p2k2.belum);
+            set('pRekonTerpenuhi', result.rekon.terpenuhi);
+            set('pRekonBelum', result.rekon.belum);
+        }
+
         // KPM dari kelompok yang terdaftar di bawah Pendamping aktif.
         function renderPendampingKpmSummary() {
             if (!document.getElementById('pendampingStatTotal')) return;
@@ -3826,6 +3923,7 @@
             const daftar = (Array.isArray(appState.kpmList) ? appState.kpmList : [])
                 .filter(kpm => kelompokBinaan.includes(String(kpm.kelompok || '').trim()));
             isiKartuRingkasanKpm('pendampingStat', daftar);
+            renderPendampingLayananSummary(daftar);
         }
 
         // Seluruh KPM yang tersimpan pada sistem untuk Admin Pusat.
@@ -3896,8 +3994,7 @@
                     const qty = document.getElementById(cb.dataset.qtyId || '');
                     if (qty) qty.disabled = true;
                 });
-            }
-        }
+            }        }
 
         function toggleCompQty(checkbox) {
             if (!checkbox) return;
@@ -3994,7 +4091,8 @@
             const alamat = document.getElementById('kpmAlamat').value.trim();
             const fotoFile = document.getElementById('kpmFoto')?.files?.[0] || null;
 
-            const checkboxes = document.querySelectorAll('input[name="kpmKomponen"]:checked');            let komponen = [];
+            const checkboxes = document.querySelectorAll('input[name="kpmKomponen"]:checked');
+            let komponen = [];
             checkboxes.forEach(cb => {
                 const qtyInput = document.getElementById(cb.dataset.qtyId || '');
                 const qty = qtyInput ? (qtyInput.value || 1) : 1;
@@ -4384,95 +4482,129 @@
             }
         }
 
-        // Komitmen Ketua
+        // Komitmen Ketua: status umum dihitung otomatis dari foto per komponen.
+        function updateKomitmenAutomaticStatus() {
+            const kpmId = document.getElementById('komitmenKpmSelect')?.value;
+            const statusEl = document.getElementById('komitmenStatus');
+            const detailEl = document.getElementById('komitmenStatusDetail');
+            if (!statusEl || !detailEl) return;
+            if (!kpmId) { statusEl.value = 'Belum dinilai'; detailEl.textContent = 'Pilih KPM untuk menghitung status.'; return; }
+            const kpm = appState.kpmList.find(k => String(k.id) === String(kpmId));
+            const components = sipGetKpmComponents(kpm);
+            if (!components.length) { statusEl.value = 'Tidak Terpenuhi'; detailEl.textContent = 'KPM belum memiliki komponen bantuan terdaftar.'; return; }
+            const selected = new Set(Array.from(document.querySelectorAll('#dynamicKomitmenContainer input[type="file"]'))
+                .filter(input => input.files && input.files.length)
+                .map(input => String(input.getAttribute('data-komponen') || '').trim()));
+            let done = 0;
+            components.forEach(comp => {
+                const input = Array.from(document.querySelectorAll('#dynamicKomitmenContainer input[type="file"]'))
+                    .find(el => String(el.getAttribute('data-komponen') || '').trim() === comp);
+                const existing = sipGetLatestKomitmenForComponent(kpmId, comp);
+                if (selected.has(comp) || (!input && sipHasActivePhoto(existing)) || (input && !selected.has(comp) && sipHasActivePhoto(existing))) done++;
+            });
+            const status = done === components.length ? 'Terpenuhi' : (done > 0 ? 'Sebagian' : 'Tidak Terpenuhi');
+            statusEl.value = status;
+            detailEl.textContent = 'Bukti foto: ' + done + ' dari ' + components.length + ' komponen.';
+        }
+
         function updateDynamicKomitmenCheckboxes() {
             const kpmId = document.getElementById('komitmenKpmSelect').value;
             const container = document.getElementById('dynamicKomitmenContainer');
             if (!container) return;
-
             if (!kpmId) {
                 container.innerHTML = `<p class="text-slate-400 italic">Silakan pilih KPM terlebih dahulu.</p>`;
+                updateKomitmenAutomaticStatus();
                 return;
             }
-
-            const kpm = appState.kpmList.find(k => k.id === kpmId);
-            const safeKomponen = kpm ? (Array.isArray(kpm.komponen) ? kpm.komponen : (kpm.komponen ? [kpm.komponen] : [])) : [];
-
+            const kpm = appState.kpmList.find(k => String(k.id) === String(kpmId));
+            const safeKomponen = sipGetKpmComponents(kpm);
             if (!kpm || safeKomponen.length === 0) {
                 container.innerHTML = `<p class="text-amber-600 italic">KPM ini belum memiliki komponen bantuan yang terdaftar. Tambahkan komponen pada menu Anggota KPM.</p>`;
+                updateKomitmenAutomaticStatus();
                 return;
             }
-
-            container.innerHTML = `<p class="text-xs font-bold text-slate-700 mb-2">Unggah Bukti Foto untuk Komponen KPM Ini:</p>`;
+            container.innerHTML = `<p class="text-xs font-bold text-slate-700 mb-2">Unggah Bukti Foto untuk Setiap Komponen KPM:</p>`;
             safeKomponen.forEach((comp, idx) => {
-                const cleanComp = String(comp).replace(/[^a-zA-Z0-9]/g, '_');
+                const existing = sipGetLatestKomitmenForComponent(kpmId, comp);
+                const existingLabel = sipHasActivePhoto(existing) ? 'Bukti foto sudah tersimpan.' : 'Belum ada foto dipilih.';
                 container.innerHTML += `
                     <div class="bg-white p-3 rounded-xl border border-slate-200 space-y-1.5">
                         <label class="block font-bold text-slate-800 text-xs"><i class="fas fa-check-circle text-emerald-600"></i> Komponen: ${comp}</label>
-                        <div class="space-y-2"><input type="file" id="komitmenFoto_${idx}" data-komponen="${comp}" accept="image/*" class="sr-only" aria-label="Pilih foto" style="position:absolute; width:1px; height:1px; opacity:0.01; overflow:hidden;" tabindex="-1"><div class="grid grid-cols-2 gap-2"><button type="button" onclick="openSipPhotoPicker('komitmenFoto_${idx}', 'camera')" class="min-h-[44px] px-3 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold shadow-sm touch-manipulation"><i class="fas fa-camera mr-1"></i> Ambil Foto</button><button type="button" onclick="openSipPhotoPicker('komitmenFoto_${idx}', 'gallery')" class="min-h-[44px] px-3 py-2 rounded-xl bg-blue-700 hover:bg-blue-800 text-white text-xs font-bold shadow-sm touch-manipulation"><i class="fas fa-images mr-1"></i> Pilih dari Galeri</button></div><p id="komitmenFoto_${idx}Name" class="text-[11px] text-slate-500">Belum ada foto dipilih.</p></div>
+                        <div class="space-y-2"><input type="file" id="komitmenFoto_${idx}" data-komponen="${comp}" accept="image/*" class="sr-only" aria-label="Pilih foto" style="position:absolute; width:1px; height:1px; opacity:0.01; overflow:hidden;" tabindex="-1"><div class="grid grid-cols-2 gap-2"><button type="button" onclick="openSipPhotoPicker('komitmenFoto_${idx}', 'camera')" class="min-h-[44px] px-3 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold shadow-sm touch-manipulation"><i class="fas fa-camera mr-1"></i> Ambil Foto</button><button type="button" onclick="openSipPhotoPicker('komitmenFoto_${idx}', 'gallery')" class="min-h-[44px] px-3 py-2 rounded-xl bg-blue-700 hover:bg-blue-800 text-white text-xs font-bold shadow-sm touch-manipulation"><i class="fas fa-images mr-1"></i> Pilih dari Galeri</button></div><p id="komitmenFoto_${idx}Name" class="text-[11px] text-slate-500">${existingLabel}</p></div>
                     </div>
                 `;
             });
+            updateKomitmenAutomaticStatus();
         }
 
         async function handleSaveKomitmen(e) {
             e.preventDefault();
             const editId = document.getElementById('editKomitmenId').value;
             const kpmId = document.getElementById('komitmenKpmSelect').value;
-            const statusKepatuhan = document.getElementById('komitmenStatus').value;
-            const fileInputs = Array.from(document.querySelectorAll('#dynamicKomitmenContainer input[type="file"]'));
             if (!kpmId) { alert("Pilih KPM terlebih dahulu."); return; }
-
+            const kpm = appState.kpmList.find(k => String(k.id) === String(kpmId));
+            const components = sipGetKpmComponents(kpm);
+            if (!components.length) { alert('KPM belum memiliki komponen bantuan.'); return; }
+            const fileInputs = Array.from(document.querySelectorAll('#dynamicKomitmenContainer input[type="file"]'));
+            const selectedFiles = fileInputs.filter(input => input.files && input.files[0]);
+            const existingCount = components.filter(comp => sipHasActivePhoto(sipGetLatestKomitmenForComponent(kpmId, comp))).length;
+            if (!selectedFiles.length && !editId && existingCount < components.length) {
+                alert('Pilih foto bukti untuk minimal satu komponen.'); return;
+            }
             const submit = document.getElementById('btnSubmitKomitmen');
             if (submit) { submit.disabled = true; submit.dataset.oldText = submit.innerText; submit.innerText = 'Mengunggah foto...'; }
             try {
                 const uploads = [];
-                for (let i = 0; i < fileInputs.length; i++) {
-                    const file = fileInputs[i].files && fileInputs[i].files[0];
-                    if (!file) continue;
+                for (let i = 0; i < selectedFiles.length; i++) {
+                    const input = selectedFiles[i];
+                    const file = input.files[0];
                     const compressed = await compressImageAsync(file);
-                    if (!compressed) continue;
+                    if (!compressed) throw new Error('Foto komponen ' + input.getAttribute('data-komponen') + ' gagal diproses.');
                     const meta = await uploadPhotoToDrive(compressed, `komitmen-${Date.now()}-${i}.jpg`, currentUser && currentUser.photoSessionToken);
-                    uploads.push({ komponen: fileInputs[i].getAttribute('data-komponen'), meta });
-                }
-
-                if (editId) {
-                    const item = appState.komitmenList.find(i => i.id === editId);
-                    if (item) {
-                        item.kpmId = kpmId;
-                        item.statusKepatuhan = statusKepatuhan;
-                        if (uploads.length) item.foto = uploads[0].meta;
-                        if (item.statusVerifikasi === 'REJECTED') { item.statusVerifikasi = 'PENDING'; item.catatanPerbaikan = 'Laporan diperbaiki dan dikirim ulang.'; item.catatanPenolakanSebelumnya = item.catatanPenolakan || ''; item.catatanPenolakan = ''; }
-                        item.updatedAt = sipNowIso();
-                    }
-                    saveState();
-                    resetKomitmenForm();
-                    renderKetuaAllTables();
-                    showToast("Berhasil", "Laporan komitmen diperbarui.", "success");
-                    return;
+                    uploads.push({ komponen: input.getAttribute('data-komponen'), meta });
                 }
 
                 const inputTime = sipNowIso();
-                if (fileInputs.length === 0) {
-                    appState.komitmenList.push({ id: "KOM-" + Date.now(), kelompok: currentUser.kelompok, kpmId, jenisLayanan: "Komponen Umum", statusKepatuhan, foto: "", statusVerifikasi: "PENDING", date: new Date().toISOString().split('T')[0], createdAt: inputTime, updatedAt: inputTime });
-                } else {
-                    if (!uploads.length) throw new Error('Pilih minimal satu foto bukti untuk diunggah.');
-                    uploads.forEach((entry, index) => appState.komitmenList.push({
-                        id: "KOM-" + Date.now() + "-" + index,
-                        kelompok: currentUser.kelompok,
-                        kpmId,
-                        jenisLayanan: entry.komponen || "Komponen Umum",
-                        statusKepatuhan,
-                        foto: entry.meta,
-                        statusVerifikasi: "PENDING",
-                        date: new Date().toISOString().split('T')[0],
-                        createdAt: inputTime, updatedAt: inputTime
-                    }));
+                // Satu dokumen laporan per komponen. Foto yang tidak diganti tetap dipertahankan.
+                uploads.forEach(entry => {
+                    let item = appState.komitmenList.find(row => String(row.kpmId) === String(kpmId) && String(row.jenisLayanan || row.komponen || '').trim() === String(entry.komponen).trim());
+                    if (!item && editId) {
+                        const editing = appState.komitmenList.find(row => String(row.id) === String(editId));
+                        if (editing && String(editing.kpmId) === String(kpmId) && String(editing.jenisLayanan || editing.komponen || '').trim() === String(entry.komponen).trim()) item = editing;
+                    }
+                    if (item) {
+                        item.foto = entry.meta;
+                        item.statusKepatuhan = 'Otomatis';
+                        if (item.statusVerifikasi === 'REJECTED') { item.statusVerifikasi = 'PENDING'; item.catatanPerbaikan = 'Laporan diperbaiki dan dikirim ulang.'; item.catatanPenolakanSebelumnya = item.catatanPenolakan || ''; item.catatanPenolakan = ''; }
+                        item.updatedAt = inputTime;
+                    } else {
+                        appState.komitmenList.push({ id: 'KOM-' + Date.now() + '-' + Math.random().toString(36).slice(2,7), kelompok: currentUser.kelompok, kpmId, jenisLayanan: entry.komponen || 'Komponen Umum', statusKepatuhan: 'Otomatis', foto: entry.meta, statusVerifikasi: 'PENDING', date: new Date().toISOString().split('T')[0], createdAt: inputTime, updatedAt: inputTime });
+                    }
+                });
+
+                // Saat edit tanpa foto baru, jangan menghapus bukti yang sudah tersimpan.
+                if (editId && !uploads.length) {
+                    const item = appState.komitmenList.find(row => String(row.id) === String(editId));
+                    if (item) {
+                        item.kpmId = kpmId;
+                        item.statusKepatuhan = 'Otomatis';
+                        if (item.statusVerifikasi === 'REJECTED') { item.statusVerifikasi = 'PENDING'; item.catatanPerbaikan = 'Laporan diperbaiki dan dikirim ulang.'; item.catatanPenolakanSebelumnya = item.catatanPenolakan || ''; item.catatanPenolakan = ''; }
+                        item.updatedAt = inputTime;
+                    }
                 }
-                saveState();
+                // Simpan status otomatis pada semua catatan komponen KPM ini.
+                const done = components.filter(comp => {
+                    const uploadedNow = uploads.some(entry => String(entry.komponen).trim() === comp);
+                    return uploadedNow || sipHasActivePhoto(sipGetLatestKomitmenForComponent(kpmId, comp));
+                }).length;
+                const automaticStatus = done === components.length ? 'Terpenuhi' : (done > 0 ? 'Sebagian' : 'Tidak Terpenuhi');
+                appState.komitmenList.filter(row => String(row.kpmId) === String(kpmId)).forEach(row => { row.statusKepatuhan = automaticStatus; });
+                const synced = await saveState();
+                if (!synced) throw new Error('Data tersimpan di perangkat, tetapi belum tersinkron ke server. Periksa koneksi lalu coba simpan kembali.');
                 resetKomitmenForm();
                 renderKetuaAllTables();
-                showToast("Berhasil", "Laporan komitmen tersimpan; foto bukti masuk Google Drive.", "success");
+                renderPendampingLayananSummary();
+                showToast("Berhasil", "Laporan komitmen tersimpan. Status kepatuhan dihitung otomatis berdasarkan bukti tiap komponen.", "success");
             } catch (err) {
                 console.error('Simpan komitmen:', err);
                 alert('Laporan belum disimpan: ' + (err.message || err));
@@ -4488,6 +4620,7 @@
             document.getElementById('btnSubmitKomitmen').innerText = "Kirim Laporan Komitmen";
             document.getElementById('btnCancelKomitmenEdit').classList.add('hidden');
             document.getElementById('dynamicKomitmenContainer').innerHTML = `<p class="text-slate-400 italic">Silakan pilih KPM terlebih dahulu untuk memunculkan pilihan komitmen.</p>`;
+            updateKomitmenAutomaticStatus();
         }
 
         function cancelKomitmenEdit() {
@@ -4501,6 +4634,7 @@
             document.getElementById('komitmenKpmSelect').value = item.kpmId;
             document.getElementById('komitmenStatus').value = item.statusKepatuhan;
             updateDynamicKomitmenCheckboxes();
+            updateKomitmenAutomaticStatus();
 
             document.getElementById('formKomitmenTitle').innerText = "Edit Laporan Komitmen Layanan";
             document.getElementById('btnSubmitKomitmen').innerText = "Perbarui Laporan Komitmen";
@@ -4859,8 +4993,7 @@
             }
         }
 
-        async function commitGraduasiListMutation(mutator) {
-            if (!db) throw new Error('Koneksi database belum tersedia. Graduasi tidak dapat disimpan ke server.');
+        async function commitGraduasiListMutation(mutator) {            if (!db) throw new Error('Koneksi database belum tersedia. Graduasi tidak dapat disimpan ke server.');
             const ref = db.collection("pkh_database").doc("main_state");
             const resultList = await db.runTransaction(async tx => {
                 const snap = await tx.get(ref);
@@ -4993,7 +5126,8 @@
             document.getElementById('editGraduasiId').value = item.id;
             document.getElementById('graduasiKpmSelect').value = item.kpmId;
             document.getElementById('graduasiNik').value = item.nik;
-            document.getElementById('graduasiKohor').value = item.kohor;            document.getElementById('graduasiAlasan').value = item.alasan;
+            document.getElementById('graduasiKohor').value = item.kohor;
+            document.getElementById('graduasiAlasan').value = item.alasan;
 
             document.getElementById('formGraduasiTitle').innerText = "Edit Usulan Graduasi Mandiri KPM";
             document.getElementById('btnSubmitGraduasi').innerText = "Perbarui Usulan Graduasi";
@@ -5858,8 +5992,7 @@
 
         function sendWhatsAppAdminPusat() {
             const nama = document.getElementById('lupaNama').value.trim();
-            const hp = document.getElementById('lupaHp').value.trim();
-            const nip = document.getElementById('lupaNip').value.trim();
+            const hp = document.getElementById('lupaHp').value.trim();            const nip = document.getElementById('lupaNip').value.trim();
             const pendamping = document.getElementById('lupaPendamping').value.trim();
             const pesan = document.getElementById('lupaPesan').value.trim();
             const jenis = document.getElementById('lupaJenisBantuan')?.value || '';
@@ -5992,7 +6125,8 @@
         }
 
         function getPendampingNotifReadSet() {
-            try {                const raw = JSON.parse(localStorage.getItem(getPendampingNotifReadStorageKey()) || '[]');
+            try {
+                const raw = JSON.parse(localStorage.getItem(getPendampingNotifReadStorageKey()) || '[]');
                 return new Set(Array.isArray(raw) ? raw : []);
             } catch (e) {
                 return new Set();
