@@ -882,6 +882,21 @@
                 </div>
             </div>
 
+            <!-- NOTIFIKASI PENOLAKAN VERIFIKASI UNTUK KETUA KELOMPOK -->
+            <section id="ketuaNotificationPanel" class="hidden bg-red-50 border border-red-200 rounded-2xl p-4 shadow-sm" aria-label="Notifikasi dari Pendamping">
+                <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+                    <div class="flex items-center gap-2">
+                        <span class="bg-red-100 text-red-700 w-9 h-9 rounded-xl flex items-center justify-center"><i class="fas fa-bell"></i></span>
+                        <div>
+                            <h3 class="font-extrabold text-red-900 text-sm">Pesan dari Pendamping</h3>
+                            <p class="text-[11px] text-red-700">Keterangan laporan yang perlu diperbaiki</p>
+                        </div>
+                    </div>
+                    <span id="ketuaNotifBadge" class="bg-red-600 text-white text-xs font-extrabold px-3 py-1 rounded-full">0 belum dibaca</span>
+                </div>
+                <div id="ketuaNotifList" class="space-y-2"></div>
+            </section>
+
             <!-- RINGKASAN JUMLAH KPM KETUA KELOMPOK - VERSI 15.1 -->
             <section id="ketuaKpmSummary" class="grid grid-cols-2 lg:grid-cols-4 gap-3" aria-label="Ringkasan jumlah KPM kelompok">
                 <div class="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm">
@@ -1932,10 +1947,10 @@
         // Setiap rilis berikutnya cukup memperbarui objek ini; label header
         // dan riwayat pada menu Tentang akan mengikuti secara otomatis.
         const SIP_RELEASE_INFO = Object.freeze({
-            appVersion: '36',
+            appVersion: '37',
             appsScriptDeployment: '29',
             photoFilenameFormat: 'Nama_NIK_Kelompok_JenisBukti',
-            releaseDate: '9 November 2026',
+            releaseDate: '10 November 2026',
             releaseTitle: 'Input foto KPM melalui kamera/galeri dan kolom foto pada daftar anggota',
             changes: [
                 'Ketua Kelompok dapat mengunggah foto KPM melalui kamera atau galeri; foto tersimpan di Google Drive dan tampil pada daftar anggota.',
@@ -1943,7 +1958,8 @@
                 'Tautan bantuan pada footer dan menu Tentang diarahkan ke formulir kategori bantuan yang sama.',
                 'Pencarian terpadu Admin Pusat untuk KPM, Ketua Kelompok, dan Pendamping.',
                 'Alur penerbitan PIN sementara oleh Admin Pusat setelah verifikasi identitas.',
-                'Pemilihan foto menggunakan pemilih file bawaan browser agar pengguna dapat memilih sumber foto yang tersedia di perangkat.'
+                'Pemilihan foto menggunakan pemilih file bawaan browser agar pengguna dapat memilih sumber foto yang tersedia di perangkat.',
+                'Notifikasi dashboard Ketua Kelompok untuk pesan penolakan verifikasi laporan dari Pendamping, dengan penanda sudah dibaca.'
                 , 'Pendamping wajib memberi keterangan saat menolak laporan; Ketua dapat melihat alasan, memperbaiki, dan mengirim ulang laporan P2K2, Komitmen, dan Rekonsiliasi.',
                 'Tombol Ambil Foto dan Pilih dari Galeri dipisahkan agar lebih mudah digunakan pada berbagai browser HP.',
             ]
@@ -2728,6 +2744,7 @@
 
                 renderKetuaAllTables();
                 populateKetuaKpmSelects();
+                updateKetuaNotifications();
             }
         }
 
@@ -3270,10 +3287,12 @@
             if (newStatus === 'REJECTED') {
                 item.catatanPenolakan = alasan;
                 item.tanggalPenolakan = sipNowIso();
+                item.ketuaNotifReadAt = '';
             } else if (newStatus === 'VERIFIED') {
                 item.catatanPenolakan = '';
                 item.tanggalPenolakan = '';
                 item.catatanPerbaikan = '';
+                item.ketuaNotifReadAt = '';
             }
             item.updatedAt = sipNowIso();
 
@@ -3952,6 +3971,78 @@
             renderKetuaRekonsiliasiTable();
             renderKetuaPpseTable();
             renderKetuaGraduasiTable();
+        }
+
+        // Notifikasi lintas-perangkat: status dibaca disimpan pada dokumen laporan di Firestore.
+        function updateKetuaNotifications() {
+            const panel = document.getElementById('ketuaNotificationPanel');
+            const badge = document.getElementById('ketuaNotifBadge');
+            const listEl = document.getElementById('ketuaNotifList');
+            if (!panel || !badge || !listEl || !currentUser || currentUser.role !== 'ketua') return;
+
+            const groups = [
+                { type: 'P2K2', label: 'Presensi P2K2', rows: appState.p2k2List || [] },
+                { type: 'Komitmen', label: 'Komitmen Layanan', rows: appState.komitmenList || [] },
+                { type: 'Rekonsiliasi', label: 'Rekonsiliasi Pencairan', rows: appState.rekonsiliasiList || [] }
+            ];
+            const unread = [];
+            groups.forEach(group => group.rows.forEach(item => {
+                if (String(item.kelompok || '').trim() !== String(currentUser.kelompok || '').trim()) return;
+                if (item.statusVerifikasi !== 'REJECTED' || !String(item.catatanPenolakan || '').trim()) return;
+                if (item.ketuaNotifReadAt) return;
+                const kpm = (appState.kpmList || []).find(k => String(k.id) === String(item.kpmId));
+                unread.push({
+                    type: group.type,
+                    label: group.label,
+                    id: item.id,
+                    namaKpm: kpm ? kpm.nama : (item.namaKpm || 'KPM'),
+                    catatan: String(item.catatanPenolakan || ''),
+                    date: item.tanggalPenolakan || item.updatedAt || item.date || '-'
+                });
+            }));
+
+            badge.textContent = unread.length + ' belum dibaca';
+            panel.classList.toggle('hidden', unread.length === 0);
+            listEl.replaceChildren();
+            unread.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'bg-white border border-red-200 rounded-xl p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3';
+                const detail = document.createElement('div');
+                detail.className = 'min-w-0';
+                const title = document.createElement('div');
+                title.className = 'text-xs font-extrabold text-slate-900';
+                title.textContent = item.label + ' — ' + item.namaKpm;
+                const note = document.createElement('p');
+                note.className = 'text-xs text-red-800 mt-1 whitespace-pre-wrap';
+                note.textContent = 'Catatan Pendamping: ' + item.catatan;
+                const date = document.createElement('p');
+                date.className = 'text-[10px] text-slate-500 mt-1';
+                date.textContent = 'Tanggal: ' + item.date;
+                detail.append(title, note, date);
+                const button = document.createElement('button');
+                button.type = 'button';
+                button.className = 'shrink-0 bg-red-700 hover:bg-red-800 text-white px-3 py-2 rounded-lg text-[11px] font-bold';
+                button.textContent = 'Baca & Buka Laporan';
+                button.addEventListener('click', () => openKetuaRejectionNotification(item.type, item.id));
+                card.append(detail, button);
+                listEl.appendChild(card);
+            });
+        }
+
+        function openKetuaRejectionNotification(type, id) {
+            const sourceMap = {
+                P2K2: appState.p2k2List,
+                Komitmen: appState.komitmenList,
+                Rekonsiliasi: appState.rekonsiliasiList
+            };
+            const item = (sourceMap[type] || []).find(row => String(row.id) === String(id));
+            if (!item || String(item.kelompok || '').trim() !== String(currentUser && currentUser.kelompok || '').trim()) return;
+            item.ketuaNotifReadAt = sipNowIso();
+            saveState();
+            updateKetuaNotifications();
+            const tabMap = { P2K2: 'p2k2', Komitmen: 'komitmen', Rekonsiliasi: 'rekonsiliasi' };
+            switchKetuaTab(tabMap[type] || 'kpm');
+            showToast('Pesan dibuka', 'Keterangan Pendamping dapat dilihat pada riwayat laporan yang ditolak.', 'info');
         }
 
         function populateKetuaKpmSelects() {
