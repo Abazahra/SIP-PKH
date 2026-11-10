@@ -580,7 +580,7 @@
                         </div>
                         <span id="pDaftarKpmCount" class="bg-blue-50 text-blue-800 px-3 py-1.5 rounded-lg text-xs font-bold">0 KPM</span>
                     </div>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3">
                         <div>
                             <label for="pDaftarKpmSearchNama" class="block text-[10px] font-bold text-slate-500 mb-1">Cari Nama KPM</label>
                             <input id="pDaftarKpmSearchNama" type="search" oninput="renderPendampingDaftarKpm()" placeholder="Ketik nama KPM..." class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs">
@@ -608,6 +608,17 @@
                             </details>
                         </div>
                         <div class="relative">
+                            <label class="block text-[10px] font-bold text-slate-500 mb-1">Filter Komitmen Layanan</label>
+                            <details class="relative">
+                                <summary id="pDaftarKpmKomitmenLabel" class="list-none cursor-pointer w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs font-semibold flex items-center justify-between gap-2"><span>Semua Status Komitmen</span><i class="fas fa-chevron-down text-[10px]"></i></summary>
+                                <div id="pDaftarKpmKomitmenOptions" class="absolute z-40 mt-1 left-0 w-full min-w-48 bg-white border border-slate-200 rounded-xl shadow-xl p-3 space-y-2">
+                                    <label class="flex items-center gap-2 text-xs font-semibold"><input type="checkbox" class="pDaftarKpmKomitmenCheck" value="SUDAH" onchange="renderPendampingDaftarKpm()"> Sudah</label>
+                                    <label class="flex items-center gap-2 text-xs font-semibold"><input type="checkbox" class="pDaftarKpmKomitmenCheck" value="SEBAGIAN" onchange="renderPendampingDaftarKpm()"> Sebagian</label>
+                                    <label class="flex items-center gap-2 text-xs font-semibold"><input type="checkbox" class="pDaftarKpmKomitmenCheck" value="BELUM" onchange="renderPendampingDaftarKpm()"> Belum</label>
+                                </div>
+                            </details>
+                        </div>
+                        <div class="relative">
                             <label class="block text-[10px] font-bold text-slate-500 mb-1">Filter Jenis Komponen</label>
                             <details class="relative">
                                 <summary id="pDaftarKpmKomponenLabel" class="list-none cursor-pointer w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs font-semibold flex items-center justify-between gap-2"><span>Semua Komponen</span><i class="fas fa-chevron-down text-[10px]"></i></summary>
@@ -621,7 +632,7 @@
                     <div class="overflow-x-auto">
                         <table class="w-full text-left border-collapse text-xs">
                             <thead><tr class="bg-slate-100 text-slate-700 font-bold border-b border-slate-200">
-                                <th class="p-3 w-12 text-center">No</th><th class="p-3 w-24 text-center">Foto</th><th class="p-3">Nama KPM</th><th class="p-3">NIK</th><th class="p-3">Kelompok</th><th class="p-3">Kohor</th><th class="p-3">Jenis Bantuan</th><th class="p-3">Komponen</th><th class="p-3">Alamat</th>
+                                <th class="p-3 w-12 text-center">No</th><th class="p-3 w-24 text-center">Foto</th><th class="p-3">Nama KPM</th><th class="p-3">NIK</th><th class="p-3">Kelompok</th><th class="p-3">Kohor</th><th class="p-3">Jenis Bantuan</th><th class="p-3">Komponen</th><th class="p-3">Komitmen Layanan</th><th class="p-3">Alamat</th>
                             </tr></thead>
                             <tbody id="tbodyPendampingDaftarKpm" class="divide-y divide-slate-100"><tr><td colspan="9" class="p-6 text-center text-slate-400">Memuat daftar KPM...</td></tr></tbody>
                         </table>
@@ -1947,7 +1958,7 @@
         // Setiap rilis berikutnya cukup memperbarui objek ini; label header
         // dan riwayat pada menu Tentang akan mengikuti secara otomatis.
         const SIP_RELEASE_INFO = Object.freeze({
-            appVersion: '37',
+            appVersion: '38',
             appsScriptDeployment: '29',
             photoFilenameFormat: 'Nama_NIK_Kelompok_JenisBukti',
             releaseDate: '10 November 2026',
@@ -3460,7 +3471,8 @@
             const configs = [
                 ['.pDaftarKpmKelompokCheck', 'pDaftarKpmKelompokLabel', 'Semua Kelompok', 'Kelompok dipilih'],
                 ['.pDaftarKpmBantuanCheck', 'pDaftarKpmBantuanLabel', 'Semua Jenis Bantuan', 'Jenis bantuan dipilih'],
-                ['.pDaftarKpmKomponenCheck', 'pDaftarKpmKomponenLabel', 'Semua Komponen', 'Komponen dipilih']
+                ['.pDaftarKpmKomponenCheck', 'pDaftarKpmKomponenLabel', 'Semua Komponen', 'Komponen dipilih'],
+                ['.pDaftarKpmKomitmenCheck', 'pDaftarKpmKomitmenLabel', 'Semua Status Komitmen', 'status dipilih']
             ];
             configs.forEach(([selector, labelId, allText, selectedText]) => {
                 const label = document.getElementById(labelId);
@@ -3480,6 +3492,15 @@
                 .filter(kpm => kelompokBinaan.has(String(kpm.kelompok || '').trim()));
         }
 
+        function getPendampingKpmKomitmenStatus(kpm) {
+            const components = sipGetKpmComponents(kpm);
+            if (!components.length) return 'TANPA_KOMPONEN';
+            const evidenceCount = components.filter(comp => sipHasActivePhoto(sipGetLatestKomitmenForComponent(kpm.id, comp))).length;
+            if (evidenceCount === components.length) return 'SUDAH';
+            if (evidenceCount > 0) return 'SEBAGIAN';
+            return 'BELUM';
+        }
+
         function renderPendampingDaftarKpm() {
             const tbody = document.getElementById('tbodyPendampingDaftarKpm');
             if (!tbody || !currentUser || currentUser.role !== 'pendamping') return;
@@ -3488,6 +3509,7 @@
             const kelompokFilter = getCheckedValues('.pDaftarKpmKelompokCheck');
             const bantuanFilter = getCheckedValues('.pDaftarKpmBantuanCheck');
             const komponenFilter = getCheckedValues('.pDaftarKpmKomponenCheck');
+            const komitmenFilter = getCheckedValues('.pDaftarKpmKomitmenCheck');
             updateDaftarKpmFilterLabels();
             const allRows = getPendampingDaftarKpmRows();
             const bantuanKey = value => {
@@ -3502,18 +3524,21 @@
                 if (bantuanFilter.length && !bantuanFilter.includes(bantuanKey(kpm.jenisBantuan))) return false;
                 const comps = Array.isArray(kpm.komponen) ? kpm.komponen : (kpm.komponen ? [kpm.komponen] : []);
                 if (komponenFilter.length && !comps.some(c => komponenFilter.includes(String(c || '').trim()))) return false;
+                if (komitmenFilter.length && !komitmenFilter.includes(getPendampingKpmKomitmenStatus(kpm))) return false;
                 return true;
             }).sort((a,b) => String(a.nama || '').localeCompare(String(b.nama || ''), 'id'));
             const count = document.getElementById('pDaftarKpmCount');
             if (count) count.textContent = `${rows.length} dari ${allRows.length} KPM`;
             tbody.innerHTML = '';
             if (!rows.length) {
-                tbody.innerHTML = '<tr><td colspan="9" class="p-6 text-center text-slate-400">Tidak ada KPM yang sesuai dengan filter.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="10" class="p-6 text-center text-slate-400">Tidak ada KPM yang sesuai dengan filter.</td></tr>';
                 return;
             }
             rows.forEach((m, idx) => {
                 const kompArray = Array.isArray(m.komponen) ? m.komponen : (m.komponen ? [m.komponen] : []);
                 const compStr = kompArray.map(c => `<span class="inline-block bg-blue-50 text-blue-800 px-1.5 py-0.5 rounded text-[10px] font-semibold mr-1 mb-1">${c}</span>`).join(' ') || '<span class="text-slate-400">-</span>';
+                const komitmenStatus = getPendampingKpmKomitmenStatus(kpm);
+                const komitmenBadge = komitmenStatus === 'SUDAH' ? '<span class="inline-block bg-emerald-100 text-emerald-800 px-2 py-1 rounded-lg text-[10px] font-bold">Sudah</span>' : komitmenStatus === 'SEBAGIAN' ? '<span class="inline-block bg-amber-100 text-amber-800 px-2 py-1 rounded-lg text-[10px] font-bold">Sebagian</span>' : komitmenStatus === 'BELUM' ? '<span class="inline-block bg-red-100 text-red-700 px-2 py-1 rounded-lg text-[10px] font-bold">Belum</span>' : '<span class="text-slate-400 text-[10px]">Tanpa komponen</span>';
                 const fotoRef = photoViewerRef(m.fotoKpm);
                 const fotoCell = fotoRef
                     ? `<button type="button" onclick="openImageViewer('${fotoRef}'${photoDownloadArgs(m.nama, m.nik, 'FOTO-KPM', m.id)})" class="inline-flex items-center justify-center rounded-lg border border-slate-200 p-1 hover:bg-slate-50" title="Lihat foto KPM"><img src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" data-pendamping-kpm-photo="${m.id}" alt="Foto ${m.nama}" class="w-12 h-12 object-cover rounded-md bg-slate-100"><span class="sr-only">Lihat foto</span></button>`
@@ -3522,7 +3547,7 @@
                     <td class="p-3 text-center font-bold">${idx + 1}</td><td class="p-3 text-center">${fotoCell}</td>
                     <td class="p-3 font-bold">${m.nama || '-'}</td><td class="p-3 font-mono">${m.nik || '-'}</td>
                     <td class="p-3 font-semibold text-blue-900">${m.kelompok || '-'}</td><td class="p-3 font-mono text-center">${m.kohor || '-'}</td>
-                    <td class="p-3">${m.jenisBantuan || 'PKH'}</td><td class="p-3">${compStr}</td><td class="p-3 text-slate-600">${m.alamat || '-'}</td>
+                    <td class="p-3">${m.jenisBantuan || 'PKH'}</td><td class="p-3">${compStr}</td><td class="p-3">${komitmenBadge}</td><td class="p-3 text-slate-600">${m.alamat || '-'}</td>
                 </tr>`;
             });
             rows.forEach(async m => {
@@ -3542,7 +3567,7 @@
 
         function resetPendampingDaftarKpmFilters() {
             ['pDaftarKpmSearchNama', 'pDaftarKpmSearchNik'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
-            document.querySelectorAll('.pDaftarKpmKelompokCheck, .pDaftarKpmBantuanCheck, .pDaftarKpmKomponenCheck').forEach(el => { el.checked = false; });
+            document.querySelectorAll('.pDaftarKpmKelompokCheck, .pDaftarKpmBantuanCheck, .pDaftarKpmKomponenCheck, .pDaftarKpmKomitmenCheck').forEach(el => { el.checked = false; });
             updateDaftarKpmFilterLabels();
             renderPendampingDaftarKpm();
         }
