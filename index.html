@@ -541,8 +541,19 @@
                                     </div>
                                 </details>
                             </div>
+                            <div class="relative">
+                                <label class="block text-[10px] font-bold text-slate-500 mb-1">Filter Status Komitmen</label>
+                                <details class="relative">
+                                    <summary id="pFilterStatusKomitmenVerifikasiLabel" class="list-none cursor-pointer min-w-44 p-2 bg-slate-50 border border-slate-300 rounded-xl text-xs font-semibold text-slate-700 flex items-center justify-between gap-3"><span>Semua Status</span><i class="fas fa-chevron-down text-[10px]"></i></summary>
+                                    <div id="pFilterStatusKomitmenVerifikasiOptions" class="absolute z-40 mt-1 left-0 min-w-44 bg-white border border-slate-200 rounded-xl shadow-xl p-3 space-y-2">
+                                        <label class="flex items-center gap-2 text-xs text-slate-700 cursor-pointer"><input type="checkbox" class="pFilterStatusKomitmenVerifikasiCheck" value="SUDAH" onchange="updatePendampingStatusKomitmenFilterLabel(); renderPendampingVerifikasiTable()"> Sudah</label>
+                                        <label class="flex items-center gap-2 text-xs text-slate-700 cursor-pointer"><input type="checkbox" class="pFilterStatusKomitmenVerifikasiCheck" value="SEBAGIAN" onchange="updatePendampingStatusKomitmenFilterLabel(); renderPendampingVerifikasiTable()"> Sebagian</label>
+                                        <label class="flex items-center gap-2 text-xs text-slate-700 cursor-pointer"><input type="checkbox" class="pFilterStatusKomitmenVerifikasiCheck" value="BELUM" onchange="updatePendampingStatusKomitmenFilterLabel(); renderPendampingVerifikasiTable()"> Belum</label>
+                                    </div>
+                                </details>
+                            </div>
                             <div>
-                                <label class="block text-[10px] font-bold text-slate-500 mb-1">Filter Bulan</label>
+                                <label class="block text-[10px] font-bold text-slate-500 mb-1">Periode Bulan</label>
                                 <input type="month" id="pFilterBulanVerifikasi" onchange="renderPendampingVerifikasiTable()" class="p-2 bg-slate-50 border border-slate-300 rounded-xl text-xs font-semibold">
                             </div>
                         </div>
@@ -580,7 +591,7 @@
                         </div>
                         <span id="pDaftarKpmCount" class="bg-blue-50 text-blue-800 px-3 py-1.5 rounded-lg text-xs font-bold">0 KPM</span>
                     </div>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3">
                         <div>
                             <label for="pDaftarKpmSearchNama" class="block text-[10px] font-bold text-slate-500 mb-1">Cari Nama KPM</label>
                             <input id="pDaftarKpmSearchNama" type="search" oninput="renderPendampingDaftarKpm()" placeholder="Ketik nama KPM..." class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs">
@@ -621,9 +632,9 @@
                     <div class="overflow-x-auto">
                         <table class="w-full text-left border-collapse text-xs">
                             <thead><tr class="bg-slate-100 text-slate-700 font-bold border-b border-slate-200">
-                                <th class="p-3 w-12 text-center">No</th><th class="p-3 w-24 text-center">Foto</th><th class="p-3">Nama KPM</th><th class="p-3">NIK</th><th class="p-3">Kelompok</th><th class="p-3">Kohor</th><th class="p-3">Jenis Bantuan</th><th class="p-3">Komponen</th><th class="p-3">Alamat</th>
+                                <th class="p-3 w-12 text-center">No</th><th class="p-3 w-24 text-center">Foto</th><th class="p-3">Nama KPM</th><th class="p-3">NIK</th><th class="p-3">Kelompok</th><th class="p-3">Kohor</th><th class="p-3">Jenis Bantuan</th><th class="p-3">Komponen</th><th class="p-3">Komitmen Layanan</th><th class="p-3">Alamat</th>
                             </tr></thead>
-                            <tbody id="tbodyPendampingDaftarKpm" class="divide-y divide-slate-100"><tr><td colspan="9" class="p-6 text-center text-slate-400">Memuat daftar KPM...</td></tr></tbody>
+                            <tbody id="tbodyPendampingDaftarKpm" class="divide-y divide-slate-100"><tr><td colspan="10" class="p-6 text-center text-slate-400">Memuat daftar KPM...</td></tr></tbody>
                         </table>
                     </div>
                 </div>
@@ -1947,7 +1958,7 @@
         // Setiap rilis berikutnya cukup memperbarui objek ini; label header
         // dan riwayat pada menu Tentang akan mengikuti secara otomatis.
         const SIP_RELEASE_INFO = Object.freeze({
-            appVersion: '37',
+            appVersion: '38',
             appsScriptDeployment: '29',
             photoFilenameFormat: 'Nama_NIK_Kelompok_JenisBukti',
             releaseDate: '10 November 2026',
@@ -3113,6 +3124,12 @@
             renderPendampingVerifikasiTable();
         }
 
+        function updatePendampingStatusKomitmenFilterLabel() {
+            const selected = Array.from(document.querySelectorAll('.pFilterStatusKomitmenVerifikasiCheck:checked')).map(el => el.value);
+            const label = document.querySelector('#pFilterStatusKomitmenVerifikasiLabel span');
+            if (label) label.textContent = selected.length ? `${selected.length} status dipilih` : 'Semua Status';
+        }
+
         function renderPendampingVerifikasiTable() {
             const tbody = document.getElementById('tbodyPendampingVerifikasi');
             if (!tbody) return;
@@ -3121,6 +3138,7 @@
             const kelompokFilter = getMultiFilterValues('pFilterKelompokVerifikasiCheck');
             const jenisFilter = getMultiFilterValues('pFilterJenisVerifikasiCheck');
             const bantuanFilter = Array.from(document.querySelectorAll('.pBantuanOption:checked')).map(el => el.value);
+            const statusKomitmenFilter = Array.from(document.querySelectorAll('.pFilterStatusKomitmenVerifikasiCheck:checked')).map(el => el.value);
             const bulanFilter = document.getElementById('pFilterBulanVerifikasi').value;
 
             // Kumpulkan semua laporan dari ketua kelompok yang terhubung dengan pendamping ini
@@ -3166,6 +3184,7 @@
                     namaKpm: namaKpm,
                     nik: nik,
                     jenisBantuan: (kpmObj && kpmObj.jenisBantuan) || item.jenisBantuan || 'PKH',
+                    statusKomitmenKpm: kpmObj ? getPendampingKpmKomitmenStatus(kpmObj) : 'BELUM',
                     keterangan: `Layanan: ${item.jenisLayanan || item.komponen || '-'} | Status: ${item.statusKepatuhan || '-'}`,
                     foto: item.foto || '',
                     statusVerifikasi: item.statusVerifikasi || 'PENDING',
@@ -3203,7 +3222,8 @@
                     (bantuan.includes('BPNT') ? 'BPNT' : 'PKH');
                 if (bantuanFilter.length > 0 && !bantuanFilter.includes(kategoriBantuan)) return false;
                 if (nikFilter && !rep.nik.includes(nikFilter)) return false;
-                if (bulanFilter && !rep.date.startsWith(bulanFilter)) return false;
+                if (bulanFilter && !String(rep.date || '').startsWith(bulanFilter)) return false;
+                if (rep.type === 'Komitmen' && statusKomitmenFilter.length && !statusKomitmenFilter.includes(rep.statusKomitmenKpm)) return false;
                 return true;
             });
 
@@ -3480,6 +3500,15 @@
                 .filter(kpm => kelompokBinaan.has(String(kpm.kelompok || '').trim()));
         }
 
+        function getPendampingKpmKomitmenStatus(kpm) {
+            const components = sipGetKpmComponents(kpm);
+            if (!components.length) return 'TANPA_KOMPONEN';
+            const evidenceCount = components.filter(comp => sipHasActivePhoto(sipGetLatestKomitmenForComponent(kpm.id, comp))).length;
+            if (evidenceCount === components.length) return 'SUDAH';
+            if (evidenceCount > 0) return 'SEBAGIAN';
+            return 'BELUM';
+        }
+
         function renderPendampingDaftarKpm() {
             const tbody = document.getElementById('tbodyPendampingDaftarKpm');
             if (!tbody || !currentUser || currentUser.role !== 'pendamping') return;
@@ -3508,12 +3537,14 @@
             if (count) count.textContent = `${rows.length} dari ${allRows.length} KPM`;
             tbody.innerHTML = '';
             if (!rows.length) {
-                tbody.innerHTML = '<tr><td colspan="9" class="p-6 text-center text-slate-400">Tidak ada KPM yang sesuai dengan filter.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="10" class="p-6 text-center text-slate-400">Tidak ada KPM yang sesuai dengan filter.</td></tr>';
                 return;
             }
             rows.forEach((m, idx) => {
                 const kompArray = Array.isArray(m.komponen) ? m.komponen : (m.komponen ? [m.komponen] : []);
                 const compStr = kompArray.map(c => `<span class="inline-block bg-blue-50 text-blue-800 px-1.5 py-0.5 rounded text-[10px] font-semibold mr-1 mb-1">${c}</span>`).join(' ') || '<span class="text-slate-400">-</span>';
+                const komitmenStatus = getPendampingKpmKomitmenStatus(m);
+                const komitmenBadge = komitmenStatus === 'SUDAH' ? '<span class="inline-block bg-emerald-100 text-emerald-800 px-2 py-1 rounded-lg text-[10px] font-bold">Sudah</span>' : komitmenStatus === 'SEBAGIAN' ? '<span class="inline-block bg-amber-100 text-amber-800 px-2 py-1 rounded-lg text-[10px] font-bold">Sebagian</span>' : komitmenStatus === 'BELUM' ? '<span class="inline-block bg-red-100 text-red-700 px-2 py-1 rounded-lg text-[10px] font-bold">Belum</span>' : '<span class="text-slate-400 text-[10px]">Tanpa komponen</span>';
                 const fotoRef = photoViewerRef(m.fotoKpm);
                 const fotoCell = fotoRef
                     ? `<button type="button" onclick="openImageViewer('${fotoRef}'${photoDownloadArgs(m.nama, m.nik, 'FOTO-KPM', m.id)})" class="inline-flex items-center justify-center rounded-lg border border-slate-200 p-1 hover:bg-slate-50" title="Lihat foto KPM"><img src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" data-pendamping-kpm-photo="${m.id}" alt="Foto ${m.nama}" class="w-12 h-12 object-cover rounded-md bg-slate-100"><span class="sr-only">Lihat foto</span></button>`
@@ -3522,7 +3553,7 @@
                     <td class="p-3 text-center font-bold">${idx + 1}</td><td class="p-3 text-center">${fotoCell}</td>
                     <td class="p-3 font-bold">${m.nama || '-'}</td><td class="p-3 font-mono">${m.nik || '-'}</td>
                     <td class="p-3 font-semibold text-blue-900">${m.kelompok || '-'}</td><td class="p-3 font-mono text-center">${m.kohor || '-'}</td>
-                    <td class="p-3">${m.jenisBantuan || 'PKH'}</td><td class="p-3">${compStr}</td><td class="p-3 text-slate-600">${m.alamat || '-'}</td>
+                    <td class="p-3">${m.jenisBantuan || 'PKH'}</td><td class="p-3">${compStr}</td><td class="p-3">${komitmenBadge}</td><td class="p-3 text-slate-600">${m.alamat || '-'}</td>
                 </tr>`;
             });
             rows.forEach(async m => {
